@@ -31,12 +31,13 @@ float zCirclePos(float x, float radius) {
 
 void Start() {
     model = LoadModel("tinker.obj"); 
+    // model = LoadModel("tinker.obj"); 
     texture = LoadTexture("Untitled1485_20230104061358.png"); 
 }
 
 void Update(float deltaTime) {
     Vector2 currentMousePos = GetMousePosition();
-    if (IsMouseButtonDown(0)) {
+    // if (IsMouseButtonDown(0)) {
         // std::cout << "neew" << std::endl;
         // if (previousMousePosition.x != currentMousePos.x) {
         //     // camera.target = (Vector3){ 0.0f, 100.0f, 0.0f };      // Camera looking at point
@@ -94,15 +95,28 @@ void Update(float deltaTime) {
 
         //     std::cout << cameraPos.y << " " << zMultiplier2*zCirclePos(y, 100) << " " << zMultiplier2 << " " << turnDirection2 << std::endl;
         // }
-    }
+    // }
     
     float x, y, z;
 
     if (IsMouseButtonDown(0)) {
         p += ((currentMousePos.x-previousMousePosition.x)) * deltaTime;
         l += ((currentMousePos.y-previousMousePosition.y))* deltaTime;
-        
+    } 
+
+    if (IsKeyDown(KEY_RIGHT)) {
+        p += deltaTime;
     }
+    if (IsKeyDown(KEY_LEFT)) {
+        p -= deltaTime;
+    }
+    if (IsKeyDown(KEY_UP)) {
+        l += deltaTime;
+    }
+    if (IsKeyDown(KEY_DOWN)) {
+        l -= deltaTime;
+    }
+
     if (GetMouseWheelMove() > 0) {
         radius += 100 * deltaTime;
     } else if (GetMouseWheelMove() < 0) {
