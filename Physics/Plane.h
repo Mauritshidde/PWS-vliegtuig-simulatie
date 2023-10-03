@@ -10,6 +10,7 @@ public:
       float anglePitch, angleYaw, angleRoll;
       float mass;
       
+      
       Plane();
       ~Plane();
 };
