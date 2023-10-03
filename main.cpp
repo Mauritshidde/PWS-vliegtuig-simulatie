@@ -20,7 +20,7 @@ float p = 0;
 float l = 0;
 float radius = 120;
 
-float zCirclePos(float x, float radius)
+float zCirclePosCam(float x, float radius)
 {
     float z;
 
@@ -40,7 +40,11 @@ void Update(float deltaTime)
 {
     Vector2 currentMousePos = GetMousePosition();
     float x, y, z;
-
+    Vector3 xAxis = {x : 1, y : 0, z : 0}; // direction and scale of x axis
+    Vector3 yAxis = {x : 0, y : 1, z : 0}; // direction and scale of y axis
+    Vector3 zAxis = {x : 0, y : 0, z : 1}; // direction and scale of z axis
+    Vector3 origin = {x : 0, y : 0, z : 0}; // position of origin.
+    Vector3 pos;
     if (IsMouseButtonDown(0))
     {
         p += ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
@@ -72,14 +76,18 @@ void Update(float deltaTime)
     {
         radius -= 100 * deltaTime;
     }
-
-    x = radius * sin(p) * cos(l);
-    y = radius * sin(p) * sin(l);
-    z = radius * cos(p);
+    Vector3 point = {x : 5, y : 6, z : 4};
+    pos.x = point.x * xAxis.x + point.y * yAxis.x + point.z * zAxis.x + origin.x;
+    pos.y = point.x * xAxis.y + point.y * yAxis.y + point.z * zAxis.y + origin.y;
+    pos.z = point.x * xAxis.z + point.y * yAxis.z + point.z * zAxis.z + origin.z;
+    // x = radius * sin(p) * cos(l);
+    // y = radius * sin(p) * sin(l);
+    // z = radius * cos(p);
+    Vector3 polar = {x, y, z};
     std::cout << GetMouseWheelMove() << std::endl;
-    camera.position.x = x;
-    camera.position.y = y;
-    camera.position.z = z;
+    camera.position.x = pos.x;
+    camera.position.y = pos.y;
+    camera.position.z = pos.z;
 
     previousMousePosition = currentMousePos;
 }
