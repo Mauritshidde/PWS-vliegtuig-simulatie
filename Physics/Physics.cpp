@@ -11,6 +11,7 @@ private:
 public:
     // add function to use 3d force vectors
     // force vector additions
+    forceVector translateForce(float force, Vector3 rotation); // create a vector3 force in the direction of rotation, don't know how yet
     forceVector addForces(std::vector<forceVector> inputVector);
     forceVector createForceVector(std::vector<Vector3> force, std::vector<Vector3> location);
     float distanceBetweenPoints(Vector3 point1, Vector3 point2);
@@ -64,7 +65,7 @@ float Physics::calcTorque(std::vector<forceVector> forces, Vector3 centerOfMass)
     }
     else if (torqueSum.x < 0)
     {
-        // go right if positive and go left if negatife didn't find formula yet
+        // go right if positive and go left if negative didn't find formula yet
     }
 }
 

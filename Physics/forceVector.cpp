@@ -15,7 +15,6 @@ forceVector::forceVector(Vector3 setForce, Vector3 setLocation)
 {
       force = setForce;
       location = setLocation;
-
 }
 
 forceVector::~forceVector()
