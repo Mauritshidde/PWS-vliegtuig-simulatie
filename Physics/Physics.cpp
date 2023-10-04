@@ -1,6 +1,6 @@
 #pragma once
 #include <raylib.h>
-#include "forceVector.cpp"
+#include "physicsVector.cpp"
 #include <vector>
 #include <math.h>
 
@@ -11,18 +11,18 @@ private:
 public:
     // add function to use 3d force vectors
     // force vector additions
-    forceVector translateForce(float force, Vector3 rotation); // create a vector3 force in the direction of rotation, don't know how yet
-    forceVector addForces(std::vector<forceVector> inputVector);
-    forceVector createForceVector(std::vector<Vector3> force, std::vector<Vector3> location);
+    physicsVector translateForce(float force, Vector3 rotation); // create a vector3 force in the direction of rotation, don't know how yet
+    physicsVector addForces(std::vector<physicsVector> inputVector);
+    // physicsVector createPhysicsVector(std::vector<Vector3> force, std::vector<Vector3> location);
     float distanceBetweenPoints(Vector3 point1, Vector3 point2);
-    float calcTorque(std::vector<forceVector> forces, Vector3 centerOfMass);
+    float calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass);
     Physics(/* args */);
     ~Physics();
 };
 
-forceVector addForces(std::vector<forceVector> inputVector)
+physicsVector addForces(std::vector<physicsVector> inputVector)
 {
-    forceVector sumVector = forceVector({0, 0, 0}, {0, 0, 0});
+    physicsVector sumVector = physicsVector({0, 0, 0}, {0, 0, 0});
     for (int i = 0; i < inputVector.size(); i++)
     {
         sumVector.force.x += inputVector.at(i).force.x;
@@ -32,21 +32,17 @@ forceVector addForces(std::vector<forceVector> inputVector)
     return sumVector;
 }
 
-forceVector Physics::createForceVector(std::vector<Vector3> force, std::vector<Vector3> location)
-{
-}
-
 float Physics::distanceBetweenPoints(Vector3 point1, Vector3 point2)
 {
     float xComponent = pow(point1.x - point2.x, 2);
     float yComponent = pow(point1.y - point2.y, 2);
     float zComponent = pow(point1.z - point2.z, 2);
-    float lenght = sqrt(xComponent + yComponent + zComponent);
+    float length = sqrt(xComponent + yComponent + zComponent);
 
-    return lenght;
+    return length;
 }
 
-float Physics::calcTorque(std::vector<forceVector> forces, Vector3 centerOfMass) // calcTorque for the x-axis
+float Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass) // calcTorque for the x-axis
 {
     Vector3 torqueSum = {0, 0, 0};
     for (int i = 0; i < forces.size(); i++)
@@ -55,7 +51,7 @@ float Physics::calcTorque(std::vector<forceVector> forces, Vector3 centerOfMass)
         torqueSum.x += forces.at(i).force.x * distance;
         torqueSum.y += forces.at(i).force.y * distance;
         torqueSum.z += forces.at(i).force.z * distance;
-        // calc distance/lenght between forces.at(i) and centerOfMass if forces.at(i) on the left of centerOfMass its negative
+        // calc distance/length between forces.at(i) and centerOfMass if forces.at(i) on the left of centerOfMass its negative
         // add this value to torqueSum
     }
 
