@@ -1,6 +1,6 @@
 #pragma once
 #include <raylib.h>
-#include "physicsVector.cpp"
+#include "physicsvector.cpp"
 #include <vector>
 #include <math.h>
 
@@ -25,9 +25,9 @@ physicsVector addForces(std::vector<physicsVector> inputVector)
     physicsVector sumVector = physicsVector({0, 0, 0}, {0, 0, 0});
     for (int i = 0; i < inputVector.size(); i++)
     {
-        sumVector.force.x += inputVector.at(i).force.x;
-        sumVector.force.y += inputVector.at(i).force.y;
-        sumVector.force.z += inputVector.at(i).force.z;
+        sumVector.components.x += inputVector.at(i).components.x;
+        sumVector.components.y += inputVector.at(i).components.y;
+        sumVector.components.z += inputVector.at(i).components.z;
     }
     return sumVector;
 }
@@ -48,9 +48,9 @@ float Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMas
     for (int i = 0; i < forces.size(); i++)
     {
         float distance = distanceBetweenPoints(forces.at(i).location, centerOfMass);
-        torqueSum.x += forces.at(i).force.x * distance;
-        torqueSum.y += forces.at(i).force.y * distance;
-        torqueSum.z += forces.at(i).force.z * distance;
+        torqueSum.x += forces.at(i).components.x * distance;
+        torqueSum.y += forces.at(i).components.y * distance;
+        torqueSum.z += forces.at(i).components.z * distance;
         // calc distance/length between forces.at(i) and centerOfMass if forces.at(i) on the left of centerOfMass its negative
         // add this value to torqueSum
     }

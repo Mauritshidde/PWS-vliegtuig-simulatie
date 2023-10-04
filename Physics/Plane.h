@@ -1,5 +1,6 @@
 #include <raylib.h>
-
+#include <vector>
+#include "physicsvector.cpp"
 class Plane
 {
 private:
@@ -11,7 +12,7 @@ public:
       Vector3 calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth);
 
       Vector3 pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
-      float speed;
+      Vector3 speed;
       float anglePitch, angleYaw, angleRoll;
       float mass;
 };
@@ -19,7 +20,7 @@ public:
 Plane::Plane(float givenMass, Vector3 startingPos)
 {
       mass = givenMass;
-      speed = 0;
+      speed = {0,0,0};
       anglePitch = 0;
       angleYaw = 0;
       angleRoll = 0;
