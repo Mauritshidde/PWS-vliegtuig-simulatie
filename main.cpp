@@ -11,13 +11,7 @@ Vector2 cameraYZPos;
 Vector3 cameraPos = {0.0f, 0.0f, -120.0f};
 Vector2 cameraXYPos = {cameraPos.x, cameraPos.y};
 Camera camera = {0};
-float rotation = PI / 4; 
 
-
-int turnDirection = 1;
-int turnDirection2 = 1;
-int zMultiplier = 1;
-int zMultiplier2 = 1;
 float p = 0;
 float l = 0;
 float radius = 120;
@@ -42,11 +36,7 @@ void Update(float deltaTime)
 {
     Vector2 currentMousePos = GetMousePosition();
     float x, y, z;
-    // Vector3 xAxis = {x : 1, y : 0, z : 0}; // direction and scale of x axis
-    // Vector3 yAxis = {x : 0, y : 1, z : 0}; // direction and scale of y axis
-    // Vector3 zAxis = {x : 0, y : 0, z : 1}; // direction and scale of z axis
-    // Vector3 origin = {x : 0, y : 0, z : 0}; // position of origin.
-    // Vector3 pos;
+
     if (IsMouseButtonDown(0))
     {
         p += ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
@@ -55,11 +45,11 @@ void Update(float deltaTime)
 
     if (IsKeyDown(KEY_RIGHT))
     {
-        rotation += deltaTime;
+        p += deltaTime;
     }
     if (IsKeyDown(KEY_LEFT))
     {
-        rotation -= deltaTime;
+        p -= deltaTime;
     }
     if (IsKeyDown(KEY_UP))
     {
@@ -78,67 +68,16 @@ void Update(float deltaTime)
     {
         radius -= 100 * deltaTime;
     }
-    // Vector3 point = {x : 5, y : 6, z : 4};
-    // pos.x = point.x * xAxis.x + point.y * yAxis.x + point.z * zAxis.x + origin.x;
-    // pos.y = point.x * xAxis.y + point.y * yAxis.y + point.z * zAxis.y + origin.y;
-    // pos.z = point.x * xAxis.z + point.y * yAxis.z + point.z * zAxis.z + origin.z;
-    // // x = radius * sin(p) * cos(l);
-    // // y = radius * sin(p) * sin(l);
-    // // z = radius * cos(p);
-    // Vector3 polar = {x, y, z};
-    // std::cout << GetMouseWheelMove() << std::endl;
+
+    x = radius * sin(p) * cos(l);
+    y = radius * sin(p) * sin(l);
+    z = radius * cos(p);
+
+    std::cout << GetMouseWheelMove() << std::endl;
     
-    // Vector3 xAxisA = {cos(ang) ,sin(ang),0};  // 1 unit long
-    // Vector3 yAxisA = {-sin(ang),cos(ang),0};  // 1 unit long
-    // Vector3 zAxisA = {0        ,0       ,1};  // 1 unit long
-    // Vector3 xAxisB = {cos(ang) ,0 , sin(ang)};  // 1 unit long
-    // Vector3 yAxisB = {0,        1 , 0 };       // 1 unit long
-    // Vector3 zAxisB = {sin(ang),0, cos(ang)};   // 1 unit long
-    
-    // Vector3 xAxisAB, yAxisAB, zAxisAB;
-    // xAxisAB.x = xAxisA.x * xAxisB.x + xAxisA.y * yAxisB.x + xAxisA.z * zAxisB.x;
-    // xAxisAB.y = xAxisA.x * xAxisB.y + xAxisA.y * yAxisB.y + xAxisA.z * zAxisB.y;
-    // xAxisAB.z = xAxisA.x * xAxisB.z + xAxisA.y * yAxisB.z + xAxisA.z * zAxisB.z;
-    // yAxisAB.x = yAxisA.x * xAxisB.x + yAxisA.y * yAxisB.x + yAxisA.z * zAxisB.x;
-    // yAxisAB.y = yAxisA.x * xAxisB.y + yAxisA.y * yAxisB.y + yAxisA.z * zAxisB.y;
-    // yAxisAB.z = yAxisA.x * xAxisB.z + yAxisA.y * yAxisB.z + yAxisA.z * zAxisB.z;
-    // zAxisAB.x = zAxisA.x * xAxisB.x + zAxisA.y * yAxisB.x + zAxisA.z * zAxisB.x;
-    // zAxisAB.y = zAxisA.x * xAxisB.y + zAxisA.y * yAxisB.y + zAxisA.z * zAxisB.y;
-    // zAxisAB.z = zAxisA.x * xAxisB.z + zAxisA.y * yAxisB.z + zAxisA.z * zAxisB.z;
-    
-    // Vector3 xAxisC = {1,        0 , 0 };        // 1 unit long
-    // Vector3 yAxisC = {0, cos(ang) , sin(ang)};  // 1 unit long
-    // Vector3 zAxisC = {0, -sin(ang), cos(ang)};  // 1 unit long
-
-    // std::vector<double> rotationX = {1, 0, 0, 0, cos(ang), sin(ang), 0, -sin(ang), cos(ang)};
-
-    
-    
-    Vector3 xAxis =  { x : 1, y : 0, z : 0 };
-    Vector3 yAxis =  { x : 0, y : 1, z : 0};
-    Vector3 zAxis =  { x : 0, y : 0, z : 0 };
-    Vector3 point =  { x : 10, y : 10 , z: 10};
-    Vector3 pos;
-    Vector3 origin = { x : 5 , y : 4, z : 5 };
-
-
-    xAxis.x = cos(rotation);
-    xAxis.y = sin(rotation);
-
-    yAxis.x = cos(rotation + (PI / 2));
-    yAxis.y = sin(rotation + (PI / 2));
-
-    pos.x = point.x * xAxis.x;
-    pos.y = point.x * xAxis.y;
-    pos.z = point.x * xAxis.z;
-
-    pos.x = point.x * xAxis.x + point.y * yAxis.x + point.z * zAxis.x + origin.x;
-    pos.y = point.x * xAxis.y + point.y * yAxis.y + point.z * zAxis.y + origin.y;
-    pos.z = point.x * xAxis.z + point.y * yAxis.z + point.z * zAxis.z + origin.z;
-    
-    camera.position.x = pos.x;
-    camera.position.y = pos.y;
-    camera.position.z = 60;
+    camera.position.x = x;
+    camera.position.y = y;
+    camera.position.z = z;
 
     previousMousePosition = currentMousePos;
 }
