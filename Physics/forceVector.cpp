@@ -7,14 +7,14 @@ private:
 public:
       Vector3 force;
       Vector3 location;
-      forceVector(/* args */);
+      forceVector(Vector3 setForce, Vector3 setLocation);
       ~forceVector();
 };
 
-forceVector::forceVector(/* args */)
+forceVector::forceVector(Vector3 setForce, Vector3 setLocation)
 {
-      force = {0.0f, 0.0f ,0.0f};
-      location = {0.0f, 0.0f ,0.0f};
+      force = setForce;
+      location = setLocation;
 
 }
 

@@ -1,7 +1,7 @@
 #include <raylib.h>
 
-
-class Plane {
+class Plane
+{
 private:
       /* data */
 public:
@@ -9,14 +9,15 @@ public:
       ~Plane();
       Vector3 calcLift();
       Vector3 calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth);
-      
+
       Vector3 pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
       float speed;
       float anglePitch, angleYaw, angleRoll;
       float mass;
 };
 
-Plane::Plane(float givenMass, Vector3 startingPos) {
+Plane::Plane(float givenMass, Vector3 startingPos)
+{
       mass = givenMass;
       speed = 0;
       anglePitch = 0;
@@ -26,14 +27,16 @@ Plane::Plane(float givenMass, Vector3 startingPos) {
       // centerOfLiftWingR = calcCenterOfLiftWing();
 }
 
-Plane::~Plane() {
-
+Plane::~Plane()
+{
 }
 
-Vector3 Plane::calcLift() {
+Vector3 Plane::calcLift()
+{
       // TODO lift formula
 }
 
-Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth) {
+Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth)
+{
       // TODO lift formula
 }

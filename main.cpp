@@ -28,7 +28,6 @@ float zCirclePosCam(float x, float radius)
 void Start()
 {
     model = LoadModel("tinker.obj");
-    // model = LoadModel("tinker.obj");
     texture = LoadTexture("Untitled1485_20230104061358.png");
 }
 
@@ -97,7 +96,8 @@ void Render()
     EndDrawing();
 }
 
-int main() {
+int main() 
+{
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
     InitWindow(screenWidth, screenHeight, "airplane simulation");

@@ -21,7 +21,7 @@ public:
 
 forceVector addForces(std::vector<forceVector> inputVector)
 {
-    forceVector sumVector = forceVector();
+    forceVector sumVector = forceVector({0, 0, 0}, {0, 0, 0});
     for (int i = 0; i < inputVector.size(); i++)
     {
         sumVector.force.x += inputVector.at(i).force.x;
@@ -47,20 +47,22 @@ float Physics::distanceBetweenPoints(Vector3 point1, Vector3 point2)
 
 float Physics::calcTorque(std::vector<forceVector> forces, Vector3 centerOfMass) // calcTorque for the x-axis
 {
-    float torqueSum = 0;
+    Vector3 torqueSum = {0, 0, 0};
     for (int i = 0; i < forces.size(); i++)
     {
         float distance = distanceBetweenPoints(forces.at(i).location, centerOfMass);
-        torqueSum += distance;
+        torqueSum.x += forces.at(i).force.x * distance;
+        torqueSum.y += forces.at(i).force.y * distance;
+        torqueSum.z += forces.at(i).force.z * distance;
         // calc distance/lenght between forces.at(i) and centerOfMass if forces.at(i) on the left of centerOfMass its negative
         // add this value to torqueSum
     }
 
-    if (torqueSum > 0)
+    if (torqueSum.x > 0)
     {
         // keep goin straight forward/ without rotation
     }
-    else if (torqueSum < 0)
+    else if (torqueSum.x < 0)
     {
         // go right if positive and go left if negatife didn't find formula yet
     }
