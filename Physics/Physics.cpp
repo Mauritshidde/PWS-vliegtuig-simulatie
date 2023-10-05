@@ -14,6 +14,7 @@ public:
     physicsVector translateForce(float force, Vector3 rotation); // create a vector3 force in the direction of rotation, don't know how yet
     physicsVector addForces(std::vector<physicsVector> inputVector);
     // physicsVector createPhysicsVector(std::vector<Vector3> force, std::vector<Vector3> location);
+    Vector3 crossProduct(Vector3 vec1, Vector3 vec2);
     float distanceBetweenPoints(Vector3 point1, Vector3 point2);
     float calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass);
     Physics(/* args */);
@@ -32,6 +33,17 @@ physicsVector addForces(std::vector<physicsVector> inputVector)
     return sumVector;
 }
 
+Vector3 Physics::crossProduct(Vector3 vec1, Vector3 vec2)
+{
+    Vector3 result;
+
+    result.x = vec1.y * vec2.z - vec1.z * vec2.y;
+    result.y = vec1.z * vec2.x - vec1.x * vec2.z;
+    result.z = vec1.x * vec2.y - vec1.y * vec2.x;
+
+    return result;
+}
+
 float Physics::distanceBetweenPoints(Vector3 point1, Vector3 point2)
 {
     float xComponent = pow(point1.x - point2.x, 2);
@@ -48,6 +60,7 @@ float Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMas
     for (int i = 0; i < forces.size(); i++)
     {
         float distance = distanceBetweenPoints(forces.at(i).location, centerOfMass);
+        // Vector3 distance = centerOfMass - forces.at(i).location
         torqueSum.x += forces.at(i).components.x * distance;
         torqueSum.y += forces.at(i).components.y * distance;
         torqueSum.z += forces.at(i).components.z * distance;
