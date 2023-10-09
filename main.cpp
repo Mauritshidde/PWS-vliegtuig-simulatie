@@ -7,9 +7,12 @@ class RunSimulation
 {
 private:
     Model airplane;
+    Model skybox;
+
     Vector2 previousMousePosition;
 
     Texture2D airplaneTexture;
+    Texture2D skyboxTexture;
     Vector2 cameraYZPos;
     Vector3 cameraPos;
     Vector2 cameraXYPos;
@@ -50,6 +53,8 @@ void RunSimulation::Start()
 {
     airplane = LoadModel("tinker.obj");
     airplaneTexture = LoadTexture("Untitled1485_20230104061358.png");
+    airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
+
     cameraPos = {0.0f, 0.0f, -120.0f};
     cameraXYPos = {cameraPos.x, cameraPos.y};
     mainCamera = {0};
@@ -59,6 +64,10 @@ void RunSimulation::Start()
     mainCamera.up = (Vector3){0.0f, 10.0f, 0.0f};     // Camera up vector (rotation towards target)
     mainCamera.fovy = 30.0f;                          // Camera field-of-view Y
     mainCamera.projection = CAMERA_PERSPECTIVE;
+
+    skybox = LoadModel("skybox.obj");
+    skyboxTexture = LoadTexture("skyboxtexture.png");
+    skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
 }
 
 void RunSimulation::Update(float deltaTime)
@@ -116,6 +125,7 @@ void RunSimulation::Render()
     ClearBackground(BLACK);
 
         BeginMode3D(mainCamera);
+            DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, WHITE);
             DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, WHITE);
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
             DrawGrid(10, 10.0f);
