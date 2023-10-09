@@ -3,18 +3,39 @@
 #include <vector>
 #include <cmath>
 
-// globally used variables like the airplane model
-Vector2 previousMousePosition;
-Model model;
-Texture2D texture;
-Vector2 cameraYZPos;
-Vector3 cameraPos = {0.0f, 0.0f, -120.0f};
-Vector2 cameraXYPos = {cameraPos.x, cameraPos.y};
-Camera camera = {0};
+class RunSimulation
+{
+private:
+    Model airplane;
+    Vector2 previousMousePosition;
 
-float p = 0;
-float l = 0;
-float radius = 120;
+    Texture2D airplaneTexture;
+    Vector2 cameraYZPos;
+    Vector3 cameraPos;
+    Vector2 cameraXYPos;
+    Camera mainCamera;
+
+    float angleYAxis = 0;
+    float angleXZAxis = 0;
+    float cameraCircleRadius = 120;
+public:
+    RunSimulation(/* args */);
+    ~RunSimulation();
+    void Start();
+    void Update(float deltaTime);
+    void Render();
+    void run();
+};
+
+RunSimulation::RunSimulation(/* args */)
+{
+}
+
+RunSimulation::~RunSimulation()
+{
+}
+
+
 
 float zCirclePosCam(float x, float radius)
 {
@@ -25,70 +46,77 @@ float zCirclePosCam(float x, float radius)
     return z;
 }
 
-void Start()
+void RunSimulation::Start()
 {
-    model = LoadModel("tinker.obj");
-    texture = LoadTexture("Untitled1485_20230104061358.png");
+    airplane = LoadModel("tinker.obj");
+    airplaneTexture = LoadTexture("Untitled1485_20230104061358.png");
+    cameraPos = {0.0f, 0.0f, -120.0f};
+    cameraXYPos = {cameraPos.x, cameraPos.y};
+    mainCamera = {0};
+
+    mainCamera.position = cameraPos;                  // Camera position perspective
+    mainCamera.target = (Vector3){0.0f, 20.0f, 0.0f}; // Camera looking at point
+    mainCamera.up = (Vector3){0.0f, 10.0f, 0.0f};     // Camera up vector (rotation towards target)
+    mainCamera.fovy = 30.0f;                          // Camera field-of-view Y
+    mainCamera.projection = CAMERA_PERSPECTIVE;
 }
 
-void Update(float deltaTime)
+void RunSimulation::Update(float deltaTime)
 {
     Vector2 currentMousePos = GetMousePosition();
-    float x, y, z;
 
     if (IsMouseButtonDown(0))
     {
-        p += ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
-        l += ((currentMousePos.y - previousMousePosition.y)) * deltaTime;
+        angleYAxis += ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
+        angleXZAxis += ((currentMousePos.y - previousMousePosition.y)) * deltaTime;
     }
 
     if (IsKeyDown(KEY_RIGHT))
     {
-        p += deltaTime;
+        angleYAxis += deltaTime;
     }
     if (IsKeyDown(KEY_LEFT))
     {
-        p -= deltaTime;
+        angleYAxis -= deltaTime;
     }
     if (IsKeyDown(KEY_UP))
     {
-        l += deltaTime;
+        angleXZAxis += deltaTime;
     }
     if (IsKeyDown(KEY_DOWN))
     {
-        l -= deltaTime;
+        angleXZAxis -= deltaTime;
     }
 
     if (GetMouseWheelMove() > 0)
     {
-        radius += 100 * deltaTime;
+        cameraCircleRadius += 100 * deltaTime;
     }
     else if (GetMouseWheelMove() < 0)
     {
-        radius -= 100 * deltaTime;
+        cameraCircleRadius -= 100 * deltaTime;
     }
 
-    x = radius * sin(p) * cos(l);
-    y = radius * sin(p) * sin(l);
-    z = radius * cos(p);
-
-    std::cout << GetMouseWheelMove() << std::endl;
+    float x, y, z;
+    x = cameraCircleRadius * sin(angleYAxis) * cos(angleXZAxis);
+    y = cameraCircleRadius * sin(angleYAxis) * sin(angleXZAxis);
+    z = cameraCircleRadius * cos(angleYAxis);
     
-    camera.position.x = x;
-    camera.position.y = y;
-    camera.position.z = z;
+    mainCamera.position.x = x;
+    mainCamera.position.y = y;
+    mainCamera.position.z = z;
 
     previousMousePosition = currentMousePos;
 }
 
-void Render()
+void RunSimulation::Render()
 {
     // render model
     BeginDrawing();
     ClearBackground(BLACK);
 
-        BeginMode3D(camera);
-            DrawModelEx(model, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, WHITE);
+        BeginMode3D(mainCamera);
+            DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, WHITE);
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
             DrawGrid(10, 10.0f);
         EndMode3D();
@@ -96,17 +124,11 @@ void Render()
     EndDrawing();
 }
 
-int main() 
+void RunSimulation::run() 
 {
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
     InitWindow(screenWidth, screenHeight, "airplane simulation");
-
-    camera.position = cameraPos;                  // Camera position perspective
-    camera.target = (Vector3){0.0f, 20.0f, 0.0f}; // Camera looking at point
-    camera.up = (Vector3){0.0f, 10.0f, 0.0f};     // Camera up vector (rotation towards target)
-    camera.fovy = 30.0f;                          // Camera field-of-view Y
-    camera.projection = CAMERA_PERSPECTIVE;
 
     SetTargetFPS(60);
 
@@ -118,6 +140,11 @@ int main()
         Update(deltaTime);
         Render();
     }
+}
 
+int main() {
+    RunSimulation simulatie;
+    simulatie.run();
+    
     return 0;
 }
