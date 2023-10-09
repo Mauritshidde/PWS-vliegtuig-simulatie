@@ -48,7 +48,7 @@ float Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMas
     for (int i = 0; i < forces.size(); i++)
     {
         float distance = distanceBetweenPoints(forces.at(i).location, centerOfMass);
-        torqueSum.x += forces.at(i).components.x * distance;
+        torqueSum.x += forces.at(i).components.x * distance; 
         torqueSum.y += forces.at(i).components.y * distance;
         torqueSum.z += forces.at(i).components.z * distance;
         // calc distance/length between forces.at(i) and centerOfMass if forces.at(i) on the left of centerOfMass its negative
