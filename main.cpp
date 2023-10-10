@@ -3,6 +3,9 @@
 #include <vector>
 #include <cmath>
 
+#define RAYGUI_IMPLEMENTATION
+#include "modules/raygui.h"
+
 class RunSimulation
 {
 private:
@@ -121,6 +124,10 @@ void RunSimulation::Update(float deltaTime)
 void RunSimulation::Render()
 {
     // render model
+    Rectangle rec = { 20, 40, 200, 150 };
+    Rectangle panelContentRec = {0, 0, 340, 340 };
+    Rectangle panelView = { 0 };
+    Vector2 panelScroll = { 99, -20 };
     BeginDrawing();
     ClearBackground(BLACK);
 
@@ -130,6 +137,9 @@ void RunSimulation::Render()
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
             DrawGrid(10, 10.0f);
         EndMode3D();
+        BeginDrawing();
+            GuiButton(rec, "#05#Open Image");
+        EndDrawing();
     
     EndDrawing();
 }

@@ -33,7 +33,8 @@ physicsVector addForces(std::vector<physicsVector> inputVector)
     return sumVector;
 }
 
-Vector3 vectorAddition(Vector3 vec1, Vector3 vec2) {
+Vector3 vectorAddition(Vector3 vec1, Vector3 vec2)
+{
     Vector3 result;
     result.x = vec1.x + vec2.x;
     result.y = vec1.y + vec2.y;
@@ -41,7 +42,8 @@ Vector3 vectorAddition(Vector3 vec1, Vector3 vec2) {
     return result;
 }
 
-Vector3 vectorSubtraction(Vector3 vec1, Vector3 vec2) {
+Vector3 vectorSubtraction(Vector3 vec1, Vector3 vec2)
+{
     Vector3 result;
     result.x = vec1.x - vec2.x;
     result.y = vec1.y - vec2.y;
@@ -70,7 +72,7 @@ float Physics::distanceBetweenPoints(Vector3 point1, Vector3 point2)
     return length;
 }
 
-float Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass) // calcTorque for the x-axis
+float Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass)
 {
     Vector3 torqueSum = {0, 0, 0};
     for (int i = 0; i < forces.size(); i++)
@@ -79,7 +81,7 @@ float Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMas
         Vector3 extraTorque = crossProduct(forces.at(i).components, distance);
         torqueSum = vectorAddition(torqueSum, extraTorque);
     }
-
+    // for rpm rotatie ook inersia nodig
     // if (torqueSum.x > 0)
     // {
     //     // keep goin straight forward/ without rotation
