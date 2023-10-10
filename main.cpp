@@ -127,8 +127,8 @@ void RunSimulation::Render()
         BeginMode3D(mainCamera);
             DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, WHITE);
             DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, WHITE);
-            DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
-            DrawGrid(10, 10.0f);
+            // DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
+            // DrawGrid(10, 10.0f);
         EndMode3D();
     
     EndDrawing();
