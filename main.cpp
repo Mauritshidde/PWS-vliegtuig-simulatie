@@ -5,6 +5,7 @@
 
 #define RAYGUI_IMPLEMENTATION
 #include "modules/raygui.h"
+#include "gui_layout_name.h"
 
 class RunSimulation
 {
@@ -27,6 +28,7 @@ private:
 public:
     RunSimulation(/* args */);
     ~RunSimulation();
+    void moveCamera(float deltaTime);
     void Start();
     void Update(float deltaTime);
     void Render();
@@ -73,8 +75,7 @@ void RunSimulation::Start()
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
 }
 
-void RunSimulation::Update(float deltaTime)
-{
+void RunSimulation::moveCamera(float deltaTime) {
     Vector2 currentMousePos = GetMousePosition();
 
     if (IsMouseButtonDown(0))
@@ -121,6 +122,12 @@ void RunSimulation::Update(float deltaTime)
     previousMousePosition = currentMousePos;
 }
 
+void RunSimulation::Update(float deltaTime)
+{
+    moveCamera(deltaTime);
+}
+
+float value = 0.5f;
 void RunSimulation::Render()
 {
     // render model
@@ -137,9 +144,9 @@ void RunSimulation::Render()
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
             DrawGrid(10, 10.0f);
         EndMode3D();
-        BeginDrawing();
-            GuiButton(rec, "#05#Open Image");
-        EndDrawing();
+        GuiLayoutName();
+        GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
+        GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
     
     EndDrawing();
 }
