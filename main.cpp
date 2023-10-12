@@ -22,10 +22,14 @@ private:
     Vector2 cameraXYPos;
     Camera mainCamera;
 
+    int renderWidth;
+    int renderHeight;
+
     float angleYAxis = 0;
     float angleXZAxis = 0;
     float cameraCircleRadius = 120;
 public:
+    float test;
     RunSimulation(/* args */);
     ~RunSimulation();
     void moveCamera(float deltaTime);
@@ -56,6 +60,10 @@ float zCirclePosCam(float x, float radius)
 
 void RunSimulation::Start()
 {
+    // GuiLoadStyle("terminal.rgs");
+    renderWidth = GetRenderWidth();
+    renderHeight = GetRenderHeight();
+    test = 3;
     airplane = LoadModel("tinker.obj");
     airplaneTexture = LoadTexture("Untitled1485_20230104061358.png");
     // airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
@@ -130,16 +138,16 @@ void RunSimulation::Update(float deltaTime)
 float value = 0.5f;
 void RunSimulation::Render()
 {
-    // render model
     Rectangle rec = { 20, 40, 200, 150 };
     Rectangle panelContentRec = {0, 0, 340, 340 };
     Rectangle panelView = { 0 };
     Vector2 panelScroll = { 99, -20 };
+    Rectangle sliderRec = {renderWidth - 240, 40, 200, 150};
     BeginDrawing();
     ClearBackground(BLACK);
 
         BeginMode3D(mainCamera);
-            DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, WHITE);
+            DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, skybox.materials->maps->color);
             DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, GRAY);
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
             DrawGrid(10, 10.0f);
