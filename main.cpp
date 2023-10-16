@@ -6,6 +6,11 @@
 #define RAYGUI_IMPLEMENTATION
 #include "modules/raygui.h"
 #include "gui_layout_name.h"
+#include "simulationGui.h"
+
+// tijdelijke plaats voor variablen die bij een andere class horen
+float maxAirspeed; // defined by mach number has to be lower than 1; speed is given in m/s
+
 
 class RunSimulation
 {
@@ -33,7 +38,7 @@ public:
     RunSimulation(/* args */);
     ~RunSimulation();
     void moveCamera(float deltaTime);
-    void Start();
+    void Start(int screenHeight, int screenWidth);
     void Update(float deltaTime);
     void Render();
     void run();
@@ -58,7 +63,7 @@ float zCirclePosCam(float x, float radius)
     return z;
 }
 
-void RunSimulation::Start()
+void RunSimulation::Start(int screenHeight, int screenWidth)
 {
     // GuiLoadStyle("terminal.rgs");
     renderWidth = GetRenderWidth();
@@ -132,9 +137,14 @@ void RunSimulation::moveCamera(float deltaTime) {
 
 void RunSimulation::Update(float deltaTime)
 {
+    // first value updates over time
+    // after that value updates by gui or key inputs
     moveCamera(deltaTime);
 }
+GuiLayoutNameState state = { 0 };
 
+float Slider001Value = 0.0f;
+bool Button002Pressed = false;
 float value = 0.5f;
 void RunSimulation::Render()
 {
@@ -146,28 +156,34 @@ void RunSimulation::Render()
     BeginDrawing();
     ClearBackground(BLACK);
 
+        DrawFPS(500, 500);
+
+
         BeginMode3D(mainCamera);
             DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, skybox.materials->maps->color);
             DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, GRAY);
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
             DrawGrid(10, 10.0f);
         EndMode3D();
-        GuiLayoutName();
-        GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
-        GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
+        GuiPanel((Rectangle){ 1920-(1920/8), 0, 1920, 1080 }, NULL);
+        GuiSlider((Rectangle){ 1980-(1980/8)+50, 500, 1980-50, 50 }, NULL, NULL, &Slider001Value, 0, 100);
+        // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT"); 
+        // GuiLayoutName();
+        // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
+        // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
     
     EndDrawing();
 }
 
 void RunSimulation::run() 
 {
+    InitWindow(0, 0, "airplane simulation");
+    ToggleFullscreen(); 
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
-    InitWindow(screenWidth, screenHeight, "airplane simulation");
 
-    SetTargetFPS(60);
-
-    Start();
+    // SetTargetFPS(60);
+    Start(screenWidth, screenHeight);
 
     while (!WindowShouldClose())
     {
