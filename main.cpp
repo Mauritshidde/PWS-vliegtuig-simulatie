@@ -10,13 +10,16 @@
 
 // tijdelijke plaats voor variablen die bij een andere class horen
 float maxAirspeed; // defined by mach number has to be lower than 1; speed is given in m/s
-
+float engineTrust = 0.0f;
+float maxEngineTrust = 1000.0f;
+bool Button002Pressed = false;
 
 class RunSimulation
 {
 private:
     Model airplane;
     Model skybox;
+    Slider testtest;
 
     Vector2 previousMousePosition;
 
@@ -33,10 +36,13 @@ private:
     float angleYAxis = 0;
     float angleXZAxis = 0;
     float cameraCircleRadius = 120;
+
 public:
     float test;
-    RunSimulation(/* args */);
+    RunSimulation();
     ~RunSimulation();
+
+    bool notOnGUI(Vector2 mousePosition);
     void moveCamera(float deltaTime);
     void Start(int screenHeight, int screenWidth);
     void Update(float deltaTime);
@@ -44,15 +50,13 @@ public:
     void run();
 };
 
-RunSimulation::RunSimulation(/* args */)
+RunSimulation::RunSimulation()
 {
 }
 
 RunSimulation::~RunSimulation()
 {
 }
-
-
 
 float zCirclePosCam(float x, float radius)
 {
@@ -86,53 +90,70 @@ void RunSimulation::Start(int screenHeight, int screenWidth)
     skybox = LoadModel("skybox.obj");
     skyboxTexture = LoadTexture("skyboxtexture.png");
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
+    testtest = Slider(0, maxEngineTrust, renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54);
 }
 
-void RunSimulation::moveCamera(float deltaTime) {
+bool RunSimulation::notOnGUI(Vector2 mousePosition)
+{
+    if (mousePosition.x >= renderWidth - (renderWidth / 8))
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+void RunSimulation::moveCamera(float deltaTime)
+{
     Vector2 currentMousePos = GetMousePosition();
 
-    if (IsMouseButtonDown(0))
+    if (notOnGUI(currentMousePos))
     {
-        angleYAxis += ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
-        angleXZAxis += ((currentMousePos.y - previousMousePosition.y)) * deltaTime;
-    }
+        if (IsMouseButtonDown(0))
+        {
+            angleYAxis += ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
+            angleXZAxis += ((currentMousePos.y - previousMousePosition.y)) * deltaTime;
+        }
 
-    if (IsKeyDown(KEY_RIGHT))
-    {
-        angleYAxis += deltaTime;
-    }
-    if (IsKeyDown(KEY_LEFT))
-    {
-        angleYAxis -= deltaTime;
-    }
-    if (IsKeyDown(KEY_UP))
-    {
-        angleXZAxis += deltaTime;
-    }
-    if (IsKeyDown(KEY_DOWN))
-    {
-        angleXZAxis -= deltaTime;
-    }
+        if (IsKeyDown(KEY_RIGHT))
+        {
+            angleYAxis += deltaTime;
+        }
+        if (IsKeyDown(KEY_LEFT))
+        {
+            angleYAxis -= deltaTime;
+        }
+        if (IsKeyDown(KEY_UP))
+        {
+            angleXZAxis += deltaTime;
+        }
+        if (IsKeyDown(KEY_DOWN))
+        {
+            angleXZAxis -= deltaTime;
+        }
 
-    if (GetMouseWheelMove() > 0)
-    {
-        cameraCircleRadius += 100 * deltaTime;
-    }
-    else if (GetMouseWheelMove() < 0)
-    {
-        cameraCircleRadius -= 100 * deltaTime;
-    }
+        if (GetMouseWheelMove() > 0)
+        {
+            cameraCircleRadius += 100 * deltaTime;
+        }
+        else if (GetMouseWheelMove() < 0)
+        {
+            cameraCircleRadius -= 100 * deltaTime;
+        }
 
-    float x, y, z;
-    x = cameraCircleRadius * sin(angleYAxis) * cos(angleXZAxis);
-    y = cameraCircleRadius * sin(angleYAxis) * sin(angleXZAxis);
-    z = cameraCircleRadius * cos(angleYAxis);
-    
-    mainCamera.position.x = x;
-    mainCamera.position.y = y;
-    mainCamera.position.z = z;
+        float x, y, z;
+        x = cameraCircleRadius * sin(angleYAxis) * cos(angleXZAxis);
+        y = cameraCircleRadius * sin(angleYAxis) * sin(angleXZAxis);
+        z = cameraCircleRadius * cos(angleYAxis);
 
-    previousMousePosition = currentMousePos;
+        mainCamera.position.x = x;
+        mainCamera.position.y = y;
+        mainCamera.position.z = z;
+
+        previousMousePosition = currentMousePos;
+    }
 }
 
 void RunSimulation::Update(float deltaTime)
@@ -141,48 +162,45 @@ void RunSimulation::Update(float deltaTime)
     // after that value updates by gui or key inputs
     moveCamera(deltaTime);
 }
-GuiLayoutNameState state = { 0 };
+GuiLayoutNameState state = {0};
 
-float Slider001Value = 0.0f;
-bool Button002Pressed = false;
-float value = 0.5f;
 void RunSimulation::Render()
 {
-    Rectangle rec = { 20, 40, 200, 150 };
-    Rectangle panelContentRec = {0, 0, 340, 340 };
-    Rectangle panelView = { 0 };
-    Vector2 panelScroll = { 99, -20 };
+    Rectangle rec = {20, 40, 200, 150};
+    Rectangle panelContentRec = {0, 0, 340, 340};
+    Rectangle panelView = {0};
+    Vector2 panelScroll = {99, -20};
     Rectangle sliderRec = {renderWidth - 240, 40, 200, 150};
     BeginDrawing();
     ClearBackground(BLACK);
 
-        DrawFPS(500, 500);
+    // DrawFPS(500, 500);
 
+    BeginMode3D(mainCamera);
+    DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
+    DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){180.0f, 0.0f, .0f}, 270.0f, (Vector3){0.4f, 0.4f, 0.4f}, GRAY);
+    // DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
+    DrawGrid(10, 10.0f);
+    EndMode3D();
 
-        BeginMode3D(mainCamera);
-            DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, skybox.materials->maps->color);
-            DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, GRAY);
-            DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
-            DrawGrid(10, 10.0f);
-        EndMode3D();
-        GuiPanel((Rectangle){ 1920-(1920/8), 0, 1920, 1080 }, NULL);
-        GuiSlider((Rectangle){ 1980-(1980/8)+50, 500, 1980-50, 50 }, NULL, NULL, &Slider001Value, 0, 100);
-        // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT"); 
-        // GuiLayoutName();
-        // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
-        // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
-    
+    GuiPanel((Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight}, NULL);
+    // GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth/38), renderHeight/3.6, (renderWidth / 8) - (renderWidth/38)*2, renderHeight/54}, NULL, NULL, &engineTrust, 0, maxEngineTrust);
+    testtest.DrawSlider();
+    // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT");
+    // GuiLayoutName();
+    // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
+    // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
     EndDrawing();
 }
 
-void RunSimulation::run() 
+void RunSimulation::run()
 {
     InitWindow(0, 0, "airplane simulation");
-    ToggleFullscreen(); 
+    ToggleFullscreen();
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
 
-    // SetTargetFPS(60);
+    SetTargetFPS(60);
     Start(screenWidth, screenHeight);
 
     while (!WindowShouldClose())
@@ -193,9 +211,10 @@ void RunSimulation::run()
     }
 }
 
-int main() {
+int main()
+{
     RunSimulation simulatie;
     simulatie.run();
-    
+
     return 0;
 }
