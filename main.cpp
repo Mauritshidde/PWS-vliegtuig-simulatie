@@ -6,7 +6,8 @@
 #define RAYGUI_IMPLEMENTATION
 #include "modules/raygui.h"
 #include "gui_layout_name.h"
-#include "simulationGui.h"
+// #include "simulationGui.h"
+#include "modules/simdjson.h"
 
 // tijdelijke plaats voor variablen die bij een andere class horen
 float maxAirspeed; // defined by mach number has to be lower than 1; speed is given in m/s
@@ -183,13 +184,19 @@ void RunSimulation::Render()
     DrawGrid(10, 10.0f);
     EndMode3D();
 
-    GuiPanel((Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight}, NULL);
-    // GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth/38), renderHeight/3.6, (renderWidth / 8) - (renderWidth/38)*2, renderHeight/54}, NULL, NULL, &engineTrust, 0, maxEngineTrust);
-    testtest.DrawSlider();
-    // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT");
-    // GuiLayoutName();
-    // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
-    // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
+        BeginMode3D(mainCamera);
+            DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, skybox.materials->maps->color);
+            DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, GRAY);
+            DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
+            DrawGrid(10, 10.0f);
+        EndMode3D();
+        GuiPanel((Rectangle){ 1920-(1920/8), 0, 1920, 1080 }, NULL);
+        GuiSlider((Rectangle){ 1980-(1980/8)+50, 500, 1980-50, 50 }, NULL, NULL, &Slider001Value, 0, 100);
+        // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT"); 
+        // GuiLayoutName();
+        // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
+        // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
+        // GuiLabel(sliderRec, )
     EndDrawing();
 }
 
