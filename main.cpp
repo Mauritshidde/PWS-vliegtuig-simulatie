@@ -6,7 +6,7 @@
 #define RAYGUI_IMPLEMENTATION
 #include "modules/raygui.h"
 #include "gui_layout_name.h"
-#include "simulationGui.h"
+#include "gui/simulationGui.h"
 
 // tijdelijke plaats voor variablen die bij een andere class horen
 float maxAirspeed; // defined by mach number has to be lower than 1; speed is given in m/s
