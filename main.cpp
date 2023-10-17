@@ -6,8 +6,12 @@
 #define RAYGUI_IMPLEMENTATION
 #include "modules/raygui.h"
 #include "gui_layout_name.h"
+<<<<<<< HEAD
 // #include "simulationGui.h"
 #include "modules/simdjson.h"
+=======
+#include "gui/simulationGui.h"
+>>>>>>> affeea3f063b869946684121ad9355ca9b2d857e
 
 // tijdelijke plaats voor variablen die bij een andere class horen
 float maxAirspeed; // defined by mach number has to be lower than 1; speed is given in m/s
@@ -201,7 +205,7 @@ void RunSimulation::Render()
 }
 
 void RunSimulation::run()
-{
+{   
     InitWindow(0, 0, "airplane simulation");
     ToggleFullscreen();
     const int screenWidth = GetScreenWidth();
