@@ -3,6 +3,7 @@
 #include "physicsvector.cpp"
 #include <vector>
 #include <math.h>
+#define g 9.81
 
 class Physics
 {
@@ -17,6 +18,8 @@ public:
     Vector3 crossProduct(Vector3 vec1, Vector3 vec2);
     float distanceBetweenPoints(Vector3 point1, Vector3 point2);
     float calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass);
+    float calcHypot(Vector3 components);
+    Vector3 calcAcceleration(physicsVector force, float mass);
     Physics(/* args */);
     ~Physics();
 };
@@ -90,6 +93,20 @@ float Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMas
     // {
     //     // go right if positive and go left if negative didn't find formula yet
     // }
+}
+
+float Physics::calcHypot(Vector3 components)
+{
+    return sqrt(pow(components.x, 2) + pow(components.y, 2) + pow(components.z, 2));
+}
+
+Vector3 Physics::calcAcceleration(physicsVector force, float mass) // newton: F = m・a ------ a = F/m
+{
+    Vector3 acceleration;
+    acceleration.x = force.components.x / mass;  
+    acceleration.y = force.components.y / mass;
+    acceleration.z = force.components.z / mass;
+    return acceleration;
 }
 
 Physics::Physics(/* args */)

@@ -10,7 +10,8 @@ public:
       ~Plane();
       Vector3 calcLift();
       Vector3 calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth);
-
+      float leftMotorForce;
+      float rightMotorForce;
       Vector3 pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
       Vector3 speed;
       float anglePitch, angleYaw, angleRoll;
