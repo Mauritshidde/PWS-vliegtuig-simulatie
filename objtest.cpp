@@ -2,6 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <fstream>
+#include <string>
 
 #define RAYGUI_IMPLEMENTATION
 #include "modules/raygui.h"
@@ -14,6 +16,121 @@ float maxAirspeed; // defined by mach number has to be lower than 1; speed is gi
 float engineTrust = 0.0f;
 float maxEngineTrust = 1000.0f;
 bool Button002Pressed = false;
+
+std::vector<Vector3> v, vn;
+std::vector<Vector2> vt;
+std::vector<std::vector<std::string>> f;
+std::vector<std::vector<Vector3>> data;
+
+void read() {
+    double a, b, c;
+    std::string as, bs, cs;
+    std::string v2;
+    std::ifstream fin("tinker.txt");
+
+    while(fin >> v2){
+        if (v2 == "f"){
+            fin >> as >> bs >> cs;
+            f.push_back({as, bs, cs});
+        } else if (v2 == "v") {
+            fin >> a >> b >> c;
+            v.push_back((Vector3){a, b, c});
+        } else if (v2 == "vt") {
+            fin >> a >> b;
+            vt.push_back((Vector2){a, b});
+        } else if (v2 == "vn") {
+            fin >> a >> b >> c;
+            vn.push_back((Vector3){a, b, c});
+        }
+        // std::cout << a << " " << b << " " <<  c << " " << std::endl;
+    }
+    
+    for (int i=0; i < f.size(); i++) {
+        std::vector<Vector3> data2;
+        for (int k=0; k < 3; k++) {
+            char z = 'e';
+            int index = 0;
+            int j = 0;
+            std::vector<int> indices;
+            // std::cout << f.at(i).at(k).size()-1 << " size" << std::endl;
+            while (z != '/' && j < f.at(i).at(k).size()) {
+                // std::cout << " fuck " << std::endl;
+                z = f.at(i).at(k).at(j);
+                if (z != '/') {
+                    // std::cout << z << " z" << std::endl;
+                    // std::cout << "ja " << z-'0' << std::endl;
+                    indices.push_back(z - '0');
+                }
+                j++;
+
+            }
+            if (indices.size() >= 1) {
+                int k2 = 0;
+                // std::cout << "nee" << std::endl;
+                for (int k=indices.size()-1; k >= 0; k--) {
+                    index += indices.at(k) * pow(10, k2);
+                    // std::cout << v.size() << " help me " << std::endl;
+                    // std::cout << indices.at(k) * pow(10, k2) << " pow" << std::endl;
+                    k2++;
+                }
+            }
+            index--;
+            // std::cout << index << std::endl;
+            data2.push_back({v.at(index).x, v.at(index).y, v.at(index).z});
+        }
+        data.push_back(data2);
+    }
+}
+
+void read2() {
+    double a, b, c;
+    std::string as, bs, cs;
+    std::string v2;
+    std::ifstream fin("tinker.txt");
+
+    while(fin >> v2){
+        if (v2 == "f"){
+            fin >> as >> bs >> cs;
+            f.push_back({as, bs, cs});
+        } else if (v2 == "v") {
+            fin >> a >> b >> c;
+            v.push_back((Vector3){a, b, c});
+        } else if (v2 == "vt") {
+            fin >> a >> b;
+            vt.push_back((Vector2){a, b});
+        } else if (v2 == "vn") {
+            fin >> a >> b >> c;
+            vn.push_back((Vector3){a, b, c});
+        }
+    }
+    
+    for (int i=0; i < f.size(); i++) {
+        std::vector<Vector3> data2;
+        for (int k=0; k < 3; k++) {
+            char z = 'e';
+            int index = 0;
+            int j = 0;
+            std::vector<int> indices;
+            while (z != '/' && j < f.at(i).at(k).size()) {
+                z = f.at(i).at(k).at(j);
+                if (z != '/') {
+                    indices.push_back(z - '0');
+                }
+                j++;
+            }
+            if (indices.size() >= 1) {
+                int k2 = 0;
+                for (int k=indices.size()-1; k >= 0; k--) {
+                    index += indices.at(k) * pow(10, k2);
+                    k2++;
+                }
+            }
+            index--;
+            data2.push_back({v.at(index).x, v.at(index).y, v.at(index).z});
+        }
+        data.push_back(data2);
+    }
+}
 
 class RunSimulation
 {
@@ -71,10 +188,11 @@ float zCirclePosCam(float x, float radius)
 
 void RunSimulation::Start(int screenHeight, int screenWidth)
 {
+    read();
     renderWidth = GetRenderWidth();
     renderHeight = GetRenderHeight();
     test = 3;
-    airplane = LoadModel("g.obj");
+    airplane = LoadModel("tinker.obj");
     airplaneTexture = LoadTexture("Untitled1485_20230104061358.png");
     // airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
 
@@ -138,11 +256,11 @@ void RunSimulation::moveCamera(float deltaTime)
 
         if (GetMouseWheelMove() > 0)
         {
-            cameraCircleRadius += 100 * deltaTime;
+            cameraCircleRadius += 1000 * deltaTime;
         }
         else if (GetMouseWheelMove() < 0)
         {
-            cameraCircleRadius -= 100 * deltaTime;
+            cameraCircleRadius -= 1000 * deltaTime;
         }
 
         float x, y, z;
@@ -179,15 +297,25 @@ void RunSimulation::Render()
     // DrawFPS(500, 500);
 
     BeginMode3D(mainCamera);
-    DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
-    DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){180.0f, 0.0f, .0f}, 270.0f, (Vector3){0.4f, 0.4f, 0.4f}, GRAY);
+    if (data.size() >= 1) {
+        for (int i=0; i < data.size(); i++) {
+            // std::cout << data.at(i).at(0).y << std::endl;
+            DrawTriangle3D(data.at(i).at(0), data.at(i).at(1), data.at(i).at(2), RED);
+            DrawTriangle3D( {10, 10, 10}, {20, 20, 20}, {40, 30, -10}, RED);
+
+            DrawLine3D(data.at(i).at(0), data.at(i).at(1), RED);
+        }
+    }
+    // DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
+    // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){180.0f, 0.0f, .0f}, 270.0f, (Vector3){0.4f, 0.4f, 0.4f}, GRAY);
     // DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
     DrawGrid(10, 10.0f);
     EndMode3D();
 
         BeginMode3D(mainCamera);
-            DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, skybox.materials->maps->color);
-            DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, GRAY);
+            
+            // DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, skybox.materials->maps->color);
+            // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, GRAY);
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
             DrawGrid(10, 10.0f);
         EndMode3D();
