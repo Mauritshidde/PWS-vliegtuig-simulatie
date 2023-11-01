@@ -5,7 +5,6 @@
 
 #define RAYGUI_IMPLEMENTATION
 #include "modules/raygui.h"
-#include "gui_layout_name.h"
 #include "gui/simulationGui.h"
 #include <json/json.h>
 
@@ -74,8 +73,8 @@ void RunSimulation::Start(int screenHeight, int screenWidth)
     renderWidth = GetRenderWidth();
     renderHeight = GetRenderHeight();
     test = 3;
-    airplane = LoadModel("g.obj");
-    airplaneTexture = LoadTexture("Untitled1485_20230104061358.png");
+    airplane = LoadModel("models/object/airplane.obj");
+    airplaneTexture = LoadTexture("models/texture/Untitled1485_20230104061358.png");
     // airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
 
     cameraPos = {0.0f, 0.0f, -120.0f};
@@ -88,8 +87,8 @@ void RunSimulation::Start(int screenHeight, int screenWidth)
     mainCamera.fovy = 30.0f;                          // Camera field-of-view Y
     mainCamera.projection = CAMERA_PERSPECTIVE;
 
-    skybox = LoadModel("skybox.obj");
-    skyboxTexture = LoadTexture("skyboxtexture.png");
+    skybox = LoadModel("models/object/skybox.obj");
+    skyboxTexture = LoadTexture("models/texture/skyboxtexture.png");
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
     testtest = Slider(0, maxEngineTrust, renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54);
     // testtest2 = Button(renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54);
@@ -164,7 +163,6 @@ void RunSimulation::Update(float deltaTime)
     // after that value updates by gui or key inputs
     moveCamera(deltaTime);
 }
-GuiLayoutNameState state = {0};
 
 void RunSimulation::Render()
 {
