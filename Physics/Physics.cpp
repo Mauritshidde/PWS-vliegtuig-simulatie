@@ -20,6 +20,7 @@ public:
     float calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass);
     float calcHypot(Vector3 components);
     Vector3 calcAcceleration(physicsVector force, float mass);
+    Vector2 calcDeltaV(float deltaTime, Vector3 acceleration);
     Physics(/* args */);
     ~Physics();
 };
@@ -107,6 +108,15 @@ Vector3 Physics::calcAcceleration(physicsVector force, float mass) // newton: F 
     acceleration.y = force.components.y / mass;
     acceleration.z = force.components.z / mass;
     return acceleration;
+}
+
+Vector3 Physics::calcDeltaV(float deltaTime, Vector3 acceleration)
+{
+    Vector3 deltaV;
+    deltaV.x = acceleration.x * deltaTime;
+    deltaV.y = acceleration.y * deltaTime;
+    deltaV.z = acceleration.z * deltaTime;
+    return deltaV;
 }
 
 Physics::Physics(/* args */)
