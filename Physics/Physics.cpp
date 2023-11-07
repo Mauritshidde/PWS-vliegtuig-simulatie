@@ -20,7 +20,7 @@ public:
     float calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass);
     float calcHypot(Vector3 components);
     Vector3 calcAcceleration(physicsVector force, float mass);
-    Vector2 calcDeltaV(float deltaTime, Vector3 acceleration);
+    Vector3 calcDeltaV(float deltaTime, Vector3 acceleration);
     Physics(/* args */);
     ~Physics();
 };
