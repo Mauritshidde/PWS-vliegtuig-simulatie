@@ -1,19 +1,73 @@
+#include <vector>
+
 class navierstokes
 {
 private:
-      /* data */
+      int nx; // amount of cells in x direction
+      int ny; // amount of cells in y direction
+      int iMin;
+      int iMax;
+      int jMin;
+      int jMax;
+      int Lx;
+      int Ly;
+
+      float dx;
+      float dy;
+      float dxi;
+      float dyi;
 public:
       navierstokes(/* args */);
       ~navierstokes();
+
+      void createMesh();
 };
 
 navierstokes::navierstokes(/* args */)
 {
+      nx = 50;
+      ny = 50;
+      iMin = 0;
+      iMax = nx - 1;
+      jMin = 0;
+      jMax = ny - 1;
+      Lx = iMax + 1;
+      Ly = jMax + 1;
 }
 
 navierstokes::~navierstokes()
 {
 }
+
+std::vector<float> linspace(int startX, int endX, int steps)
+{
+      float stepSize = (endX - startX) / (steps - 1);
+      std::vector<float> coords;
+
+      for (int i = 0; i < steps; i++)
+      {
+            coords.push_back(startX + (stepSize * i));
+      }
+
+      return coords;
+}
+
+void navierstokes::createMesh()
+{
+      float stepSizeX = (Lx - 0) / (nx);
+      float stepSizeY = (Ly - 0) / (ny);
+
+      std::vector<float> x = linspace(0, Lx, nx + 1);
+      std::vector<float> y = linspace(0, Ly, ny + 1);
+      std::vector<float> xm = linspace(0 + stepSizeX, Lx - stepSizeX, nx);
+      std::vector<float> ym = linspace(0 + stepSizeY, Ly - stepSizeY, ny);
+
+      dx = x.at(iMin + 1) - x.at(iMin);
+      dy = y.at(jMin + 1) - y.at(jMin);
+      dxi = 1 / dx;
+      dyi = 1 / dy;
+}
+
 /*
 Code overview:
 
@@ -41,7 +95,7 @@ u = [u,v], the velocity vector (2d)
 (∂u/∂t) + u · ∇u = − (1/ρ) ∇p + ν∇²u
 
 t = time
-ρ = density = air density 
+ρ = density = air density
 p = pressure = air pressure op vlieghoogte (lookuptable?)
 v =  kinematic viscosity (misschien onnodig)
 */
