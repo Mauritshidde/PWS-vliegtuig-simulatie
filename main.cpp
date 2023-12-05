@@ -59,14 +59,14 @@ RunSimulation::~RunSimulation()
 {
 }
 
-float zCirclePosCam(float x, float radius)
-{
-    float z;
+// float zCirclePosCam(float x, float radius)
+// {
+//     float z;
 
-    z = sqrt(pow(radius, 2) - pow(x, 2));
+//     z = sqrt(pow(radius, 2) - pow(x, 2));
 
-    return z;
-}
+//     return z;
+// }
 
 void RunSimulation::Start(int screenHeight, int screenWidth)
 {
