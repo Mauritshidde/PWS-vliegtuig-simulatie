@@ -159,6 +159,20 @@ void NavierStokes::boundaryConditions() {
       }
 }
 
+std::vector<std::vector<float>> zeros(int width, int height) {
+      std::vector<std::vector<float>> vector;
+
+      for(int i=0; i < width; i++) {
+            std::vector<float> helper;
+            for (int j=0; j < height; j++) {
+                  helper.push_back(0);
+            }
+            vector.push_back(helper);
+      }
+      
+      return vector;
+}
+
 void NavierStokes::calc() {
       float time = 0;
       float maxTime = 1000;
@@ -182,7 +196,6 @@ void NavierStokes::calc() {
                         float c = -u.at(i).at(j) * (u.at(i+1).at(j) - u.at(i-1).at(j)) * 0.5 * dxi;
                         float d = -vHere * (u.at(i).at(j+1) - u.at(i).at(j-1)) * 0.5 * dyi;
                         float us = u.at(i).at(j) + dT * (a + b + c + d);
-
                   }
             }
 
@@ -197,7 +210,33 @@ void NavierStokes::calc() {
                   }
             }
 
+
+
+            // for (int j=1; j < ny; j++) {
+            //       for (int i=1; i < nx; i++) {
+                        
+            //       }
+            // }
+            // float dP = ;
+
+            // float a = (p.at(i+1).at(j) + p.at(i-1).at(j) + p.at(i).at(j+1) + p.at(i).at(j-1));
+            // float b = -((rho * dx) / 16) * ((2/dT) * (u.at(i+1).at(j) - u.at(i-1).at(j) + v.at(i).at(j+1) - v.at(i).at(j-1));
+            // float c = -(2/dx) * (u.at(i).at(j+1) - u.at(i).at(j-1)) * (v.at(i+1).at(j) - v.at(i-1).at(j));
+            // float d = (u.at(i+1).at(j) 
+            // p.at(i).at(j) = (1/4) * a -((rho * dx) / 16) * ((2/dT) * (u.at(i+1).at(j) - u.at(i-1).at(j) + v.at(i).at(j+1) - v.at(i).at(j-1)) -(2/dx) * (u.at(i).at(j+1) - u.at(i).at(j-1)) * (v.at(i+1).at(j) - v.at(i-1).at(j)) - (pow(u.at(i+1).at(j) - u.at(i-1).at(j), 2) / dx) - (pow(v.at(i).at(j+1) - v.at(i).at(j-1), 2) / dx);
             // float changeInU = 
+
+            std::vector<std::vector<float>> L = zeros(nx * ny, nx * ny);
+
+            for (int j=0; j < ny+1; j++) {
+                  for (int i=0; i < nx+1; i++) {
+                        L.at(i+(j-1) * nx).at(i + (j-1) * nx) = 2 * pow(dxi, 2) + 2 * pow(dyi, 2);
+
+                        for (int k=i-1; k = i+2; k+=2) {
+
+                        }
+                  }
+            }
       }
 }
 
