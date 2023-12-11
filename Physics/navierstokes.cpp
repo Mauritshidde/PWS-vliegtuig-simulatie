@@ -287,21 +287,7 @@ void NavierStokes::calc()
 
             //       }
             // }
-
-            for (int j = jMin; j < jMax + 1; j++)
-            {
-                  for (int i = iMin + 1; i < iMax + 1; i++)
-                  {
-                        float vHere = 0.25 * (v.at(i - 1).at(j) + v.at(i - 1).at(j + 1) + v.at(i).at(j) + v.at(i).at(j + 1));
-                        float a = (nu * (u.at(i - 1).at(j) - 2 * u.at(i).at(j) + u.at(i + 1).at(j)) * pow(dxi, 2));
-                        float b = nu * (u.at(i).at(j - 1) - 2 * u.at(i).at(j) + u.at(i).at(j + 1) * pow(dyi, 2));
-                        float c = -u.at(i).at(j) * (u.at(i + 1).at(j) - u.at(i - 1).at(j)) * 0.5 * dxi;
-                        float d = -vHere * (u.at(i).at(j + 1) - u.at(i).at(j - 1)) * 0.5 * dyi;
-                        us.at(i).at(j) = u.at(i).at(j) + dT * (a + b + c + d); // nieuwe s over tijd
-                  }
-            }
-
-            for (int j = jMin + 1; j < jMax + 1; j++)
+            for (int j = jMin + 1; j < jMax + 1; j++) // predictor step to find u
             {
                   for (int i = iMin; i < iMax + 1; i++)
                   {
@@ -314,7 +300,20 @@ void NavierStokes::calc()
                   }
             }
 
-            std::vector<std::vector<float>> pv = L / R;
+            for (int j = jMin; j < jMax + 1; j++) // predictor step to find v
+            {
+                  for (int i = iMin + 1; i < iMax + 1; i++)
+                  {
+                        float vHere = 0.25 * (v.at(i - 1).at(j) + v.at(i - 1).at(j + 1) + v.at(i).at(j) + v.at(i).at(j + 1));
+                        float a = (nu * (u.at(i - 1).at(j) - 2 * u.at(i).at(j) + u.at(i + 1).at(j)) * pow(dxi, 2));
+                        float b = nu * (u.at(i).at(j - 1) - 2 * u.at(i).at(j) + u.at(i).at(j + 1) * pow(dyi, 2));
+                        float c = -u.at(i).at(j) * (u.at(i + 1).at(j) - u.at(i - 1).at(j)) * 0.5 * dxi;
+                        float d = -vHere * (u.at(i).at(j + 1) - u.at(i).at(j - 1)) * 0.5 * dyi;
+                        us.at(i).at(j) = u.at(i).at(j) + dT * (a + b + c + d); // nieuwe s over tijd
+                  }
+            }
+
+
 
             // for (int j=1; j < ny; j++) {
             //       for (int i=1; i < nx; i++) {
@@ -332,7 +331,7 @@ void NavierStokes::calc()
 
             int n = 0;
 
-            for (int j = jMin; j < jMax + 1; j++)
+            for (int j = jMin; j < jMax + 1; j++) // make the vector R to solve the pressure poisson equation
             {
                   for (int i = iMin; i < iMax + 1; i++)
                   {
@@ -340,6 +339,7 @@ void NavierStokes::calc()
                         R.at(n) = -rho / dT * ((us.at(i + 1).at(j) - us.at(i).at(j)) * dxi + (vs.at(i).at(j + 1) - vs.at(i).at(j)) * dyi);
                   }
             }
+            //TODO std::vector<std::vector<float>> pv = L / R;
       }
 }
 
@@ -347,18 +347,18 @@ void NavierStokes::calc()
 Code overview:
 
 Set input parameters: viscosity, density, number of grid points, time information, and boundary conditions
-• Create the index extents and the computational grid (see Section 2)
-• Initialize any arrays you use to allocate the memory
-• Create the Laplacian operator (see Section 6)
-• Loop over time (use a for or while loop)
-      – Update time t = t + ∆t
-      – Apply boundary conditions to the velocity field (see Section 8)
+DONE • Create the index extents and the computational grid (see Section 2)
+? • Initialize any arrays you use to allocate the memory
+DONE • Create the Laplacian operator (see Section 6) 
+DONE • Loop over time (use a for or while loop)
+      DONE – Update time t = t + ∆t
+      DONE – Apply boundary conditions to the velocity field (see Section 8)
       – Perform the predictor step to find u∗ and v∗ (see Sections 4 and 5)
-      – Form the right-hand-side of the Poisson equation (see Section 6)
-      – Solve for the pressure using pv = L\R and convert the pressure vector pv into a matrix p(i, j)
+      DONE – Form the right-hand-side of the Poisson equation (see Section 6)
+      TODO – Solve for the pressure using pv = L\R and convert the pressure vector pv into a matrix p(i, j)
       (see Section 6)
-      – Perform the corrector step to find un+1 and vn+1 (see Section 7)
-      – Plot the velocity field and the pressure field
+      TODO – Perform the corrector step to find un+1 and vn+1 (see Section 7)
+      TODO – Plot the velocity field and the pressure field
 • End Simulation
 
 We gebruiken classes dus de variables zet je in de class.
