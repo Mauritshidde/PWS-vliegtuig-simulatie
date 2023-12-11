@@ -13,6 +13,7 @@ private:
       int jMax;
       int Lx;
       int Ly;
+      std::vector<std::vector<float>> L;
 
       float uBottom, uTop, vLeft, vRight;
       float dx;
@@ -60,7 +61,7 @@ NavierStokes::NavierStokes()
       Ly = 100;
 
       createMesh();
-      std::vector<std::vector<float>> L = zeros(nx * ny, nx * ny); // initialise the laplacian operator
+      L = zeros(nx * ny, nx * ny); // initialise the laplacian operator
       L = calcL(L);
 }
 
