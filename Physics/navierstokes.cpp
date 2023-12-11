@@ -21,7 +21,13 @@ private:
       float dyi;
       float nu; 
       float Re;
+      float rho;
 
+      float maxTime;
+      float dT;
+
+      std::vector<float> R;
+      std::vector<std::vector<float>> us, vs;
       std::vector<float> boundaryMinU, boundaryMaxU, boundaryMinV, boundaryMaxV;
       std::vector<std::vector<float>> v, u, p;
 
@@ -29,23 +35,31 @@ public:
       NavierStokes(/* args */);
       ~NavierStokes();
 
-      void boundaryConditions();
-      void calc();
+      void generateVectors();
       void createMesh();
+      void boundaryConditions();
+      std::vector<std::vector<float>> calcL(std::vector<std::vector<float>> L);
+      void calc();
 };
 
 NavierStokes::NavierStokes()
 {
+      maxTime = 1000;
+      dT = 0.01;
       Re = 100; // Reynolds number
       nu = 1 / Re;
+      
       nx = 50;
       ny = 50;
-      iMin = 0;
+      iMin = 1;
       iMax = nx - 1;
       jMin = 1; // jMin has to be 1;
       jMax = ny - 1;
+
       Lx = 100;
       Ly = 100;
+
+      createMesh();
 }
 
 NavierStokes::~NavierStokes()
@@ -65,21 +79,7 @@ std::vector<float> linspace(int startX, int endX, int steps)
       return coords;
 }
 
-void NavierStokes::createMesh()
-{
-      float stepSizeX = (Lx - 0) / (nx);
-      float stepSizeY = (Ly - 0) / (ny);
-
-      std::vector<float> x = linspace(0, Lx, nx + 1);
-      std::vector<float> y = linspace(0, Ly, ny + 1);
-      std::vector<float> xm = linspace(0 + stepSizeX, Lx - stepSizeX, nx);
-      std::vector<float> ym = linspace(0 + stepSizeY, Ly - stepSizeY, ny);
-
-      dx = x.at(iMin + 1) - x.at(iMin);
-      dy = y.at(jMin + 1) - y.at(jMin);
-      dxi = 1 / dx;
-      dyi = 1 / dy;
-
+void NavierStokes::generateVectors() {
       for (int i = iMin-1; i < iMax+2; i++)
       {
             std::vector<float> helper;
@@ -107,7 +107,7 @@ void NavierStokes::createMesh()
             p.push_back(helper);
       }
 
-      // for (int i=0; i < xm.size(); i++) {
+            // for (int i=0; i < xm.size(); i++) {
       //       std::vector<float> helper;
       //       for (int j=0; j < ym.size(); j++) {
       //             helper.push_back(0);
@@ -131,6 +131,7 @@ void NavierStokes::createMesh()
       //       u.push_back(helper);
       // }
 
+
       for (int i=iMin; i < iMax+1; i++) {
             boundaryMinU.push_back(0);
             boundaryMaxU.push_back(0);
@@ -140,6 +141,46 @@ void NavierStokes::createMesh()
             boundaryMinU.push_back(0);
             boundaryMaxU.push_back(0);
       }
+
+      int n = 0;
+      for (int j=jMin; j < jMax+1; j++) {
+            for (int i=iMin; i < iMax+1; i++) {
+                  n++;
+                  R.push_back(0);
+            }
+      }
+
+      // for (int j=jMin; j < jMax+1; j++) {
+      //       std::vector<float> helper;
+      //       for (int i=iMin+1; i < iMax+1; i++) {
+      //             helper.push_back(0);
+      //       }
+
+      // }
+
+      // for (int j=jMin+1; j < jMax+1; j++) {
+      //       for (int i=iMin; i < iMax+1; i++) {
+
+      //       }
+      // }
+}
+
+void NavierStokes::createMesh()
+{
+      float stepSizeX = (Lx - 0) / (nx);
+      float stepSizeY = (Ly - 0) / (ny);
+
+      std::vector<float> x = linspace(0, Lx, nx + 1);
+      std::vector<float> y = linspace(0, Ly, ny + 1);
+      std::vector<float> xm = linspace(0 + stepSizeX, Lx - stepSizeX, nx);
+      std::vector<float> ym = linspace(0 + stepSizeY, Ly - stepSizeY, ny);
+
+      dx = x.at(iMin + 1) - x.at(iMin);
+      dy = y.at(jMin + 1) - y.at(jMin);
+      dxi = 1 / dx;
+      dyi = 1 / dy;
+
+      generateVectors();
 }
 
 
@@ -173,11 +214,41 @@ std::vector<std::vector<float>> zeros(int width, int height) {
       return vector;
 }
 
+std::vector<std::vector<float>> NavierStokes::calcL(std::vector<std::vector<float>> L) {
+      for (int j=0; j < ny + 1; j++) {
+            for (int i=0; i < nx + 1; i++) {
+                  L.at(i+(j-1) * nx).at(i + (j-1) * nx) = 2 * pow(dxi, 2) + 2 * pow(dyi, 2);
+
+                  for (int k=i-1; k = i+2; k+=2) {
+                        if (k > 0 && k <= nx) {
+                              L.at(i+(j-1)*nx).at(k+(j-1) * nx)  = - pow(dxi, 2);
+                        } else {
+                              L.at(i + (j-1) * nx).at(i + (j-1) * nx) = L.at(i + (j-1) * nx).at(i + (j-1) * nx) - pow(dxi, 2);
+                        }
+                  }
+
+                  for (int k=j-1; k < j + 2; k+=2) {
+                        if (k > 0 && k <= ny) {
+                              L.at(i+(j-1)*nx).at(i+(k-1) * nx)  = - pow(dyi, 2);
+                        } else {
+                              L.at(i + (j-1) * nx).at(i + (j-1) * nx) = L.at(i + (j-1) * nx).at(i + (j-1) * nx) - pow(dyi, 2);
+                        }
+                  }
+            }
+            for (int i=0; i < L.at(0).size(); i++) {
+                  L.at(0).at(i) = 0;
+            }
+            L.at(0).at(0) = 1;
+      }
+}
+
+float det(std::vector<std::vector<float>> A) {
+
+}
+
 void NavierStokes::calc() {
       float time = 0;
-      float maxTime = 1000;
-      float dT = 0.01;
-      
+
       while(time < maxTime) {
             time += dT;
             boundaryConditions();
@@ -189,15 +260,16 @@ void NavierStokes::calc() {
             // }
 
             for (int j=jMin; j < jMax+1; j++) {
-                  for (int i=iMin+1; i < iMax+1; j++) {
+                  for (int i=iMin+1; i < iMax+1; i++) {
                         float vHere = 0.25 * (v.at(i-1).at(j) + v.at(i-1).at(j+1) + v.at(i).at(j) + v.at(i).at(j+1));
                         float a = (nu * (u.at(i-1).at(j) -2 * u.at(i).at(j) + u.at(i+1).at(j)) * pow(dxi, 2));
                         float b = nu * (u.at(i).at(j-1) -2 * u.at(i).at(j) + u.at(i).at(j+1) * pow(dyi, 2));
                         float c = -u.at(i).at(j) * (u.at(i+1).at(j) - u.at(i-1).at(j)) * 0.5 * dxi;
                         float d = -vHere * (u.at(i).at(j+1) - u.at(i).at(j-1)) * 0.5 * dyi;
-                        float us = u.at(i).at(j) + dT * (a + b + c + d);
+                        us.at(i).at(j) = u.at(i).at(j) + dT * (a + b + c + d); // nieuwe s over tijd
                   }
             }
+
 
             for (int j=jMin+1; j < jMax+1; j++) {
                   for (int i=iMin; i < iMax+1; i++) {
@@ -206,9 +278,11 @@ void NavierStokes::calc() {
                         float b = nu * (v.at(i).at(j-1) -2 * v.at(i).at(j) + v.at(i).at(j+1) * pow(dyi, 2));
                         float c = -uHere * (v.at(i+1).at(j) - v.at(i-1).at(j)) * 0.5 * dyi;
                         float d = -v.at(i).at(j) * (v.at(1).at(j+1) - v.at(i).at(j-1)) * 0.5 * dxi;
-                        float vs = v.at(i).at(j) + dT * (a + b + c + d);
+                        vs.at(i).at(j) = v.at(i).at(j) + dT * (a + b + c + d);
                   }
             }
+
+            std::vector<std::vector<float>> pv = L/R;
 
 
 
@@ -227,14 +301,14 @@ void NavierStokes::calc() {
             // float changeInU = 
 
             std::vector<std::vector<float>> L = zeros(nx * ny, nx * ny);
-
-            for (int j=0; j < ny+1; j++) {
-                  for (int i=0; i < nx+1; i++) {
-                        L.at(i+(j-1) * nx).at(i + (j-1) * nx) = 2 * pow(dxi, 2) + 2 * pow(dyi, 2);
-
-                        for (int k=i-1; k = i+2; k+=2) {
-
-                        }
+            L = calcL(L);
+            
+            int n=0;
+            
+            for (int j=jMin; j < jMax+1; j++) {
+                  for (int i=iMin; i < iMax+1; i++) {
+                        n++;
+                        R.at(n) = -rho / dT * ((us.at(i+1).at(j) - us.at(i).at(j)) * dxi + (vs.at(i).at(j+1)-vs.at(i).at(j)) * dyi);
                   }
             }
       }
