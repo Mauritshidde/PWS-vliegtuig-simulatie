@@ -63,15 +63,6 @@ RunSimulation::~RunSimulation()
 {
 }
 
-// float zCirclePosCam(float x, float radius)
-// {
-//     float z;
-
-//     z = sqrt(pow(radius, 2) - pow(x, 2));
-
-//     return z;
-// }
-
 void RunSimulation::Start(int screenHeight, int screenWidth)
 {
     plane.loadObjectModel();
@@ -79,9 +70,6 @@ void RunSimulation::Start(int screenHeight, int screenWidth)
     renderWidth = GetRenderWidth();
     renderHeight = GetRenderHeight();
     test = 3;
-    // airplane = LoadModel("models/object/airplane.obj");
-    // airplaneTexture = LoadTexture("models/texture/Untitled1485_20230104061358.png");
-    // airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
 
     cameraPos = {0.0f, 0.0f, -120.0f};
     cameraXYPos = {cameraPos.x, cameraPos.y};
@@ -97,7 +85,6 @@ void RunSimulation::Start(int screenHeight, int screenWidth)
     skyboxTexture = LoadTexture("models/texture/skyboxtexture.png");
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
     testtest = Slider(0, maxEngineTrust, renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54);
-    // testtest2 = Button(renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54);
 }
 
 bool RunSimulation::notOnGUI(Vector2 mousePosition)
@@ -180,35 +167,29 @@ void RunSimulation::Render()
     BeginDrawing();
     ClearBackground(BLACK);
 
-    // DrawFPS(500, 500);
-
     BeginMode3D(mainCamera);
-    // DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
-    // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){180.0f, 0.0f, .0f}, 270.0f, (Vector3){0.4f, 0.4f, 0.4f}, GRAY);
-    // DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
     DrawGrid(10, 10.0f);
     EndMode3D();
 
-        BeginMode3D(mainCamera);
-            DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, skybox.materials->maps->color);
-            plane.drawModel();
-            // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, GRAY);
-            DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
-            DrawGrid(10, 10.0f);
-        EndMode3D();
-        GuiPanel((Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight}, NULL);
-        // GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth/38), renderHeight/3.6, (renderWidth / 8) - (renderWidth/38)*2, renderHeight/54}, NULL, NULL, &engineTrust, 0, maxEngineTrust);
-        testtest.DrawSlider();
-        testtest2.DrawButton();
-        // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT");
-        // GuiLayoutName();
-        // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
-        // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
+    BeginMode3D(mainCamera);
+    DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
+    plane.drawModel();
+    DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
+    DrawGrid(10, 10.0f);
+    EndMode3D();
+    GuiPanel((Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight}, NULL);
+    GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, NULL, NULL, &engineTrust, 0, maxEngineTrust);
+    testtest.DrawSlider();
+    testtest2.DrawButton();
+    // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT");
+    // GuiLayoutName();
+    // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
+    // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
     EndDrawing();
 }
 
 void RunSimulation::run()
-{   
+{
     InitWindow(0, 0, "airplane simulation");
     ToggleFullscreen();
     const int screenWidth = GetScreenWidth();

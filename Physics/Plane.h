@@ -21,7 +21,7 @@ public:
 Plane::Plane(float givenMass, Vector3 startingPos)
 {
       mass = givenMass;
-      speed = {0,0,0};
+      speed = {0, 0, 0};
       anglePitch = 0;
       angleYaw = 0;
       angleRoll = 0;

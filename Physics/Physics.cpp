@@ -104,7 +104,7 @@ float Physics::calcHypot(Vector3 components)
 Vector3 Physics::calcAcceleration(physicsVector force, float mass) // newton: F = m・a ------ a = F/m
 {
     Vector3 acceleration;
-    acceleration.x = force.components.x / mass;  
+    acceleration.x = force.components.x / mass;
     acceleration.y = force.components.y / mass;
     acceleration.z = force.components.z / mass;
     return acceleration;
