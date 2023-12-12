@@ -454,7 +454,39 @@ void NavierStokes::calc() {
                   }
                   pv.at(i) = lTimesR;
             }
+
+            int n = 0;
+            std::vector<std::vector<float>> p = zeros(iMax, jMax);
+
+            for (int j=jMin; j < jMax+1; j++) {
+                  for (int i=iMin; i < iMax+1; i++) {
+                        n++;
+                        p.at(i).at(j) = pv.at(n);
+                  }
+            }
             
+      }
+
+      // corrector step
+
+      for (int j = jMin; j < jMax+1; j++) {
+            for (int i = iMin; i < iMax+1; i++) {
+                  u.at(i).at(j) = us.at(i).at(j) - dT/rho * (p.at(i).at(j) - p.at(i).at(j-1)) * dxi;
+            }
+      }
+
+      for (int j = jMin+1; j < jMax+1; j++) {
+            for (int i = iMin; i < iMax+1; i++) {
+                  v.at(i).at(j) = vs.at(i).at(j) - dT/rho * (p.at(i).at(j) - p.at(i).at(j-1)) * dxi;
+            }
+      }
+
+
+      for (int i=0; i < v.size(); i++) {
+            for (int j=0; j < v.at(i).size(); j++) {
+                  std::cout << v.at(i).at(j);
+            }
+            std::cout << std::endl;
       }
 
 }

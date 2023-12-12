@@ -1,10 +1,8 @@
-#include <raylib.h>
-#include <vector>
-#include <fstream>
-#include <cmath>
-#include <string>
-
-
+// #include <raylib.h>
+// #include <vector>
+// #include <fstream>
+// #include <cmath>
+// #include <string>
 
 class FluidDynamicsModel {
     private:
@@ -12,19 +10,28 @@ class FluidDynamicsModel {
         std::vector<Vector2> vt;
         std::vector<std::vector<std::string>> f;
         std::vector<std::vector<Vector3>> objectTrianglePoints;
+
+        void readObjectModelFile(std::string *as, std::string *bs, std::string *cs, double *a, double *b, double *c);
     public:
         FluidDynamicsModel();
         ~FluidDynamicsModel();
 
-        void readObjectModelFile(std::string *as, std::string *bs, std::string *cs, double *a, double *b, double *c);
+        void detectCollision();
         void loadObjectModel();
         void drawModel();
 };
 
+FluidDynamicsModel::FluidDynamicsModel() {
+
+}
+
+FluidDynamicsModel::~FluidDynamicsModel() {
+    
+}
 
 void FluidDynamicsModel::readObjectModelFile(std::string *as, std::string *bs, std::string *cs, double *a, double *b, double *c)
 {
-    std::ifstream fin("tinker.txt");
+    std::ifstream fin("models/object/txt/tinker.txt");
     std::string v2;
 
     while (fin >> v2)
@@ -96,11 +103,8 @@ void FluidDynamicsModel::loadObjectModel()
 void FluidDynamicsModel::drawModel() {
     if (objectTrianglePoints.size() >= 1) {
         for (int i=0; i < objectTrianglePoints.size(); i++) {
-            // std::cout << data.at(i).at(0).y << std::endl;
             DrawTriangle3D(objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), objectTrianglePoints.at(i).at(2), RED);
-            DrawTriangle3D( {10, 10, 10}, {20, 20, 20}, {40, 30, -10}, RED);
-
-            DrawLine3D(objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), RED);
+            DrawLine3D(objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), BLACK);
         }
     }
 }

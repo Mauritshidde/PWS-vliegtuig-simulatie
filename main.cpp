@@ -2,11 +2,14 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <fstream>
+#include <string>
 
 #define RAYGUI_IMPLEMENTATION
 #include "modules/raygui.h"
 #include "gui/simulationGui.h"
 #include <json/json.h>
+#include "Physics/ModelLoader.h"
 
 // tijdelijke plaats voor variablen die bij een andere class horen
 float maxAirspeed; // defined by mach number has to be lower than 1; speed is given in m/s
@@ -17,7 +20,8 @@ bool Button002Pressed = false;
 class RunSimulation
 {
 private:
-    Model airplane;
+    FluidDynamicsModel plane; // use this class instead of the model class for plane, because an error occurs when the model is loaded form the obj file
+    // Model airplane;
     Model skybox;
     Slider testtest;
     Button testtest2;
@@ -70,11 +74,13 @@ RunSimulation::~RunSimulation()
 
 void RunSimulation::Start(int screenHeight, int screenWidth)
 {
+    plane.loadObjectModel();
+
     renderWidth = GetRenderWidth();
     renderHeight = GetRenderHeight();
     test = 3;
-    airplane = LoadModel("models/object/airplane.obj");
-    airplaneTexture = LoadTexture("models/texture/Untitled1485_20230104061358.png");
+    // airplane = LoadModel("models/object/airplane.obj");
+    // airplaneTexture = LoadTexture("models/texture/Untitled1485_20230104061358.png");
     // airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
 
     cameraPos = {0.0f, 0.0f, -120.0f};
@@ -177,15 +183,16 @@ void RunSimulation::Render()
     // DrawFPS(500, 500);
 
     BeginMode3D(mainCamera);
-    DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
-    DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){180.0f, 0.0f, .0f}, 270.0f, (Vector3){0.4f, 0.4f, 0.4f}, GRAY);
+    // DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
+    // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){180.0f, 0.0f, .0f}, 270.0f, (Vector3){0.4f, 0.4f, 0.4f}, GRAY);
     // DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
     DrawGrid(10, 10.0f);
     EndMode3D();
 
         BeginMode3D(mainCamera);
             DrawModel(skybox, (Vector3){0.0f,0.0f,0.0f}, 1.0f, skybox.materials->maps->color);
-            DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, GRAY);
+            plane.drawModel();
+            // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f }, (Vector3){180.0f, 0.0f, .0f }, 270.0f, (Vector3){0.4f,0.4f,0.4f}, GRAY);
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f }, (Vector3){0.0f, 100.0f, 0.0f }, RED);  
             DrawGrid(10, 10.0f);
         EndMode3D();
