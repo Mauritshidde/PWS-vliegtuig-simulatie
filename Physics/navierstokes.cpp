@@ -3,6 +3,7 @@
 #include <math.h>
 #include <bits/stdc++.h>
 
+#include <matplot/matplot.h>
 class NavierStokes
 {
 private:
