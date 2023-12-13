@@ -3,6 +3,8 @@
 #include <math.h>
 #include <bits/stdc++.h>
 
+#include "matplotlibcpp.h"
+namespace mat = matplotlibcpp;
 class NavierStokes
 {
 private:
@@ -41,6 +43,7 @@ public:
       void createMesh();
       void boundaryConditions();
       std::vector<std::vector<float>> calcL(std::vector<std::vector<float>> L);
+      void plot();
       void calc();
 };
 
@@ -68,9 +71,8 @@ NavierStokes::NavierStokes()
       detOfL = determinantOfMatrix(L, L.size());
 
       invL = inverse(L, invL);
-}
+} 
 
-#include <vector>
 
 void getCofactor(std::vector<std::vector<float>> A, std::vector<std::vector<float>> temp, int p, int q, int n)
 {
@@ -193,6 +195,13 @@ std::vector<std::vector<float>> NavierStokes::calcL(std::vector<std::vector<floa
             }
             L.at(0).at(0) = 1;
       }
+}
+
+void NavierStokes::plot()
+{
+
+      // mat::quiver(x, y, u, v);
+      // mat::show();
 }
 
 std::vector<float> linspace(int startX, int endX, int steps)
