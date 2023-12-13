@@ -5,7 +5,7 @@
 
 #include "matplotlibcpp.h"
 namespace mat = matplotlibcpp;
-void getCofactor(std::vector<std::vector<float>> A, std::vector<std::vector<float>> temp, int p, int q, int n)
+void getCofactor(std::vector<std::vector<float>> A, int temp[][], int p, int q, int n)
 {
       int i = 0, j = 0;
       for (int row = 0; row < n; row++)
@@ -14,7 +14,7 @@ void getCofactor(std::vector<std::vector<float>> A, std::vector<std::vector<floa
             {
                   if (row != p && col != q)
                   {
-                        temp.at(i).at(j++) = A.at(row).at(col);
+                        temp[i][j++] = A.at(row).at(col);
                         if (j == n - 1)
                         {
                               j = 0;
@@ -63,6 +63,23 @@ void adjoint(std::vector<std::vector<float>> A, std::vector<std::vector<float>> 
                   adj[j][i] = (sign) * (determinant(temp, A.size() - 1));
             }
       }
+}
+
+std::vector<std::vector<float>> zeros(int width, int height)
+{
+      std::vector<std::vector<float>> vector;
+
+      for (int i = 0; i < width; i++)
+      {
+            std::vector<float> helper;
+            for (int j = 0; j < height; j++)
+            {
+                  helper.push_back(0);
+            }
+            vector.push_back(helper);
+      }
+
+      return vector;
 }
 
 std::vector<std::vector<float>> inverse(std::vector<std::vector<float>> A, std::vector<std::vector<float>> inverse)
@@ -196,6 +213,7 @@ std::vector<std::vector<float>> NavierStokes::calcL(std::vector<std::vector<floa
             }
             L.at(0).at(0) = 1;
       }
+      return L;
 }
 
 void NavierStokes::plot()
@@ -370,22 +388,6 @@ void NavierStokes::boundaryConditions()
       }
 }
 
-std::vector<std::vector<float>> zeros(int width, int height)
-{
-      std::vector<std::vector<float>> vector;
-
-      for (int i = 0; i < width; i++)
-      {
-            std::vector<float> helper;
-            for (int j = 0; j < height; j++)
-            {
-                  helper.push_back(0);
-            }
-            vector.push_back(helper);
-      }
-
-      return vector;
-}
 
 float det(std::vector<std::vector<float>> A)
 {
