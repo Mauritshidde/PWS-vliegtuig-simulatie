@@ -5,6 +5,85 @@
 
 #include "matplotlibcpp.h"
 namespace mat = matplotlibcpp;
+void getCofactor(std::vector<std::vector<float>> A, std::vector<std::vector<float>> temp, int p, int q, int n)
+{
+      int i = 0, j = 0;
+      for (int row = 0; row < n; row++)
+      {
+            for (int col = 0; col < n; col++)
+            {
+                  if (row != p && col != q)
+                  {
+                        temp.at(i).at(j++) = A.at(row).at(col);
+                        if (j == n - 1)
+                        {
+                              j = 0;
+                              i++;
+                        }
+                  }
+            }
+      }
+}
+
+int determinant(std::vector<std::vector<float>> A, int n)
+{
+      int D = 0; // Initialize result
+      if (n == 1)
+      {
+            return A.at(0).at(0);
+      }
+
+      std::vector<std::vector<float>> temp; // To store cofactors
+      int sign = 1;                         // To store sign multiplier
+
+      for (int f = 0; f < n; f++)
+      {
+            getCofactor(A, temp, 0, f, n);
+            D += sign * A.at(0).at(f) * determinant(temp, n - 1);
+            sign = -sign;
+      }
+      return D;
+}
+
+void adjoint(std::vector<std::vector<float>> A, std::vector<std::vector<float>> adj)
+{
+      if (A.size() == 1)
+      {
+            adj[0][0] = 1;
+            return;     
+      }
+      int sign = 1;
+      int temp[A.size()][A.size()];
+      for (int i = 0; i < A.size(); i++)
+      {
+            for (int j = 0; j < A.size(); j++)
+            {
+                  getCofactor(A, temp, i, j, A.size());
+                  sign = ((i + j) % 2 == 0) ? 1 : -1;
+                  adj[j][i] = (sign) * (determinant(temp, A.size() - 1));
+            }
+      }
+}
+
+std::vector<std::vector<float>> inverse(std::vector<std::vector<float>> A, std::vector<std::vector<float>> inverse)
+{
+      int det = determinant(A, A.size());
+      if (det == 0)
+      {
+            std::cout << "Singular matrix, can't find its inverse";
+            return A = zeros(A.size() * A.size(), A.size() * A.size());
+      }
+
+      std::vector<std::vector<float>> adj;
+      adjoint(A, adj);
+
+      for (int i = 0; i < A.size(); i++)
+            for (int j = 0; j < A.size(); j++)
+                  inverse.at(i).at(j) = adj.at(i).at(j) / float(det);
+
+      return A;
+}
+
 class NavierStokes
 {
 private:
@@ -74,84 +153,6 @@ NavierStokes::NavierStokes()
 } 
 
 
-void getCofactor(std::vector<std::vector<float>> A, std::vector<std::vector<float>> temp, int p, int q, int n)
-{
-      int i = 0, j = 0;
-      for (int row = 0; row < n; row++)
-      {
-            for (int col = 0; col < n; col++)
-            {
-                  if (row != p && col != q)
-                  {
-                        temp.at(i).at(j++) = A.at(row).at(col);
-                        if (j == n - 1)
-                        {
-                              j = 0;
-                              i++;
-                        }
-                  }
-            }
-      }
-}
-
-int determinant(std::vector<std::vector<float>> A, int n)
-{
-      int D = 0; // Initialize result
-      if (n == 1)
-      {
-            return A.at(0).at(0);
-      }
-
-      std::vector<std::vector<float>> temp; // To store cofactors
-      int sign = 1;                         // To store sign multiplier
-
-      for (int f = 0; f < n; f++)
-      {
-            getCofactor(A, temp, 0, f, n);
-            D += sign * A.at(0).at(f) * determinant(temp, n - 1);
-            sign = -sign;
-      }
-      return D;
-}
-
-void adjoint(std::vector<std::vector<float>> A, std::vector<std::vector<float>> adj)
-{
-      if (A.size() == 1)
-      {
-            adj[0][0] = 1;
-            return;
-      }
-      int sign = 1;
-      int temp[A.size()][A.size()};
-      for (int i = 0; i < A.size(); i++)
-      {
-            for (int j = 0; j < A.size(); j++)
-            {
-                  getCofactor(A, temp, i, j, A.size());
-                  sign = ((i + j) % 2 == 0) ? 1 : -1;
-                  adj[j][i] = (sign) * (determinant(temp, A.size() - 1));
-            }
-      }
-}
-
-std::vector<std::vector<float>> inverse(std::vector<std::vector<float>> A, std::vector<std::vector<float>> inverse)
-{
-      int det = determinant(A, A.size());
-      if (det == 0)
-      {
-            std::cout << "Singular matrix, can't find its inverse";
-            return A = zeros(A.size() * A.size(), A.size() * A.size());
-      }
-
-      std::vector<std::vector<float>> adj;
-      adjoint(A, adj);
-
-      for (int i = 0; i < A.size(); i++)
-            for (int j = 0; j < A.size(); j++)
-                  inverse.at(i).at(j) = adj.at(i).at(j) / float(det);
-
-      return A;
-}
 
 NavierStokes::~NavierStokes()
 {
