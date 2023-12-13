@@ -195,8 +195,8 @@ void RunSimulation::Render()
 
         BeginMode3D(mainCamera);
             DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
-            DrawModel(airplane, (Vector3){0.0f, 0.0f, 0.0f}, 0.5f, BLACK);
-            // plane.drawModel();
+            // DrawModel(airplane, (Vector3){0.0f, 0.0f, 0.0f}, 0.5f, BLACK);
+            plane.drawModel();
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
             DrawGrid(10, 10.0f);
         EndMode3D();
