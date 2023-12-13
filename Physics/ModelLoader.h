@@ -33,7 +33,7 @@ FluidDynamicsModel::~FluidDynamicsModel()
 
 void FluidDynamicsModel::readObjectModelFile(std::string *as, std::string *bs, std::string *cs, double *a, double *b, double *c)
 {
-    std::ifstream fin("models/object/txt/tinker.txt");
+    std::ifstream fin("models/object/txt/tinker2.txt");
     std::string v2;
 
     while (fin >> v2)

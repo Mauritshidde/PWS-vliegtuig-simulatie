@@ -10,19 +10,22 @@
 #include "gui/simulationGui.h"
 #include <json/json.h>
 #include "Physics/ModelLoader.h"
+#include "Physics/Plane.h"
 
 // tijdelijke plaats voor variablen die bij een andere class horen
-float maxAirspeed; // defined by mach number has to be lower than 1; speed is given in m/s
-float engineTrust = 0.0f;
-float maxEngineTrust = 1000.0f;
+float maxAirspeed = 1; // defined by mach number has to be lower than 1; this speed is given in mach whilst the speed in most other parts of the code is in m/s
+
 bool Button002Pressed = false;
 
 class RunSimulation
 {
 private:
     FluidDynamicsModel plane; // use this class instead of the model class for plane, because an error occurs when the model is loaded form the obj file
-    // Model airplane;
+    Model airplane;
     Model skybox;
+
+    Plane planePhysicsModel;
+
     Slider testtest;
     Button testtest2;
 
@@ -38,20 +41,24 @@ private:
     int renderWidth;
     int renderHeight;
 
-    float angleYAxis = 0;
-    float angleXZAxis = 0;
-    float cameraCircleRadius = 120;
+    float adiabaticIndex; // adiabatic index of air
+    float gasConstant; // the gas constant of air
+    float temperature; // the temperature
+    float speedOfSound; // the speed of sound in the simulation
 
-public:
-    float test;
-    RunSimulation();
-    ~RunSimulation();
+    float angleYAxis;
+    float angleXZAxis;
+    float cameraCircleRadius;
 
     bool notOnGUI(Vector2 mousePosition);
     void moveCamera(float deltaTime);
     void Start(int screenHeight, int screenWidth);
     void Update(float deltaTime);
     void Render();
+public:
+    RunSimulation();
+    ~RunSimulation();
+
     void run();
 };
 
@@ -69,7 +76,10 @@ void RunSimulation::Start(int screenHeight, int screenWidth)
 
     renderWidth = GetRenderWidth();
     renderHeight = GetRenderHeight();
-    test = 3;
+
+    angleYAxis = 0;
+    angleXZAxis = 0;
+    cameraCircleRadius = 120;
 
     cameraPos = {0.0f, 0.0f, -120.0f};
     cameraXYPos = {cameraPos.x, cameraPos.y};
@@ -82,9 +92,15 @@ void RunSimulation::Start(int screenHeight, int screenWidth)
     mainCamera.projection = CAMERA_PERSPECTIVE;
 
     skybox = LoadModel("models/object/skybox.obj");
+    airplane = LoadModel("models/object/plane.obj");
+    airplaneTexture = LoadTexture("models/texture/skyboxtexture.png");
     skyboxTexture = LoadTexture("models/texture/skyboxtexture.png");
+    airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
-    testtest = Slider(0, maxEngineTrust, renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54);
+    
+    planePhysicsModel = Plane(41145, {0,0,0});
+
+    testtest = Slider(0, planePhysicsModel.maxEngineTrust, renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54);
 }
 
 bool RunSimulation::notOnGUI(Vector2 mousePosition)
@@ -152,6 +168,11 @@ void RunSimulation::moveCamera(float deltaTime)
 
 void RunSimulation::Update(float deltaTime)
 {
+    speedOfSound = sqrt(adiabaticIndex * gasConstant * temperature);
+
+    if (planePhysicsModel.totalSpeed/speedOfSound <= 0.8) {
+        planePhysicsModel.totalSpeed = 0.8 * speedOfSound;
+    }
     // first value updates over time
     // after that value updates by gui or key inputs
     moveCamera(deltaTime);
@@ -165,26 +186,29 @@ void RunSimulation::Render()
     Vector2 panelScroll = {99, -20};
     Rectangle sliderRec = {renderWidth - 240, 40, 200, 150};
     BeginDrawing();
-    ClearBackground(BLACK);
+        ClearBackground(BLACK);
 
-    BeginMode3D(mainCamera);
-    DrawGrid(10, 10.0f);
-    EndMode3D();
+        BeginMode3D(mainCamera);
+            DrawGrid(10, 10.0f);
+        EndMode3D();
 
-    BeginMode3D(mainCamera);
-    DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
-    plane.drawModel();
-    DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
-    DrawGrid(10, 10.0f);
-    EndMode3D();
-    GuiPanel((Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight}, NULL);
-    GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, NULL, NULL, &engineTrust, 0, maxEngineTrust);
-    testtest.DrawSlider();
-    testtest2.DrawButton();
-    // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT");
-    // GuiLayoutName();
-    // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
-    // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
+        BeginMode3D(mainCamera);
+            DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
+            DrawModel(airplane, (Vector3){0.0f, 0.0f, 0.0f}, 0.5f, BLACK);
+            // plane.drawModel();
+            DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
+            DrawGrid(10, 10.0f);
+        EndMode3D();
+        
+        GuiPanel((Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight}, NULL);
+        GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, NULL, NULL, &planePhysicsModel.maxEngineTrust, 0, planePhysicsModel.currentEngineTrust);
+
+        testtest.DrawSlider();
+        testtest2.DrawButton();
+        // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT");
+        // GuiLayoutName();
+        // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
+        // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
     EndDrawing();
 }
 
