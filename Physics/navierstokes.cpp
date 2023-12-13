@@ -119,7 +119,8 @@ void adjoint(std::vector<std::vector<float>> A, std::vector<std::vector<float>> 
             adj[0][0] = 1;
             return;
       }
-      int sign = 1, temp[N][N];
+      int sign = 1;
+      int temp[A.size()][A.size()};
       for (int i = 0; i < A.size(); i++)
       {
             for (int j = 0; j < A.size(); j++)

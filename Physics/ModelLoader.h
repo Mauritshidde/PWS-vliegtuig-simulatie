@@ -21,6 +21,8 @@ public:
     void detectCollision();
     void loadObjectModel();
     void drawModel();
+
+    void modelToCubes();
 };
 
 FluidDynamicsModel::FluidDynamicsModel()
@@ -112,4 +114,8 @@ void FluidDynamicsModel::drawModel()
             DrawLine3D(objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), BLACK);
         }
     }
+}
+
+void modelToCubes() {
+    // start with a cube in the middle and go in every direction until collision with the object repeat for every cube;
 }
