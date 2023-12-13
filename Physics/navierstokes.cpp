@@ -2,7 +2,7 @@
 #include <raylib.h>
 #include <math.h>
 #include <bits/stdc++.h>
-
+#define WITHOUT_NUMPY
 #include "matplotlibcpp.h"
 namespace mat = matplotlibcpp;
 void getCofactor(std::vector<std::vector<float>> A, int temp[][], int p, int q, int n)
@@ -33,6 +33,16 @@ int determinant(std::vector<std::vector<float>> A, int n)
             return A.at(0).at(0);
       }
 
+      std::vector<std::vector<float>> temp; // To store cofactors
+      int sign = 1;                         // To store sign multiplier
+
+      for (int f = 0; f < n; f++)
+      {
+            getCofactor(A, temp, 0, f, n);
+            D += sign * A.at(0).at(f) * determinant(temp, n - 1);
+            sign = -sign;
+      }
+      return D;
       std::vector<std::vector<float>> temp; // To store cofactors
       int sign = 1;                         // To store sign multiplier
 
