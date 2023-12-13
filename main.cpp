@@ -11,6 +11,7 @@
 #include <json/json.h>
 #include "Physics/ModelLoader.h"
 #include "Physics/Plane.h"
+#include "ui/menu.h"
 
 // tijdelijke plaats voor variablen die bij een andere class horen
 float maxAirspeed = 1; // defined by mach number has to be lower than 1; this speed is given in mach whilst the speed in most other parts of the code is in m/s
