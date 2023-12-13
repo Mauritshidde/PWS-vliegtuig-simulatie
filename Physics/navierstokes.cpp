@@ -2,77 +2,125 @@
 #include <raylib.h>
 #include <math.h>
 #include <bits/stdc++.h>
+
 #define WITHOUT_NUMPY
 #include "matplotlibcpp.h"
 namespace mat = matplotlibcpp;
-void getCofactor(std::vector<std::vector<float>> A, int temp[][], int p, int q, int n)
-{
-      int i = 0, j = 0;
-      for (int row = 0; row < n; row++)
-      {
-            for (int col = 0; col < n; col++)
-            {
-                  if (row != p && col != q)
-                  {
-                        temp[i][j++] = A.at(row).at(col);
-                        if (j == n - 1)
-                        {
-                              j = 0;
-                              i++;
-                        }
-                  }
+
+float getDeterminant(const std::vector<std::vector<float>> vect) {
+    if(vect.size() != vect[0].size()) {
+        throw std::runtime_error("Matrix is not quadratic");
+    } 
+    int dimension = vect.size();
+
+    if(dimension == 0) {
+        return 1;
+    }
+
+    if(dimension == 1) {
+        return vect[0][0];
+    }
+
+    //Formula for 2x2-matrix
+    if(dimension == 2) {
+        return vect[0][0] * vect[1][1] - vect[0][1] * vect[1][0];
+    }
+
+    float result = 0;
+    int sign = 1;
+    for(int i = 0; i < dimension; i++) {
+
+        //Submatrix
+        std::vector<std::vector<float>> subVect(dimension - 1, std::vector<float> (dimension - 1));
+        for(int m = 1; m < dimension; m++) {
+            int z = 0;
+            for(int n = 0; n < dimension; n++) {
+                if(n != i) {
+                    subVect[m-1][z] = vect[m][n];
+                    z++;
+                }
             }
-      }
+        }
+
+        //recursive call
+        result = result + sign * vect[0][i] * getDeterminant(subVect);
+        sign = -sign;
+    }
+
+    return result;
 }
 
-int determinant(std::vector<std::vector<float>> A, int n)
-{
-      int D = 0; // Initialize result
-      if (n == 1)
-      {
-            return A.at(0).at(0);
-      }
+std::vector<std::vector<float>> getTranspose(const std::vector<std::vector<float>> matrix1) {
 
-      std::vector<std::vector<float>> temp; // To store cofactors
-      int sign = 1;                         // To store sign multiplier
+    //Transpose-matrix: height = width(matrix), width = height(matrix)
+    std::vector<std::vector<float>> solution(matrix1[0].size(), std::vector<float> (matrix1.size()));
 
-      for (int f = 0; f < n; f++)
-      {
-            getCofactor(A, temp, 0, f, n);
-            D += sign * A.at(0).at(f) * determinant(temp, n - 1);
-            sign = -sign;
-      }
-      return D;
-      std::vector<std::vector<float>> temp; // To store cofactors
-      int sign = 1;                         // To store sign multiplier
-
-      for (int f = 0; f < n; f++)
-      {
-            getCofactor(A, temp, 0, f, n);
-            D += sign * A.at(0).at(f) * determinant(temp, n - 1);
-            sign = -sign;
-      }
-      return D;
+    //Filling solution-matrix
+    for(size_t i = 0; i < matrix1.size(); i++) {
+        for(size_t j = 0; j < matrix1[0].size(); j++) {
+            solution[j][i] = matrix1[i][j];
+        }
+    }
+    return solution;
 }
 
-void adjoint(std::vector<std::vector<float>> A, std::vector<std::vector<float>> adj)
-{
-      if (A.size() == 1)
-      {
-            adj[0][0] = 1;
-            return;     
-      }
-      int sign = 1;
-      int temp[A.size()][A.size()];
-      for (int i = 0; i < A.size(); i++)
-      {
-            for (int j = 0; j < A.size(); j++)
-            {
-                  getCofactor(A, temp, i, j, A.size());
-                  sign = ((i + j) % 2 == 0) ? 1 : -1;
-                  adj[j][i] = (sign) * (determinant(temp, A.size() - 1));
+std::vector<std::vector<float>> getCofactor(const std::vector<std::vector<float>> vect) {
+    if(vect.size() != vect[0].size()) {
+        throw std::runtime_error("Matrix is not quadratic");
+    } 
+
+    std::vector<std::vector<float>> solution(vect.size(), std::vector<float> (vect.size()));
+    std::vector<std::vector<float>> subVect(vect.size() - 1, std::vector<float> (vect.size() - 1));
+
+    for(std::size_t i = 0; i < vect.size(); i++) {
+        for(std::size_t j = 0; j < vect[0].size(); j++) {
+
+            int p = 0;
+            for(size_t x = 0; x < vect.size(); x++) {
+                if(x == i) {
+                    continue;
+                }
+                int q = 0;
+
+                for(size_t y = 0; y < vect.size(); y++) {
+                    if(y == j) {
+                        continue;
+                    }
+
+                    subVect[p][q] = vect[x][y];
+                    q++;
+                }
+                p++;
             }
-      }
+            solution[i][j] = pow(-1, i + j) * getDeterminant(subVect);
+        }
+    }
+    return solution;
+}
+
+std::vector<std::vector<float>> getInverse(const std::vector<std::vector<float>> vect) {
+    if(getDeterminant(vect) == 0) {
+        throw std::runtime_error("Determinant is 0");
+    } 
+
+    float d = 1.0/getDeterminant(vect);
+    std::vector<std::vector<float>> solution(vect.size(), std::vector<float> (vect.size()));
+
+    for(size_t i = 0; i < vect.size(); i++) {
+        for(size_t j = 0; j < vect.size(); j++) {
+            solution[i][j] = vect[i][j]; 
+        }
+    }
+
+    solution = getTranspose(getCofactor(solution));
+
+    for(size_t i = 0; i < vect.size(); i++) {
+        for(size_t j = 0; j < vect.size(); j++) {
+            solution[i][j] *= d;
+        }
+    }
+
+    return solution;
 }
 
 std::vector<std::vector<float>> zeros(int width, int height)
@@ -92,23 +140,58 @@ std::vector<std::vector<float>> zeros(int width, int height)
       return vector;
 }
 
-std::vector<std::vector<float>> inverse(std::vector<std::vector<float>> A, std::vector<std::vector<float>> inverse)
+float det(std::vector<std::vector<float>> A)
 {
-      int det = determinant(A, A.size());
-      if (det == 0)
+}
+
+float determinantOfMatrix(std::vector<std::vector<float>> mat, int n)
+{
+      float num1, num2, det = 1, index, total = 1;
+
+      float temp[n + 1];
+
+      for (int i = 0; i < n; i++)
       {
-            std::cout << "Singular matrix, can't find its inverse";
-            return A = zeros(A.size() * A.size(), A.size() * A.size());
+            index = i;
+            while (index < n && mat.at(index).at(i) == 0)
+            {
+                  index++;
+            }
+            if (index == n)
+            {
+                  continue;
+            }
+            if (index != i)
+            {
+                  for (int j = 0; j < n; j++)
+                  {
+                        std::swap(mat.at(index).at(j), mat.at(i).at(j));
+                  }
+                  det = det * pow(-1, index - i);
+            }
+
+            for (int j = 0; j < n; j++)
+            {
+                  temp[j] = mat.at(i).at(j);
+            }
+            for (int j = i + 1; j < n; j++)
+            {
+                  num1 = temp[i];         // value of diagonal element
+                  num2 = mat.at(j).at(i); // value of next row element
+
+                  for (int k = 0; k < n; k++)
+                  {
+                        mat.at(j).at(k) = (num1 * mat.at(j).at(k)) - (num2 * temp[k]);
+                  }
+                  total = total * num1; // Det(kA)=kDet(A);
+            }
       }
 
-      std::vector<std::vector<float>> adj;
-      adjoint(A, adj);
-
-      for (int i = 0; i < A.size(); i++)
-            for (int j = 0; j < A.size(); j++)
-                  inverse.at(i).at(j) = adj.at(i).at(j) / float(det);
-
-      return A;
+      for (int i = 0; i < n; i++)
+      {
+            det = det * mat.at(i).at(i);
+      }
+      return (det / total); // Det(kA)/k=Det(A);
 }
 
 class NavierStokes
@@ -153,6 +236,19 @@ public:
       void calc();
 };
 
+std::vector<float> linspace(int startX, int endX, int steps)
+{
+      float stepSize = (endX - startX) / (steps - 1);
+      std::vector<float> coords;
+
+      for (int i = 0; i < steps; i++)
+      {
+            coords.push_back(startX + (stepSize * i));
+      }
+
+      return coords;
+}
+
 NavierStokes::NavierStokes()
 {
       maxTime = 1000;
@@ -176,7 +272,7 @@ NavierStokes::NavierStokes()
       L = calcL(L);
       detOfL = determinantOfMatrix(L, L.size());
 
-      invL = inverse(L, invL);
+      invL = getInverse(L);
 } 
 
 
@@ -245,18 +341,6 @@ void NavierStokes::plot()
       mat::show();
 }
 
-std::vector<float> linspace(int startX, int endX, int steps)
-{
-      float stepSize = (endX - startX) / (steps - 1);
-      std::vector<float> coords;
-
-      for (int i = 0; i < steps; i++)
-      {
-            coords.push_back(startX + (stepSize * i));
-      }
-
-      return coords;
-}
 
 void NavierStokes::generateVectors()
 {
@@ -336,7 +420,7 @@ void NavierStokes::generateVectors()
             }
       }
 
-      int n = 0;
+      n = 0;
       for (int j = jMin; j < jMax + 1; j++)
       {
             for (int i = iMin; i < iMax + 1; i++)
@@ -399,59 +483,6 @@ void NavierStokes::boundaryConditions()
 }
 
 
-float det(std::vector<std::vector<float>> A)
-{
-}
-
-float determinantOfMatrix(std::vector<std::vector<float>> mat, int n)
-{
-      float num1, num2, det = 1, index, total = 1;
-
-      float temp[n + 1];
-
-      for (int i = 0; i < n; i++)
-      {
-            index = i;
-            while (index < n && mat.at(index).at(i) == 0)
-            {
-                  index++;
-            }
-            if (index == n)
-            {
-                  continue;
-            }
-            if (index != i)
-            {
-                  for (int j = 0; j < n; j++)
-                  {
-                        std::swap(mat.at(index).at(j), mat.at(i).at(j));
-                  }
-                  det = det * pow(-1, index - i);
-            }
-
-            for (int j = 0; j < n; j++)
-            {
-                  temp[j] = mat.at(i).at(j);
-            }
-            for (int j = i + 1; j < n; j++)
-            {
-                  num1 = temp[i];         // value of diagonal element
-                  num2 = mat.at(j).at(i); // value of next row element
-
-                  for (int k = 0; k < n; k++)
-                  {
-                        mat.at(j).at(k) = (num1 * mat.at(j).at(k)) - (num2 * temp[k]);
-                  }
-                  total = total * num1; // Det(kA)=kDet(A);
-            }
-      }
-
-      for (int i = 0; i < n; i++)
-      {
-            det = det * mat.at(i).at(i);
-      }
-      return (det / total); // Det(kA)/k=Det(A);
-}
 
 void NavierStokes::calc()
 {
@@ -531,7 +562,7 @@ void NavierStokes::calc()
                   pv.at(i) = lTimesR;
             }
 
-            int n = 0;
+            n = 0;
             std::vector<std::vector<float>> p = zeros(iMax, jMax);
 
             for (int j = jMin; j < jMax + 1; j++)

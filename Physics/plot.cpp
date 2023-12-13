@@ -1,3 +1,4 @@
+#define WITHOUT_NUMPY
 #include "matplotlibcpp.h"
 namespace mat = matplotlibcpp;
 int main()
