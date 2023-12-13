@@ -12,19 +12,19 @@ int main()
             v.push_back(-j);
         }
     }
-    // std::cout << "{";
-    // for (int i = 0; i < x.size(); i++)
-    // {
-    //     std::cout << x.at(i) << ", ";
-    // }
-    // std::cout << "} \n";
+    std::cout << "{";
+    for (int i = 0; i < x.size(); i++)
+    {
+        std::cout << x.at(i) << ", ";
+    }
+    std::cout << "} \n";
 
-    // std::cout << "{";
-    // for (int i = 0; i < y.size(); i++)
-    // {
-    //     std::cout << y.at(i) << ", ";
-    // }
-    // std::cout << "} \n";
+    std::cout << "{";
+    for (int i = 0; i < y.size(); i++)
+    {
+        std::cout << y.at(i) << ", ";
+    }
+    std::cout << "} \n";
 
     std::cout << "{";
     for (int i = 0; i < u.size(); i++)

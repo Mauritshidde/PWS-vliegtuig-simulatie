@@ -198,9 +198,21 @@ std::vector<std::vector<float>> NavierStokes::calcL(std::vector<std::vector<floa
 
 void NavierStokes::plot()
 {
+      std::vector<int> meshXCoordinates, meshYCoordinates;
+      std::vector<int> xVelComponent, yVelComponent;
 
-      // mat::quiver(x, y, u, v);
-      // mat::show();
+      for (int i = iMin; i <= iMax; i++)
+      {
+            for (int j = jMin; j <= jMax; i++)
+            {
+                  meshXCoordinates.push_back(j);
+                  meshYCoordinates.push_back(i);
+                  xVelComponent.push_back(u.at(j).at(i));
+                  yVelComponent.push_back(v.at(j).at(i));
+            }       
+      }
+      mat::quiver(meshXCoordinates, meshYCoordinates, xVelComponent, yVelComponent);
+      mat::show();
 }
 
 std::vector<float> linspace(int startX, int endX, int steps)
@@ -544,7 +556,17 @@ void NavierStokes::calc()
             }
             std::cout << std::endl;
       }
+      plot();
 }
+
+int main(int argc, char const *argv[])
+{
+      NavierStokes fluidSimulation;
+      fluidSimulation = NavierStokes();
+      fluidSimulation.calc();
+      return 0;
+}
+
 
 /*
 Code overview:
