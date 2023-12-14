@@ -3,7 +3,7 @@ class Menu
 private:
     const char *oneLetter = "A";
     const char *simuText = "Simulation";
-    const char *cdfText = "CDf";
+    const char *cdfText = "CFD";
     const char *addtext = "Add module";
     const char *settingsText = "Settings";
     const char *quitText = "Quit";
@@ -65,6 +65,7 @@ void Menu::Draw(int screenWidth, int screenHeight) {
             if (selected == i) {
                 DrawText(menuTexts.at(i), (screenWidth/2)-(MeasureText(menuTexts.at(i), fontSize)/2), val*(i+1)-50, fontSize, RED);
                 // DrawLine((screenWidth/2)-(MeasureText(menuTexts.at(i), 100)/2) - (lenghtOfOneLetter/2), val*(i+1)-50-(screenWidth/20), (screenWidth/2)-(MeasureText(menuTexts.at(i), 100)/2) + lenghtOfOneLetter, val*(i+1)-50-(screenWidth/20), RED);
+                DrawLine(startX.at(i) - (lenghtOfOneLetter/2), startY.at(i) + (lenghtOfOneLetter/10), endX.at(i) + lenghtOfOneLetter, startY.at(i) + (lenghtOfOneLetter/10), RED);
             } else {
                 DrawText(menuTexts.at(i), (screenWidth/2)-(MeasureText(menuTexts.at(i), fontSize)/2), val*(i+1)-50, fontSize, BLACK);
             }
@@ -106,7 +107,11 @@ void Menu::Update(int screenWidth, int screenHeight) {
                 break;
             }
         }
+    } else if (IsKeyPressed(KEY_ENTER)) {
+        buttonPressed = selected;
+        isButtonPressed = true;
     }
+    
 
     if (isButtonPressed) {
         if (buttonPressed == 0) {
