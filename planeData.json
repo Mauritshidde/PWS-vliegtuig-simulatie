@@ -1,0 +1,16 @@
+{
+    "Planes": [
+        {
+            "name": "Boeing 737",
+            "minimal mass": 1,
+            "maximal mass": 1,
+            "thrust": 1,
+            "cl file name": "file", 
+            "model file name": "file",
+            "hasTexture": "no",
+            "texture file name": "file",
+            "fuel capacity": 100,
+            "description": "model of an boeing 737 "
+        }
+    ]
+}

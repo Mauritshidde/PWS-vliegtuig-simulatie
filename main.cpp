@@ -9,6 +9,7 @@
 #include "modules/raygui.h"
 #include "gui/simulationGui.h"
 #include <json/json.h>
+
 #include "Physics/ModelLoader.h"
 #include "Physics/Plane.h"
 #include "ui/menu.h"
@@ -28,8 +29,8 @@ private:
     Menu mainMenu;
     Plane planePhysicsModel;
 
-    Slider testtest;
-    Button testtest2;
+    // Slider testtest;
+    // Button testtest2;
 
     Vector2 previousMousePosition;
 
@@ -51,6 +52,11 @@ private:
     float angleYAxis;
     float angleXZAxis;
     float cameraCircleRadius;
+
+    float maxAngle;
+    float currentAngle;
+    const char *minText = "0";
+    const char *maxText = "360";
 
     bool notOnGUI(Vector2 mousePosition);
     void moveCamera(float deltaTime);
@@ -75,6 +81,9 @@ RunSimulation::~RunSimulation()
 void RunSimulation::Start(int screenWidth, int screenHeight)
 {
     plane.loadObjectModel();
+
+    maxAngle = 360;
+    currentAngle = 0;
 
     renderWidth = GetRenderWidth();
     renderHeight = GetRenderHeight();
@@ -104,7 +113,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     
     planePhysicsModel = Plane(41145, {0,0,0});
 
-    testtest = Slider(0, planePhysicsModel.maxEngineTrust, renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54);
+    // testtest = Slider(0, planePhysicsModel.maxEngineTrust, renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54);
 }
 
 bool RunSimulation::notOnGUI(Vector2 mousePosition)
@@ -209,17 +218,22 @@ void RunSimulation::Render()
 
             BeginMode3D(mainCamera);
                 DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
+                DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, currentAngle, (Vector3){0.5f, 0.5f, 0.5f}, RED); // 2de vector geeft aan met welke factor hij met currentangle draait 
                 // DrawModel(airplane, (Vector3){0.0f, 0.0f, 0.0f}, 0.5f, BLACK);
-                plane.drawModel();
+                // plane.drawModel();
                 DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
                 DrawGrid(10, 10.0f);
             EndMode3D();
             
             GuiPanel((Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight}, NULL);
-            GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, NULL, NULL, &planePhysicsModel.maxEngineTrust, 0, planePhysicsModel.currentEngineTrust);
-
-            testtest.DrawSlider();
-            testtest2.DrawButton();
+            // GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, NULL, NULL, &planePhysicsModel.maxEngineTrust, 0, planePhysicsModel.currentEngineTrust);
+            
+            GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, minText, maxText, &currentAngle, 0, maxAngle);
+            std::cout << currentAngle << std::endl;
+            // GuiSlider(Rectangle bounds, const char *textLeft, const char *textRight, float *value, float minValue, float maxValue);
+            
+            // testtest.DrawSlider();
+            // testtest2.DrawButton();
             // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT");
             // GuiLayoutName();
             // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
