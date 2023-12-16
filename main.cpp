@@ -7,6 +7,10 @@
 
 #define RAYGUI_IMPLEMENTATION
 #include "modules/raygui.h"
+
+#define RAYMATH_IMPLEMENTATION
+#include "modules/raymath.h"
+
 #include "gui/simulationGui.h"
 #include <json/json.h>
 
@@ -54,7 +58,10 @@ private:
     float cameraCircleRadius;
 
     float maxAngle;
-    float currentAngle;
+    float currentPitchAngle;
+    float currentYawAngle;
+    float currentRollAngle;
+
     const char *minText = "0";
     const char *maxText = "360";
 
@@ -83,7 +90,9 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     plane.loadObjectModel();
 
     maxAngle = 360;
-    currentAngle = 0;
+    currentPitchAngle = 0;
+    currentYawAngle = 0;
+    currentRollAngle = 0;
 
     renderWidth = GetRenderWidth();
     renderHeight = GetRenderHeight();
@@ -218,7 +227,9 @@ void RunSimulation::Render()
 
             BeginMode3D(mainCamera);
                 DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
-                DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, currentAngle, (Vector3){0.5f, 0.5f, 0.5f}, RED); // 2de vector geeft aan met welke factor hij met currentangle draait 
+                
+                airplane.transform = MatrixRotateXYZ((Vector3){ DEG2RAD*currentPitchAngle, DEG2RAD*currentYawAngle, DEG2RAD*currentRollAngle});
+                DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, currentPitchAngle, (Vector3){0.5f, 0.5f, 0.5f}, RED); // 2de vector geeft aan met welke factor hij met currentangle draait 
                 // DrawModel(airplane, (Vector3){0.0f, 0.0f, 0.0f}, 0.5f, BLACK);
                 // plane.drawModel();
                 DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
@@ -228,8 +239,10 @@ void RunSimulation::Render()
             GuiPanel((Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight}, NULL);
             // GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, NULL, NULL, &planePhysicsModel.maxEngineTrust, 0, planePhysicsModel.currentEngineTrust);
             
-            GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, minText, maxText, &currentAngle, 0, maxAngle);
-            std::cout << currentAngle << std::endl;
+            GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, minText, maxText, &currentPitchAngle, 0, maxAngle);
+            GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 5, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 50}, minText, maxText, &currentYawAngle, 0, maxAngle);
+            GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 6.4, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 46}, minText, maxText, &currentRollAngle, 0, maxAngle);
+            std::cout << currentPitchAngle << " " << currentRollAngle << std::endl;
             // GuiSlider(Rectangle bounds, const char *textLeft, const char *textRight, float *value, float minValue, float maxValue);
             
             // testtest.DrawSlider();
