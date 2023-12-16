@@ -23,7 +23,8 @@ NavierStokes::NavierStokes()
       L = calcL(L);
       detOfL = determinantOfMatrix(L, L.size());
 
-      invL = getInverse(L);
+      // invL = getInverse(L);
+      invL = invertMatrix(L, L.size());
       std::cout << "past l \n";
 } 
 
@@ -257,6 +258,7 @@ void NavierStokes::calc()
             {
                   for (int i = iMin + 1; i < iMax + 1; i++)
                   {
+                        std::cout << "ja 1" << std::endl;
                         float vHere = 0.25 * (v.at(i - 1).at(j) + v.at(i - 1).at(j + 1) + v.at(i).at(j) + v.at(i).at(j + 1));
                         float a = (nu * (u.at(i - 1).at(j) - 2 * u.at(i).at(j) + u.at(i + 1).at(j)) * pow(dxi, 2));
                         float b = nu * (u.at(i).at(j - 1) - 2 * u.at(i).at(j) + u.at(i).at(j + 1) * pow(dyi, 2));
@@ -265,11 +267,14 @@ void NavierStokes::calc()
                         us.at(i).at(j) = u.at(i).at(j) + dT * (a + b + c + d); // nieuwe s over tijd
                   }
             }
+            std::cout << "ja 1 2" << std::endl;
+
 
             for (int j = jMin + 1; j < jMax + 1; j++)
             {
                   for (int i = iMin; i < iMax + 1; i++)
                   {
+                        std::cout << "ja 2" << std::endl;
                         float uHere = 0.25 * (u.at(i).at(j - 1) + u.at(i).at(j) + u.at(i + 1).at(j - 1) + u.at(i + 1).at(j));
                         float a = (nu * (v.at(i - 1).at(j) - 2 * v.at(i).at(j) + v.at(i + 1).at(j)) * pow(dxi, 2));
                         float b = nu * (v.at(i).at(j - 1) - 2 * v.at(i).at(j) + v.at(i).at(j + 1) * pow(dyi, 2));
@@ -278,6 +283,7 @@ void NavierStokes::calc()
                         vs.at(i).at(j) = v.at(i).at(j) + dT * (a + b + c + d);
                   }
             }
+            std::cout << "ja 2 2" << std::endl;
 
             // std::vector<std::vector<float>> pv = L/R;
 
