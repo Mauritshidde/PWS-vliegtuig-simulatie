@@ -2,7 +2,7 @@
 
 float getDeterminant(const std::vector<std::vector<float>> vect)
 {
-      if (vect.size() != vect[0].size())
+      if (vect.size() != vect.at(0).size())
       {
             throw std::runtime_error("Matrix is not quadratic");
       }
@@ -15,13 +15,13 @@ float getDeterminant(const std::vector<std::vector<float>> vect)
 
       if (dimension == 1)
       {
-            return vect[0][0];
+            return vect.at(0).at(0);
       }
 
       // Formula for 2x2-matrix
       if (dimension == 2)
       {
-            return vect[0][0] * vect[1][1] - vect[0][1] * vect[1][0];
+            return vect.at(0).at(0) * vect.at(1).at(1) - vect.at(0).at(1) * vect.at(1).at(0);
       }
 
       float result = 0;
@@ -38,14 +38,14 @@ float getDeterminant(const std::vector<std::vector<float>> vect)
                   {
                         if (n != i)
                         {
-                              subVect[m - 1][z] = vect[m][n];
+                              subVect.at(m - 1).at(z) = vect.at(n).at(m);
                               z++;
                         }
                   }
             }
 
             // recursive call
-            result = result + sign * vect[0][i] * getDeterminant(subVect);
+            result = result + sign * vect.at(0).at(i) * getDeterminant(subVect);
             sign = -sign;
       }
 
@@ -56,14 +56,14 @@ std::vector<std::vector<float>> getTranspose(const std::vector<std::vector<float
 {
 
       // Transpose-matrix: height = width(matrix), width = height(matrix)
-      std::vector<std::vector<float>> solution(matrix1[0].size(), std::vector<float>(matrix1.size()));
+      std::vector<std::vector<float>> solution(matrix1.at(0).size(), std::vector<float>(matrix1.size()));
 
       // Filling solution-matrix
       for (size_t i = 0; i < matrix1.size(); i++)
       {
-            for (size_t j = 0; j < matrix1[0].size(); j++)
+            for (size_t j = 0; j < matrix1.at(0).size(); j++)
             {
-                  solution[j][i] = matrix1[i][j];
+                  solution.at(j).at(i) = matrix1.at(i).at(j);
             }
       }
       return solution;
@@ -71,7 +71,7 @@ std::vector<std::vector<float>> getTranspose(const std::vector<std::vector<float
 
 std::vector<std::vector<float>> getCofactor(const std::vector<std::vector<float>> vect)
 {
-      if (vect.size() != vect[0].size())
+      if (vect.size() != vect.at(0).size())
       {
             throw std::runtime_error("Matrix is not quadratic");
       }
@@ -81,7 +81,7 @@ std::vector<std::vector<float>> getCofactor(const std::vector<std::vector<float>
 
       for (std::size_t i = 0; i < vect.size(); i++)
       {
-            for (std::size_t j = 0; j < vect[0].size(); j++)
+            for (std::size_t j = 0; j < vect.at(0).size(); j++)
             {
 
                   int p = 0;
@@ -100,12 +100,12 @@ std::vector<std::vector<float>> getCofactor(const std::vector<std::vector<float>
                                     continue;
                               }
 
-                              subVect[p][q] = vect[x][y];
+                              subVect.at(p).at(q) = vect.at(x).at(y);
                               q++;
                         }
                         p++;
                   }
-                  solution[i][j] = pow(-1, i + j) * getDeterminant(subVect);
+                  solution.at(i).at(j) = pow(-1, i + j) * getDeterminant(subVect);
             }
       }
       return solution;
@@ -113,29 +113,29 @@ std::vector<std::vector<float>> getCofactor(const std::vector<std::vector<float>
 
 std::vector<std::vector<float>> getInverse(const std::vector<std::vector<float>> vect)
 {
-      if (getDeterminant(vect) == 0)
-      {
-            throw std::runtime_error("Determinant is 0");
-      }
+      // if (getDeterminant(vect) == 0)
+      // {
+      //       throw std::runtime_error("Determinant is 0");
+      // }
 
-      float d = 1.0 / getDeterminant(vect);
+      float d = 1.0 /* / getDeterminant(vect) */;
       std::vector<std::vector<float>> solution(vect.size(), std::vector<float>(vect.size()));
 
       for (size_t i = 0; i < vect.size(); i++)
       {
             for (size_t j = 0; j < vect.size(); j++)
             {
-                  solution[i][j] = vect[i][j];
+                  solution.at(i).at(j) = vect.at(i).at(j);
             }
       }
 
-      solution = getTranspose(getCofactor(solution));
+      // solution = getTranspose(getCofactor(solution));
 
       for (size_t i = 0; i < vect.size(); i++)
       {
             for (size_t j = 0; j < vect.size(); j++)
             {
-                  solution[i][j] *= d;
+                  solution.at(i).at(j) *= d;
             }
       }
 

@@ -7,8 +7,8 @@ NavierStokes::NavierStokes()
       Re = 100; // Reynolds number
       nu = 1 / Re;
 
-      nx = 50;
-      ny = 50;
+      nx = 5;
+      ny = 5;
       iMin = 1;
       iMax = nx - 1;
       jMin = 1; // jMin has to be 1;
@@ -24,6 +24,7 @@ NavierStokes::NavierStokes()
       detOfL = determinantOfMatrix(L, L.size());
 
       invL = getInverse(L);
+      std::cout << "past l \n";
 } 
 
 
@@ -34,23 +35,25 @@ NavierStokes::~NavierStokes()
 
 std::vector<std::vector<float>> NavierStokes::calcL(std::vector<std::vector<float>> L)
 {
-      for (int j = 0; j < ny + 1; j++)
+      for (int j = 1; j < ny + 1; j++)
       {
-            for (int i = 0; i < nx + 1; i++)
+            for (int i = 0; i < nx; i++)
             {
                   L.at(i + (j - 1) * nx).at(i + (j - 1) * nx) = 2 * pow(dxi, 2) + 2 * pow(dyi, 2);
 
-                  for (int k = i - 1; k = i + 2; k += 2)
+                  for (int k = i - 1; k < i + 2; k += 2)
                   {
                         if (k > 0 && k <= nx)
                         {
-                              L.at(i + (j - 1) * nx).at(k + (j - 1) * nx) = -pow(dxi, 2);
+                              L.at(i + (j - 1) * nx).at(i + (j - 1) * nx) = -pow(dxi, 2);
                         }
                         else
                         {
                               L.at(i + (j - 1) * nx).at(i + (j - 1) * nx) = L.at(i + (j - 1) * nx).at(i + (j - 1) * nx) - pow(dxi, 2);
                         }
+                        std::cout << " k";
                   }
+                  std::cout << " i";
 
                   for (int k = j - 1; k < j + 2; k += 2)
                   {
