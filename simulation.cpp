@@ -20,7 +20,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     renderWidth = GetRenderWidth();
     renderHeight = GetRenderHeight();
 
-    mainMenu = Menu(screenWidth, screenHeight);
+    // mainMenu = Menu(screenWidth, screenHeight);
 
     angleYAxis = 0;
     angleXZAxis = 0;
@@ -113,9 +113,9 @@ void RunSimulation::moveCamera(float deltaTime)
 
 void RunSimulation::Update(float deltaTime)
 {
-    if (mainMenu.startScreen) {
-        mainMenu.Update(GetScreenWidth(), GetScreenHeight());
-    } else {
+    // if (mainMenu.startScreen) {
+    //     mainMenu.Update(GetScreenWidth(), GetScreenHeight());
+    // } else {
         speedOfSound = sqrt(adiabaticIndex * gasConstant * temperature);
 
         if (planePhysicsModel.totalSpeed/speedOfSound <= 0.8) {
@@ -124,7 +124,7 @@ void RunSimulation::Update(float deltaTime)
         // first value updates over time
         // after that value updates by gui or key inputs
         moveCamera(deltaTime);
-    }
+    // }
     // if (IsMouseButtonPressed(0)) {
     // } else if (IsMouseButtonPressed(1)) {
 
@@ -133,9 +133,9 @@ void RunSimulation::Update(float deltaTime)
 
 void RunSimulation::Render()
 {
-    if (mainMenu.startScreen) {
-        mainMenu.Draw(GetScreenWidth(), GetScreenHeight());
-    } else {
+    // if (mainMenu.startScreen) {
+    //     mainMenu.Draw(GetScreenWidth(), GetScreenHeight());
+    // } else {
         Rectangle sliderRec = {renderWidth - 240, 40, 200, 150};
         // Rectangle rec = {20, 40, 200, 150};
         // Rectangle panelContentRec = {0, 0, 340, 340};
@@ -170,7 +170,6 @@ void RunSimulation::Render()
             GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 3.6, guiTriangleWidth, renderHeight / 54}, minText, maxText, &currentPitchAngle, 0, maxAngle);
             GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 5, guiTriangleWidth, renderHeight / 50}, minText, maxText, &currentYawAngle, 0, maxAngle);
             GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 6.4, guiTriangleWidth, renderHeight / 46}, minText, maxText, &currentRollAngle, 0, maxAngle);
-            std::cout << currentPitchAngle << " " << currentRollAngle << std::endl;
             // GuiSlider(Rectangle bounds, const char *textLeft, const char *textRight, float *value, float minValue, float maxValue);
             
             // testtest.DrawSlider();
@@ -180,13 +179,16 @@ void RunSimulation::Render()
             // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
             // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
         EndDrawing();
-    }
+    // }
 }
 
 void RunSimulation::run()
 {
-    InitWindow(0, 0, "airplane simulation");
-    ToggleFullscreen();
+    // InitWindow(0, 0, "airplane simulation");
+    if (!IsWindowFullscreen()) {
+        ToggleFullscreen();
+
+    }
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
 

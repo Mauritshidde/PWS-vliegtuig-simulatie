@@ -13,7 +13,6 @@ private:
     float val;
 
     bool isButtonPressed;
-    int buttonPressed;
     int selected;
     
     float lenghtOfOneLetter;
@@ -22,6 +21,8 @@ private:
     std::vector<float> startX, startY, endX, endY;
 
 public:
+    int buttonPressed;
+    bool running;
     bool startScreen;
     void Draw(int screenWidth, int screenHeight);
     void Update(int screenWidth, int screenHeight);
@@ -32,6 +33,7 @@ public:
 
 Menu::Menu(int screenWidth, int screenHeight)
 {
+    running = true;
     fontSize = 100;
     startScreen = true;
     selected = 0;
@@ -112,23 +114,7 @@ void Menu::Update(int screenWidth, int screenHeight) {
         isButtonPressed = true;
     }
     
-
     if (isButtonPressed) {
-        if (buttonPressed == 0) {
-            startScreen = false;
-            // start simulation;
-        } else if (buttonPressed == 1) {
-            startScreen = false;
-            // start cdf program for calculating cl and cd;
-        } else if (buttonPressed == 2) {
-            startScreen = false;
-            // load application for loading a model // selecting parts from the model;
-        } else if (buttonPressed == 3) {
-            startScreen = false;
-            // open settings
-        } else if (buttonPressed == 4) {
-            startScreen = false;
-            // quit the application
-        }
+        startScreen = false;
     }
 }
