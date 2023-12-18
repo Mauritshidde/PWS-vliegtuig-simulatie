@@ -12,7 +12,7 @@ private:
     std::vector<std::vector<std::string>> f;
     std::vector<std::vector<Vector3>> objectTrianglePoints;
 
-    void readObjectModelFile(std::string *as, std::string *bs, std::string *cs, double *a, double *b, double *c);
+    void readObjectModelFile(std::string *as, std::string *bs, std::string *cs, float *a, float *b, float *c);
 
 public:
     FluidDynamicsModel();
@@ -33,7 +33,7 @@ FluidDynamicsModel::~FluidDynamicsModel()
 {
 }
 
-void FluidDynamicsModel::readObjectModelFile(std::string *as, std::string *bs, std::string *cs, double *a, double *b, double *c)
+void FluidDynamicsModel::readObjectModelFile(std::string *as, std::string *bs, std::string *cs, float *a, float *b, float *c)
 {
     std::ifstream fin("models/object/txt/tinker2.txt");
     std::string v2;
@@ -65,7 +65,7 @@ void FluidDynamicsModel::readObjectModelFile(std::string *as, std::string *bs, s
 
 void FluidDynamicsModel::loadObjectModel()
 {
-    double a, b, c;
+    float a, b, c;
     std::string aString, bString, cString;
 
     readObjectModelFile(&aString, &bString, &cString, &a, &b, &c);

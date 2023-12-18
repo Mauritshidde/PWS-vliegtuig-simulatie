@@ -136,11 +136,11 @@ void RunSimulation::Render()
     if (mainMenu.startScreen) {
         mainMenu.Draw(GetScreenWidth(), GetScreenHeight());
     } else {
-        Rectangle rec = {20, 40, 200, 150};
-        Rectangle panelContentRec = {0, 0, 340, 340};
-        Rectangle panelView = {0};
-        Vector2 panelScroll = {99, -20};
         Rectangle sliderRec = {renderWidth - 240, 40, 200, 150};
+        // Rectangle rec = {20, 40, 200, 150};
+        // Rectangle panelContentRec = {0, 0, 340, 340};
+        // Rectangle panelView = {0};
+        // Vector2 panelScroll = {99, -20};
         BeginDrawing();
             ClearBackground(BLACK);
 
