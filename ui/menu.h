@@ -4,7 +4,7 @@ private:
     const char *oneLetter = "A";
     const char *simuText = "Simulation";
     const char *cdfText = "CFD";
-    const char *addtext = "Add module";
+    const char *addtext = "Add model";
     const char *settingsText = "Settings";
     const char *quitText = "Quit";
 
