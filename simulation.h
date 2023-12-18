@@ -13,7 +13,7 @@
 #include "modules/raymath.h"
 
 #include "gui/simulationGui.h"
-#include <json/json.h>
+// #include <json/json.h>
 
 #include "Physics/ModelLoader.h"
 #include "Physics/Plane.h"

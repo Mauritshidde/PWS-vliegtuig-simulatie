@@ -1,16 +1,18 @@
-objects = simulation.o
+objects = main.o simulation.o
 CXX = g++
 
 all: main
 
 main: ${objects}
-	${CXX} -o main ${objects}
+	${CXX} -o main ${objects} -lraylib
 
-# matplotlib.o: matplotlib.h
-# 	${CXX} -c matplotlib.h
+simulation.o: simulation.cpp simulation.h ModelLoader.o
+	${CXX} -c simulation.cpp -lraylib
 
-simulation.o: simulation.cpp simulation.h
-	${CXX} -c simulation.cpp
+main.o: main.cpp
+	${CXX} -c main.cpp
 
+ModelLoader.o: ModelLoader.cpp ModelLoader.h
+	${CXX} -c ModelLoader.cpp
 clean:
 	rm *.o main
