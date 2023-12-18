@@ -83,7 +83,6 @@ std::vector<std::vector<float>> getCofactor(const std::vector<std::vector<float>
       {
             for (std::size_t j = 0; j < vect.at(0).size(); j++)
             {
-
                   int p = 0;
                   for (size_t x = 0; x < vect.size(); x++)
                   {
@@ -102,10 +101,12 @@ std::vector<std::vector<float>> getCofactor(const std::vector<std::vector<float>
 
                               subVect.at(p).at(q) = vect.at(x).at(y);
                               q++;
+                              std::cout << "y";
                         }
                         p++;
                   }
                   solution.at(i).at(j) = pow(-1, i + j) * getDeterminant(subVect);
+                  std::cout << "j";
             }
       }
       return solution;
@@ -129,7 +130,7 @@ std::vector<std::vector<float>> getInverse(const std::vector<std::vector<float>>
             }
       }
 
-      // solution = getTranspose(getCofactor(solution));
+      solution = getTranspose(getCofactor(solution));
 
       for (size_t i = 0; i < vect.size(); i++)
       {
