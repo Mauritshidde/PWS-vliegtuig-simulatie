@@ -1,175 +1,109 @@
 #include "matrix.h"
 
-float getDeterminant(const std::vector<std::vector<float>> vect)
-{
-      if (vect.size() != vect.at(0).size())
-      {
-            throw std::runtime_error("Matrix is not quadratic");
-      }
-      int dimension = vect.size();
-
-      if (dimension == 0)
-      {
-            return 1;
-      }
-
-      if (dimension == 1)
-      {
-            return vect.at(0).at(0);
-      }
-
-      // Formula for 2x2-matrix
-      if (dimension == 2)
-      {
-            return vect.at(0).at(0) * vect.at(1).at(1) - vect.at(0).at(1) * vect.at(1).at(0);
-      }
-
-      float result = 0;
-      int sign = 1;
-      for (int i = 0; i < dimension; i++)
-      {
-
-            // Submatrix
-            std::vector<std::vector<float>> subVect(dimension - 1, std::vector<float>(dimension - 1));
-            for (int m = 1; m < dimension; m++)
-            {
-                  int z = 0;
-                  for (int n = 0; n < dimension; n++)
-                  {
-                        if (n != i)
-                        {
-                              subVect.at(m - 1).at(z) = vect.at(n).at(m);
-                              z++;
-                        }
-                  }
-            }
-
-            // recursive call
-            result = result + sign * vect.at(0).at(i) * getDeterminant(subVect);
-            sign = -sign;
-      }
-
-      return result;
-}
-
-std::vector<std::vector<float>> getTranspose(const std::vector<std::vector<float>> matrix1)
+std::vector<std::vector<float>> invertMatrix(std::vector<std::vector<float>> matrix, int size)
 {
 
-      // Transpose-matrix: height = width(matrix), width = height(matrix)
-      std::vector<std::vector<float>> solution(matrix1.at(0).size(), std::vector<float>(matrix1.size()));
+    float a[size * size][size * size], x[size * size], ratio;
+    int i, j, k, n;
+    n = size;
 
-      // Filling solution-matrix
-      for (size_t i = 0; i < matrix1.size(); i++)
-      {
-            for (size_t j = 0; j < matrix1.at(0).size(); j++)
+    for (i = 1; i <= n; i++)
+    {
+        for (j = 1; j <= n; j++)
+        {
+            a[i][j] = matrix.at(i - 1).at(j - 1);
+        }
+    }
+
+    /* Augmenting Identity Matrix of Order n */
+    for (i = 1; i <= n; i++)
+    {
+        for (j = 1; j <= n; j++)
+        {
+            if (i == j)
             {
-                  solution.at(j).at(i) = matrix1.at(i).at(j);
+                a[i][j + n] = 1;
             }
-      }
-      return solution;
+            else
+            {
+                a[i][j + n] = 0;
+            }
+        }
+    }
+
+    /* Applying Gauss Jordan Elimination */
+    for (i = 1; i <= n; i++)
+    {
+        if (a[i][i] == 0.0)
+        {
+            std::cout << "Mathematical Error!";
+            exit(0);
+        }
+        for (j = 1; j <= n; j++)
+        {
+            if (i != j)
+            {
+                ratio = a[j][i] / a[i][i];
+                for (k = 1; k <= 2 * n; k++)
+                {
+                    a[j][k] = a[j][k] - ratio * a[i][k];
+                }
+            }
+        }
+    }
+    /* Row Operation to Make Principal Diagonal to 1 */
+    for (i = 1; i <= n; i++)
+    {
+        for (j = n + 1; j <= 2 * n; j++)
+        {
+            a[i][j] = a[i][j] / a[i][i];
+        }
+    }
+    /* Displaying Inverse Matrix */
+    std::vector<std::vector<float>> invertedMatrix = matrix;
+    std::cout << std::endl
+              << "Inverse Matrix is:" << std::endl;
+
+    int i2 = 0;
+    int j2 = 0;
+
+    for (i = 1; i <= n; i++)
+    {
+        for (j = n + 1; j <= 2 * n; j++)
+        {
+            invertedMatrix.at(i - 1).at(j - n - 1) = a[i][j];
+            std::cout << a[i][j] << "\t";
+            j2++;
+        }
+        i2++;
+        std::cout << std::endl;
+    }
+
+    return invertedMatrix;
 }
 
-std::vector<std::vector<float>> getCofactor(const std::vector<std::vector<float>> vect)
-{
-      if (vect.size() != vect.at(0).size())
-      {
-            throw std::runtime_error("Matrix is not quadratic");
-      }
+// int main()
+// {
+//     std::vector<std::vector<float>> matrix = {
+//         {1, 2, 3, 4, 5, 6}, {5, 3, 41, 2, 3, 4}, {3, 4, 2, 1, 2, 0}, {23, 4, 45, 3, 2, 1}, {12, 32, 3224, 4, 2, 42}, {42, 42, 42, 42, 2, 2}};
+//     matrix = invertMatrix(matrix, matrix.size());
 
-      std::vector<std::vector<float>> solution(vect.size(), std::vector<float>(vect.size()));
-      std::vector<std::vector<float>> subVect(vect.size() - 1, std::vector<float>(vect.size() - 1));
+//     for (int i = 0; i < matrix.size(); i++)
+//     {
+//         for (int j = 0; j < matrix.size(); j++)
+//         {
+//             std::cout << matrix.at(i).at(j) << " ";
+//         }
+//         std::cout << std::endl;
+//     }
+//     return (0);
+// }
 
-      for (std::size_t i = 0; i < vect.size(); i++)
-      {
-            for (std::size_t j = 0; j < vect.at(0).size(); j++)
-            {
-                  int p = 0;
-                  for (size_t x = 0; x < vect.size(); x++)
-                  {
-                        if (x == i)
-                        {
-                              continue;
-                        }
-                        int q = 0;
-
-                        for (size_t y = 0; y < vect.size(); y++)
-                        {
-                              if (y == j)
-                              {
-                                    continue;
-                              }
-
-                              subVect.at(p).at(q) = vect.at(x).at(y);
-                              q++;
-                              std::cout << "y";
-                        }
-                        p++;
-                  }
-                  solution.at(i).at(j) = pow(-1, i + j) * getDeterminant(subVect);
-                  std::cout << "j";
-            }
-      }
-      return solution;
-}
-
-std::vector<std::vector<float>> getInverse(const std::vector<std::vector<float>> vect)
-{
-      // if (getDeterminant(vect) == 0)
-      // {
-      //       throw std::runtime_error("Determinant is 0");
-      // }
-
-      float d = 1.0 /* / getDeterminant(vect) */;
-      std::vector<std::vector<float>> solution(vect.size(), std::vector<float>(vect.size()));
-
-      for (size_t i = 0; i < vect.size(); i++)
-      {
-            for (size_t j = 0; j < vect.size(); j++)
-            {
-                  solution.at(i).at(j) = vect.at(i).at(j);
-            }
-      }
-
-      solution = getTranspose(getCofactor(solution));
-
-      for (size_t i = 0; i < vect.size(); i++)
-      {
-            for (size_t j = 0; j < vect.size(); j++)
-            {
-                  solution.at(i).at(j) *= d;
-            }
-      }
-
-      return solution;
-}
-
-std::vector<std::vector<float>> zeros(int width, int height)
-{
-      std::vector<std::vector<float>> vector;
-
-      for (int i = 0; i < width; i++)
-      {
-            std::vector<float> helper;
-            for (int j = 0; j < height; j++)
-            {
-                  helper.push_back(0);
-            }
-            vector.push_back(helper);
-      }
-
-      return vector;
-}
-
-float det(std::vector<std::vector<float>> A)
-{
-}
 
 float determinantOfMatrix(std::vector<std::vector<float>> mat, int n)
 {
       float num1, num2, det = 1, index, total = 1;
-
       float temp[n + 1];
-
       for (int i = 0; i < n; i++)
       {
             index = i;
@@ -189,7 +123,6 @@ float determinantOfMatrix(std::vector<std::vector<float>> mat, int n)
                   }
                   det = det * pow(-1, index - i);
             }
-
             for (int j = 0; j < n; j++)
             {
                   temp[j] = mat.at(i).at(j);
@@ -198,7 +131,6 @@ float determinantOfMatrix(std::vector<std::vector<float>> mat, int n)
             {
                   num1 = temp[i];         // value of diagonal element
                   num2 = mat.at(j).at(i); // value of next row element
-
                   for (int k = 0; k < n; k++)
                   {
                         mat.at(j).at(k) = (num1 * mat.at(j).at(k)) - (num2 * temp[k]);
@@ -206,7 +138,6 @@ float determinantOfMatrix(std::vector<std::vector<float>> mat, int n)
                   total = total * num1; // Det(kA)=kDet(A);
             }
       }
-
       for (int i = 0; i < n; i++)
       {
             det = det * mat.at(i).at(i);
@@ -218,11 +149,24 @@ std::vector<float> linspace(int startX, int endX, int steps)
 {
       float stepSize = (endX - startX) / (steps - 1);
       std::vector<float> coords;
-
       for (int i = 0; i < steps; i++)
       {
             coords.push_back(startX + (stepSize * i));
       }
-
       return coords;
+}
+
+std::vector<std::vector<float>> zeros(int width, int height)
+{
+      std::vector<std::vector<float>> vector;
+      for (int i = 0; i < width; i++)
+      {
+            std::vector<float> helper;
+            for (int j = 0; j < height; j++)
+            {
+                  helper.push_back(0);
+            }
+            vector.push_back(helper);
+      }
+      return vector;
 }
