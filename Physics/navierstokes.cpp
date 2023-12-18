@@ -22,7 +22,12 @@ NavierStokes::NavierStokes()
       L = zeros(nx * ny, nx * ny);
       L = calcL(L);
       detOfL = determinantOfMatrix(L, L.size());
-
+      for (int i=0; i < L.size(); i++) {
+            for (int j=0; j < L.size(); j++) {
+                  std::cout << L.at(i).at(j) << " ";
+            }
+            std::cout << std::endl;
+      }
       // invL = getInverse(L);
       invL = invertMatrix(L, L.size());
       std::cout << "past l \n";
