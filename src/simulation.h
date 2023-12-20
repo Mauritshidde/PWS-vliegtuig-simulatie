@@ -27,7 +27,7 @@ private:
     Model airplane;
     Model skybox;
 
-    Menu mainMenu;
+    // Menu mainMenu;
     Plane planePhysicsModel;
 
     // Slider testtest;
