@@ -7,17 +7,17 @@
 #include <string>
 
 #define RAYGUI_IMPLEMENTATION
-#include "modules/raygui.h"
+#include "../include/modules/raygui.h"
 
 #define RAYMATH_IMPLEMENTATION
-#include "modules/raymath.h"
+#include "../include/modules/raymath.h"
 
-#include "gui/simulationGui.h"
+#include "../include/gui/simulationGui.h"
 // #include <json/json.h>
 
 #include "Physics/ModelLoader.h"
 #include "Physics/Plane.h"
-#include "ui/menu.h"
+#include "../include/ui/menu.h"
 
 // tijdelijke plaats voor variablen die bij een andere class horen
 

@@ -1,18 +1,40 @@
-objects = main.o simulation.o
-CXX = g++
+# objects = main.o simulation
 
-all: main
+# all: main
 
-main: ${objects}
-	${CXX} -o main ${objects} -lraylib
+# main: ${objects}
+# 	${CXX} -o main ${objects} -lraylib
 
-simulation.o: simulation.cpp simulation.h ModelLoader.o
-	${CXX} -c simulation.cpp -lraylib
+# ModelLoader.o: ModelLoader.cpp ModelLoader.h
+# 	${CXX} -c ModelLoader.cpp
 
-main.o: main.cpp
-	${CXX} -c main.cpp
+# simulation: simulation.o ModelLoader.o
+# 	${CXX} -c simulation.o ModelLoader.o
 
-ModelLoader.o: ModelLoader.cpp ModelLoader.h
-	${CXX} -c ModelLoader.cpp
+# simulation.o: simulation.cpp simulation.h
+# 	${CXX} -c simulation.cpp
+# main.o: main.cpp
+# 	${CXX} -c main.cpp
+
+# clean:
+# 	rm *.o main
+TARGET ?= a.out
+SRC_DIRS ?= ./src
+
+SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
+OBJS := $(addsuffix .o,$(basename $(SRCS)))
+DEPS := $(OBJS:.o=.d)
+
+INC_DIRS := $(shell find $(SRC_DIRS) -type d) /usr/include/python3.10 
+INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
+
+$(TARGET): $(OBJS)
+	$(CC) $(LDFLAGS) $(OBJS) -o $@ $(LOADLIBES) $(LDLIBS) -lraylib
+
+.PHONY: clean
 clean:
-	rm *.o main
+	$(RM) $(TARGET) $(OBJS) $(DEPS)
+
+-include $(DEPS)
