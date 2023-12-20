@@ -126,9 +126,3 @@ Physics::Physics(/* args */)
 Physics::~Physics()
 {
 }
-
-int main()
-{
-
-    return 0;
-}

@@ -12,7 +12,7 @@
 // #define RAYMATH_IMPLEMENTATION
 #include "../include/modules/raymath.h"
 
-#include "../include/gui/simulationGui.h"
+// #include "../include/gui/simulationGui.h"
 // #include <json/json.h>
 
 #include "Physics/ModelLoader.h"

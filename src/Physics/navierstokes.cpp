@@ -401,10 +401,3 @@ p = pressure = air pressure op vlieghoogte (lookuptable?)
 v =  kinematic viscosity (misschien onnodig)
 */
 
-int main()
-{
-      NavierStokes fluidSimulation;
-      fluidSimulation = NavierStokes();
-      fluidSimulation.calc();
-      return 0;
-}
