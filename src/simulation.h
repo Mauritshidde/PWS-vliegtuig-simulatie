@@ -6,10 +6,10 @@
 #include <fstream>
 #include <string>
 
-#define RAYGUI_IMPLEMENTATION
+// #define RAYGUI_IMPLEMENTATION
 #include "../include/modules/raygui.h"
 
-#define RAYMATH_IMPLEMENTATION
+// #define RAYMATH_IMPLEMENTATION
 #include "../include/modules/raymath.h"
 
 #include "../include/gui/simulationGui.h"

@@ -1,6 +1,6 @@
 #pragma once
 #include <raylib.h>
-#include "physicsvector.cpp"
+#include "physicsvector.h"
 #include <vector>
 #include <math.h>
 #define g 9.81
