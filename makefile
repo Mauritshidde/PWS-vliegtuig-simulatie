@@ -1,23 +1,3 @@
-# objects = main.o simulation
-
-# all: main
-
-# main: ${objects}
-# 	${CXX} -o main ${objects} -lraylib
-
-# ModelLoader.o: ModelLoader.cpp ModelLoader.h
-# 	${CXX} -c ModelLoader.cpp
-
-# simulation: simulation.o ModelLoader.o
-# 	${CXX} -c simulation.o ModelLoader.o
-
-# simulation.o: simulation.cpp simulation.h
-# 	${CXX} -c simulation.cpp
-# main.o: main.cpp
-# 	${CXX} -c main.cpp
-
-# clean:
-# 	rm *.o main
 TARGET ?= a.out
 SRC_DIRS ?= ./src
 CC = g++
