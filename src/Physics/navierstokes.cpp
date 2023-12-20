@@ -97,8 +97,8 @@ void NavierStokes::plot()
                   yVelComponent.push_back(v.at(j).at(i));
             }       
       }
-      mat::quiver(meshXCoordinates, meshYCoordinates, xVelComponent, yVelComponent);
-      mat::show();
+      // mat::quiver(meshXCoordinates, meshYCoordinates, xVelComponent, yVelComponent);
+      // mat::show();
 }
 
 
