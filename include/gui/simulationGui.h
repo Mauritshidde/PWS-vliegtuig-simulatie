@@ -25,7 +25,7 @@
 // {
 //     GuiPanel((Rectangle){screenWidth - (screenWidth / 8), 0, screenWidth, screenHeight}, NULL);
 // }
-
+#pragma once
 class Slider
 {
 private:

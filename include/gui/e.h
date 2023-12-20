@@ -18,12 +18,12 @@
 *   usage in any other form by expresely written permission.
 *
 **********************************************************************************************/
-
+#pragma once
 #include "raylib.h"
 
 // WARNING: raygui implementation is expected to be defined before including this header
 #undef RAYGUI_IMPLEMENTATION
-#include "raygui.h"
+#include "../modules/raygui.h"
 
 #include <string.h>     // Required for: strcpy()
 
