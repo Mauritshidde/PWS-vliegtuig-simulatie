@@ -1,5 +1,9 @@
 #include "simulation.h"
 #include "ui/menu.h"
+#include "navierstokes.h"
+
+#include <raylib.h>
+#include <iostream>
 
 int main()
 {
@@ -26,6 +30,8 @@ int main()
                 RunSimulation simulatie;
                 simulatie.run();
             } else if (menu.buttonPressed == 1) {
+                NavierStokes cfd;
+                cfd.calc();
                 // start cdf program for calculating cl and cd;
             } else if (menu.buttonPressed == 2) {
                 // load application for loading a model // selecting parts from the model;

@@ -7,10 +7,10 @@
 #include <string>
 
 // #define RAYGUI_IMPLEMENTATION
-#include "../include/modules/raygui.h"
+// #include "../include/modules/raygui.h"
 
 // #define RAYMATH_IMPLEMENTATION
-#include "../include/modules/raymath.h"
+// #include "../include/modules/raymath.h"
 
 // #include "../include/gui/simulationGui.h"
 // #include <json/json.h>
