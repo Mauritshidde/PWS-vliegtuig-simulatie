@@ -24,20 +24,30 @@ int main()
         menu.Update(screenWidth, screenHeight);
         menu.Draw(screenWidth, screenHeight);
 
-        if (!menu.startScreen) {
+        if (!menu.startScreen)
+        {
             std::cout << "ja" << std::endl;
-            if (menu.buttonPressed == 0) {
+            if (menu.buttonPressed == 0)
+            {
                 RunSimulation simulatie;
                 simulatie.run();
-            } else if (menu.buttonPressed == 1) {
+            }
+            else if (menu.buttonPressed == 1)
+            {
                 NavierStokes cfd;
                 cfd.calc();
                 // start cdf program for calculating cl and cd;
-            } else if (menu.buttonPressed == 2) {
+            }
+            else if (menu.buttonPressed == 2)
+            {
                 // load application for loading a model // selecting parts from the model;
-            } else if (menu.buttonPressed == 3) {
+            }
+            else if (menu.buttonPressed == 3)
+            {
                 // open settings
-            } else if (menu.buttonPressed == 4) {
+            }
+            else if (menu.buttonPressed == 4)
+            {
                 running = false;
             }
         }
@@ -45,7 +55,6 @@ int main()
         // RunSimulation simulatie;
         // simulatie.run();
     }
-    
 
     return 0;
 }

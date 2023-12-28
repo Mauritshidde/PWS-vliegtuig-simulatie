@@ -91,6 +91,7 @@ void FluidDynamicsModel::drawModel()
     }
 }
 
-void modelToCubes() {
+void modelToCubes()
+{
     // start with a cube in the middle and go in every direction until collision with the object repeat for every cube;
 }

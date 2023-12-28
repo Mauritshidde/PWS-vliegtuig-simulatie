@@ -33,11 +33,11 @@ private:
 
     int renderWidth;
     int renderHeight;
-    
+
     float adiabaticIndex; // adiabatic index of air
-    float gasConstant; // the gas constant of air
-    float temperature; // the temperature
-    float speedOfSound; // the speed of sound in the simulation
+    float gasConstant;    // the gas constant of air
+    float temperature;    // the temperature
+    float speedOfSound;   // the speed of sound in the simulation
 
     float angleYAxis;
     float angleXZAxis;
@@ -57,6 +57,7 @@ private:
     void Start(int screenHeight, int screenWidth);
     void Update(float deltaTime);
     void Render();
+
 public:
     RunSimulation();
     ~RunSimulation();

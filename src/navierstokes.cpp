@@ -27,18 +27,18 @@ NavierStokes::NavierStokes()
       L = zeros(nx * ny, nx * ny);
       L = calcL(L);
       detOfL = determinantOfMatrix(L, L.size());
-      for (int i=0; i < L.size(); i++) {
-            for (int j=0; j < L.size(); j++) {
+      for (int i = 0; i < L.size(); i++)
+      {
+            for (int j = 0; j < L.size(); j++)
+            {
                   std::cout << L.at(i).at(j) << " ";
             }
             std::cout << std::endl;
       }
-      
+
       invL = invertMatrix(L, L.size());
       std::cout << "past l \n";
-} 
-
-
+}
 
 NavierStokes::~NavierStokes()
 {
@@ -100,12 +100,11 @@ void NavierStokes::plot()
                   meshYCoordinates.push_back(i);
                   xVelComponent.push_back(u.at(j).at(i));
                   yVelComponent.push_back(v.at(j).at(i));
-            }       
+            }
       }
       // mat::quiver(meshXCoordinates, meshYCoordinates, xVelComponent, yVelComponent);
       // mat::show();
 }
-
 
 void NavierStokes::generateVectors()
 {
@@ -247,8 +246,6 @@ void NavierStokes::boundaryConditions()
       }
 }
 
-
-
 void NavierStokes::calc()
 {
       float time = 0;
@@ -278,7 +275,6 @@ void NavierStokes::calc()
                   }
             }
             std::cout << "ja 1 2" << std::endl;
-
 
             for (int j = jMin + 1; j < jMax + 1; j++)
             {
@@ -405,4 +401,3 @@ t = time
 p = pressure = air pressure op vlieghoogte (lookuptable?)
 v =  kinematic viscosity (misschien onnodig)
 */
-

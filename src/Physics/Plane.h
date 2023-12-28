@@ -10,6 +10,7 @@ private:
       Texture2D airplaneTexture;
 
       float rotationMultiplier;
+
 public:
       Plane(float givenMass = 10000, Vector3 startingPos = {0, 0, 0}, float givenrRotationMultiplier = 10);
       ~Plane();
@@ -30,4 +31,3 @@ public:
       float anglePitch, angleYaw, angleRoll;
       float mass; // in kg
 };
-

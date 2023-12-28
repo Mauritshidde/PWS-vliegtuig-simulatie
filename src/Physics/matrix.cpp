@@ -99,74 +99,73 @@ std::vector<std::vector<float>> invertMatrix(std::vector<std::vector<float>> mat
 //     return (0);
 // }
 
-
 float determinantOfMatrix(std::vector<std::vector<float>> mat, int n)
 {
-      float num1, num2, det = 1, index, total = 1;
-      float temp[n + 1];
-      for (int i = 0; i < n; i++)
-      {
-            index = i;
-            while (index < n && mat.at(index).at(i) == 0)
-            {
-                  index++;
-            }
-            if (index == n)
-            {
-                  continue;
-            }
-            if (index != i)
-            {
-                  for (int j = 0; j < n; j++)
-                  {
-                        std::swap(mat.at(index).at(j), mat.at(i).at(j));
-                  }
-                  det = det * pow(-1, index - i);
-            }
+    float num1, num2, det = 1, index, total = 1;
+    float temp[n + 1];
+    for (int i = 0; i < n; i++)
+    {
+        index = i;
+        while (index < n && mat.at(index).at(i) == 0)
+        {
+            index++;
+        }
+        if (index == n)
+        {
+            continue;
+        }
+        if (index != i)
+        {
             for (int j = 0; j < n; j++)
             {
-                  temp[j] = mat.at(i).at(j);
+                std::swap(mat.at(index).at(j), mat.at(i).at(j));
             }
-            for (int j = i + 1; j < n; j++)
+            det = det * pow(-1, index - i);
+        }
+        for (int j = 0; j < n; j++)
+        {
+            temp[j] = mat.at(i).at(j);
+        }
+        for (int j = i + 1; j < n; j++)
+        {
+            num1 = temp[i];         // value of diagonal element
+            num2 = mat.at(j).at(i); // value of next row element
+            for (int k = 0; k < n; k++)
             {
-                  num1 = temp[i];         // value of diagonal element
-                  num2 = mat.at(j).at(i); // value of next row element
-                  for (int k = 0; k < n; k++)
-                  {
-                        mat.at(j).at(k) = (num1 * mat.at(j).at(k)) - (num2 * temp[k]);
-                  }
-                  total = total * num1; // Det(kA)=kDet(A);
+                mat.at(j).at(k) = (num1 * mat.at(j).at(k)) - (num2 * temp[k]);
             }
-      }
-      for (int i = 0; i < n; i++)
-      {
-            det = det * mat.at(i).at(i);
-      }
-      return (det / total); // Det(kA)/k=Det(A);
+            total = total * num1; // Det(kA)=kDet(A);
+        }
+    }
+    for (int i = 0; i < n; i++)
+    {
+        det = det * mat.at(i).at(i);
+    }
+    return (det / total); // Det(kA)/k=Det(A);
 }
 
 std::vector<float> linspace(int startX, int endX, int steps)
 {
-      float stepSize = (endX - startX) / (steps - 1);
-      std::vector<float> coords;
-      for (int i = 0; i < steps; i++)
-      {
-            coords.push_back(startX + (stepSize * i));
-      }
-      return coords;
+    float stepSize = (endX - startX) / (steps - 1);
+    std::vector<float> coords;
+    for (int i = 0; i < steps; i++)
+    {
+        coords.push_back(startX + (stepSize * i));
+    }
+    return coords;
 }
 
 std::vector<std::vector<float>> zeros(int width, int height)
 {
-      std::vector<std::vector<float>> vector;
-      for (int i = 0; i < width; i++)
-      {
-            std::vector<float> helper;
-            for (int j = 0; j < height; j++)
-            {
-                  helper.push_back(0);
-            }
-            vector.push_back(helper);
-      }
-      return vector;
+    std::vector<std::vector<float>> vector;
+    for (int i = 0; i < width; i++)
+    {
+        std::vector<float> helper;
+        for (int j = 0; j < height; j++)
+        {
+            helper.push_back(0);
+        }
+        vector.push_back(helper);
+    }
+    return vector;
 }

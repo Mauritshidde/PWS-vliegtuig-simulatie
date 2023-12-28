@@ -11,7 +11,7 @@ Plane::Plane(float givenMass, Vector3 startingPos, float givenrRotationMultiplie
       angleYaw = 0;
       angleRoll = 0;
       rotationMultiplier = givenrRotationMultiplier;
-      
+
       // centerOfLiftWingL = calcCenterOfLiftWing();
       // centerOfLiftWingR = calcCenterOfLiftWing();
 }
@@ -30,51 +30,69 @@ Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, floa
       // TODO lift formula
 }
 
-void Plane::Start() {
+void Plane::Start()
+{
       airplaneTexture = LoadTexture("models/texture/skyboxtexture.png");
       airplane = LoadModel("models/object/plane.obj");
       airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
 }
 
-void Plane::Draw() {
-      DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, RED); // 2de vector geeft aan met welke factor hij met currentangle draait 
+void Plane::Draw()
+{
+      DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, RED); // 2de vector geeft aan met welke factor hij met currentangle draait
 }
 
-void Plane::Update(float deltaTime) {
-      if (IsKeyDown(KEY_W)) {
+void Plane::Update(float deltaTime)
+{
+      if (IsKeyDown(KEY_W))
+      {
             anglePitch += rotationMultiplier * deltaTime;
-            if (anglePitch > 360) {
+            if (anglePitch > 360)
+            {
                   anglePitch -= 360;
             }
-      } else if (IsKeyDown(KEY_S)) {
+      }
+      else if (IsKeyDown(KEY_S))
+      {
             anglePitch -= rotationMultiplier * deltaTime;
-            if (anglePitch < 0) {
+            if (anglePitch < 0)
+            {
                   anglePitch += 360;
             }
       }
 
-      if (IsKeyDown(KEY_A)) {
+      if (IsKeyDown(KEY_A))
+      {
             angleYaw += rotationMultiplier * deltaTime;
-            if (angleYaw > 360) {
+            if (angleYaw > 360)
+            {
                   angleYaw -= 360;
             }
-      } else if (IsKeyDown(KEY_D)) {
+      }
+      else if (IsKeyDown(KEY_D))
+      {
             angleYaw -= rotationMultiplier * deltaTime;
-            if (angleYaw < 0) {
+            if (angleYaw < 0)
+            {
                   angleYaw += 360;
             }
       }
 
-      if (IsKeyDown(KEY_Q)) {
+      if (IsKeyDown(KEY_Q))
+      {
             angleRoll += rotationMultiplier * deltaTime;
-            if (angleRoll > 360) {
+            if (angleRoll > 360)
+            {
                   angleRoll -= 360;
             }
-      } else if (IsKeyDown(KEY_E)) {
+      }
+      else if (IsKeyDown(KEY_E))
+      {
             angleRoll -= rotationMultiplier * deltaTime;
-            if (angleRoll < 0) {
+            if (angleRoll < 0)
+            {
                   angleRoll += 360;
             }
       }
-      airplane.transform = MatrixRotateXYZ((Vector3){ DEG2RAD*anglePitch, DEG2RAD*angleYaw, DEG2RAD*angleRoll});
+      airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
 }

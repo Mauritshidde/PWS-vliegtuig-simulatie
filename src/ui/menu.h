@@ -18,7 +18,7 @@ private:
 
     bool isButtonPressed;
     int selected;
-    
+
     float lenghtOfOneLetter;
 
     std::vector<const char *> menuTexts;
@@ -31,7 +31,6 @@ public:
     void Draw(int screenWidth, int screenHeight);
     void Update(int screenWidth, int screenHeight);
 
-    Menu(int screenWidth=1920, int screenHeight=1080);
+    Menu(int screenWidth = 1920, int screenHeight = 1080);
     ~Menu();
 };
-
