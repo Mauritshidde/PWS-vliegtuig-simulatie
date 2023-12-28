@@ -16,17 +16,15 @@ RunSimulation::~RunSimulation()
 
 void RunSimulation::Start(int screenWidth, int screenHeight)
 {
-    plane.loadObjectModel();
-
+    // plane.loadObjectModel();
+    roatationMultiplier = 10;
     maxAngle = 360;
-    currentPitchAngle = 0;
-    currentYawAngle = 0;
-    currentRollAngle = 0;
+    // currentPitchAngle = 0;
+    // currentYawAngle = 0;
+    // currentRollAngle = 0;
 
     renderWidth = GetRenderWidth();
     renderHeight = GetRenderHeight();
-
-    // mainMenu = Menu(screenWidth, screenHeight);
 
     angleYAxis = 0;
     angleXZAxis = 0;
@@ -43,15 +41,15 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     mainCamera.projection = CAMERA_PERSPECTIVE;
 
     skybox = LoadModel("models/object/skybox.obj");
-    airplane = LoadModel("models/object/plane.obj");
-    airplaneTexture = LoadTexture("models/texture/skyboxtexture.png");
+    // airplane = LoadModel("models/object/plane.obj");
+    // airplaneTexture = LoadTexture("models/texture/skyboxtexture.png");
     skyboxTexture = LoadTexture("models/texture/skyboxtexture.png");
-    airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
+    // airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
     
     planePhysicsModel = Plane(41145, {0,0,0});
 
-    // testtest = Slider(0, planePhysicsModel.maxEngineTrust, renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54);
+    plane.Start();
 }
 
 bool RunSimulation::notOnGUI(Vector2 mousePosition)
@@ -119,73 +117,55 @@ void RunSimulation::moveCamera(float deltaTime)
 
 void RunSimulation::Update(float deltaTime)
 {
-    // if (mainMenu.startScreen) {
-    //     mainMenu.Update(GetScreenWidth(), GetScreenHeight());
-    // } else {
-        speedOfSound = sqrt(adiabaticIndex * gasConstant * temperature);
+    speedOfSound = sqrt(adiabaticIndex * gasConstant * temperature);
 
-        if (planePhysicsModel.totalSpeed/speedOfSound <= 0.8) {
-            planePhysicsModel.totalSpeed = 0.8 * speedOfSound;
-        }
-        // first value updates over time
-        // after that value updates by gui or key inputs
-        moveCamera(deltaTime);
-    // }
-    // if (IsMouseButtonPressed(0)) {
-    // } else if (IsMouseButtonPressed(1)) {
+    if (planePhysicsModel.totalSpeed/speedOfSound <= 0.8) {
+        planePhysicsModel.totalSpeed = 0.8 * speedOfSound;
+    }
+    // first value updates over time
+    // after that value updates by gui or key inputs
 
-    // }
+    plane.Update(deltaTime);
+
+    moveCamera(deltaTime);
 }
 
 void RunSimulation::Render()
 {
-    // if (mainMenu.startScreen) {
-    //     mainMenu.Draw(GetScreenWidth(), GetScreenHeight());
-    // } else {
-        Rectangle sliderRec = {renderWidth - 240, 40, 200, 150};
-        // Rectangle rec = {20, 40, 200, 150};
-        // Rectangle panelContentRec = {0, 0, 340, 340};
-        // Rectangle panelView = {0};
-        // Vector2 panelScroll = {99, -20};
-        BeginDrawing();
-            ClearBackground(BLACK);
+    Rectangle sliderRec = {renderWidth - 240, 40, 200, 150};
 
-            BeginMode3D(mainCamera);
-                DrawGrid(10, 10.0f);
-            EndMode3D();
+    BeginDrawing();
+        ClearBackground(BLACK);
 
-            BeginMode3D(mainCamera);
-                DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
-                
-                // airplane.transform = MatrixRotateXYZ((Vector3){ DEG2RAD*currentPitchAngle, DEG2RAD*currentYawAngle, DEG2RAD*currentRollAngle});
-                DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, currentPitchAngle, (Vector3){0.5f, 0.5f, 0.5f}, RED); // 2de vector geeft aan met welke factor hij met currentangle draait 
-                // DrawModel(airplane, (Vector3){0.0f, 0.0f, 0.0f}, 0.5f, BLACK);
-                // plane.drawModel();
-                DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
-                DrawGrid(10, 10.0f);
-            EndMode3D();
-            
-            Rectangle guiPanelSize = (Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight};
-            GuiPanel(guiPanelSize, NULL);
-            // GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, NULL, NULL, &planePhysicsModel.maxEngineTrust, 0, planePhysicsModel.currentEngineTrust);
-            
-            float guiTriangleWidth = guiPanelSize.width - guiPanelSize.x/25;
-            float panelSliderWidthDifference = guiPanelSize.width - guiTriangleWidth; // differnce in width of the panel and the gui slider rectangle
-            // float guiTriangleHeight = guiPanelSize; 
+        BeginMode3D(mainCamera);
+            DrawGrid(10, 10.0f);
+        EndMode3D();
 
-            GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 3.6, guiTriangleWidth, renderHeight / 54}, minText, maxText, &currentPitchAngle, 0, maxAngle);
-            GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 5, guiTriangleWidth, renderHeight / 50}, minText, maxText, &currentYawAngle, 0, maxAngle);
-            GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 6.4, guiTriangleWidth, renderHeight / 46}, minText, maxText, &currentRollAngle, 0, maxAngle);
-            // GuiSlider(Rectangle bounds, const char *textLeft, const char *textRight, float *value, float minValue, float maxValue);
-            
-            // testtest.DrawSlider();
-            // testtest2.DrawButton();
-            // Button002Pressed = GuiButton((Rectangle){ 824, 288, 120, 24 }, "SAMPLE TEXT");
-            // GuiLayoutName();
-            // GuiGroupBox((Rectangle){ 66, 24, 276, 312 }, "STANDARD");
-            // GuiSlider((Rectangle){ 96, 48, 216, 16 }, TextFormat("%0.f", value), NULL, &value, 0.0f, 1000.0f);
-        EndDrawing();
-    // }
+        BeginMode3D(mainCamera);
+            DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
+            plane.Draw();
+            // airplane.transform = MatrixRotateXYZ((Vector3){ DEG2RAD*plane.anglePitch, DEG2RAD*plane.angleYaw, DEG2RAD*plane.angleRoll});
+            // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, RED); // 2de vector geeft aan met welke factor hij met currentangle draait 
+            // DrawModel(airplane, (Vector3){0.0f, 0.0f, 0.0f}, 0.5f, BLACK);
+            // plane.drawModel();
+            DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
+            DrawGrid(10, 10.0f);
+        EndMode3D();
+        
+        Rectangle guiPanelSize = (Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight};
+        GuiPanel(guiPanelSize, NULL);
+        // GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, NULL, NULL, &planePhysicsModel.maxEngineTrust, 0, planePhysicsModel.currentEngineTrust);
+        
+        float guiTriangleWidth = guiPanelSize.width - guiPanelSize.x/25;
+        float panelSliderWidthDifference = guiPanelSize.width - guiTriangleWidth; // differnce in width of the panel and the gui slider rectangle
+        // float guiTriangleHeight = guiPanelSize; 
+
+        GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 3.6, guiTriangleWidth, renderHeight / 54}, minText, maxText, &plane.anglePitch, 0, maxAngle);
+        GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 5, guiTriangleWidth, renderHeight / 50}, minText, maxText, &plane.angleYaw, 0, maxAngle);
+        GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 6.4, guiTriangleWidth, renderHeight / 46}, minText, maxText, &plane.angleRoll, 0, maxAngle);
+        // GuiSlider(Rectangle bounds, const char *textLeft, const char *textRight, float *value, float minValue, float maxValue);
+        
+    EndDrawing();
 }
 
 void RunSimulation::run()

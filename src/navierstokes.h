@@ -5,10 +5,6 @@
 #include <bits/stdc++.h>
 #include "matrix.h"
 
-// #define WITHOUT_NUMPY
-// #include "matplotlibcpp.h"
-// namespace mat = matplotlibcpp;
-
 class NavierStokes
 {
 private:

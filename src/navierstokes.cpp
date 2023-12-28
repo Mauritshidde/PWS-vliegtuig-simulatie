@@ -1,5 +1,10 @@
 #include "navierstokes.h"
 
+#define WITHOUT_NUMPY
+#include "Physics/matplotlibcpp.h"
+
+namespace mat = matplotlibcpp;
+
 NavierStokes::NavierStokes()
 {
       maxTime = 1000;
@@ -28,7 +33,7 @@ NavierStokes::NavierStokes()
             }
             std::cout << std::endl;
       }
-      // invL = getInverse(L);
+      
       invL = invertMatrix(L, L.size());
       std::cout << "past l \n";
 } 
