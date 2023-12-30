@@ -17,7 +17,7 @@ RunSimulation::~RunSimulation()
 void RunSimulation::Start(int screenWidth, int screenHeight)
 {
     // plane.loadObjectModel();
-    roatationMultiplier = 10;
+    rotationMultiplier = 10;
     maxAngle = 360;
     // currentPitchAngle = 0;
     // currentYawAngle = 0;
@@ -29,16 +29,18 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     angleYAxis = 0;
     angleXZAxis = 0;
     cameraCircleRadius = 120;
+    cameraRotationMultiplier = 10;
+    cameraZoomMultiplier = 10;
 
-    cameraPos = {0.0f, 0.0f, -120.0f};
+    cameraPos = {0.0f, 0.0f, 120.0f};
     cameraXYPos = {cameraPos.x, cameraPos.y};
     mainCamera = {0};
 
     mainCamera.position = cameraPos;                  // Camera position perspective
-    mainCamera.target = (Vector3){0.0f, 20.0f, 0.0f}; // Camera looking at point
+    mainCamera.target = (Vector3){0.0f, 20.0f, 0.0f}; // Camera looking at point  20 ?????????????? hier naar nog kijken TODO
     mainCamera.up = (Vector3){0.0f, 10.0f, 0.0f};     // Camera up vector (rotation towards target)
-    mainCamera.fovy = 30.0f;                          // Camera field-of-view Y
-    mainCamera.projection = CAMERA_PERSPECTIVE;
+    mainCamera.fovy = 30.0f;                          // Camera field-of-view Y   effect van dit veranderen bestuderen ?????????????? TODO
+    mainCamera.projection = CAMERA_PERSPECTIVE;  /// wat doet dit TODO
 
     skybox = LoadModel("models/object/skybox.obj");
     // airplane = LoadModel("models/object/plane.obj");
@@ -67,50 +69,55 @@ bool RunSimulation::notOnGUI(Vector2 mousePosition)
 void RunSimulation::moveCamera(float deltaTime)
 {
     Vector2 currentMousePos = GetMousePosition();
-
+    
     if (notOnGUI(currentMousePos))
     {
+        angleYAxis = 0;
+        angleXZAxis = 0;
         if (IsMouseButtonDown(0))
         {
-            angleYAxis += ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
-            angleXZAxis += ((currentMousePos.y - previousMousePosition.y)) * deltaTime;
+            angleYAxis += cameraRotationMultiplier * ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
+            angleXZAxis += cameraRotationMultiplier * ((currentMousePos.y - previousMousePosition.y)) * deltaTime;
         }
 
         if (IsKeyDown(KEY_RIGHT))
         {
-            angleYAxis += deltaTime;
+            angleYAxis += cameraRotationMultiplier * deltaTime;
         }
         if (IsKeyDown(KEY_LEFT))
         {
-            angleYAxis -= deltaTime;
+            angleYAxis -= cameraRotationMultiplier * deltaTime;
         }
         if (IsKeyDown(KEY_UP))
         {
-            angleXZAxis += deltaTime;
+            angleXZAxis += cameraRotationMultiplier * deltaTime;
         }
         if (IsKeyDown(KEY_DOWN))
         {
-            angleXZAxis -= deltaTime;
+            angleXZAxis -= cameraRotationMultiplier * deltaTime;
         }
 
         if (GetMouseWheelMove() > 0)
         {
-            cameraCircleRadius += 100 * deltaTime;
+            std::cout << "test" << std::endl;
+            cameraCircleRadius += cameraZoomMultiplier * deltaTime;
         }
         else if (GetMouseWheelMove() < 0)
         {
-            cameraCircleRadius -= 100 * deltaTime;
+            cameraCircleRadius -= cameraZoomMultiplier * deltaTime;
         }
 
-        float x, y, z;
-        x = cameraCircleRadius * sin(angleYAxis) * cos(angleXZAxis);
-        y = cameraCircleRadius * sin(angleYAxis) * sin(angleXZAxis);
-        z = cameraCircleRadius * cos(angleYAxis);
+        // float x, y, z;
+        // x = cameraCircleRadius * sin(angleYAxis) * cos(angleXZAxis);
+        // y = cameraCircleRadius * sin(angleYAxis) * sin(angleXZAxis);
+        // z = cameraCircleRadius * cos(angleYAxis);
 
-        mainCamera.position.x = x;
-        mainCamera.position.y = y;
-        mainCamera.position.z = z;
+        // mainCamera.position.x = x;
+        // mainCamera.position.y = y;
+        // mainCamera.position.z = z;
 
+
+        mainCamera.position = Vector3Transform(mainCamera.position, MatrixRotateXYZ((Vector3){DEG2RAD * angleXZAxis, DEG2RAD * angleYAxis, 0}));
         previousMousePosition = currentMousePos;
     }
 }

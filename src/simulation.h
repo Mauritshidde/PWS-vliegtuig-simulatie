@@ -42,12 +42,14 @@ private:
     float angleYAxis;
     float angleXZAxis;
     float cameraCircleRadius;
+    float cameraRotationMultiplier;
+    float cameraZoomMultiplier;
 
-    float roatationMultiplier;
+    float rotationMultiplier;
     float maxAngle;
-    // float currentPitchAngle;
-    // float currentYawAngle;
-    // float currentRollAngle;
+
+    float airDensity; // ρ = P/(R×T)
+    float height;
 
     const char *minText = "0";
     const char *maxText = "360";
@@ -57,6 +59,7 @@ private:
     void Start(int screenHeight, int screenWidth);
     void Update(float deltaTime);
     void Render();
+    void currentAirDensity();
 
 public:
     RunSimulation();

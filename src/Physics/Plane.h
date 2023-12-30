@@ -30,4 +30,5 @@ public:
       float totalSpeed;
       float anglePitch, angleYaw, angleRoll;
       float mass; // in kg
+      float height;
 };
