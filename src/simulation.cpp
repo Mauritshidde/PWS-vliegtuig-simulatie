@@ -30,9 +30,9 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     angleXZAxis = 0;
     cameraCircleRadius = 120;
     cameraRotationMultiplier = 10;
-    cameraZoomMultiplier = 10;
-
-    cameraPos = {0.0f, 0.0f, 120.0f};
+    cameraZoomMultiplier = 30;
+    
+    cameraPos = {0.0f, 0.0f, cameraCircleRadius};
     cameraXYPos = {cameraPos.x, cameraPos.y};
     mainCamera = {0};
 
@@ -72,39 +72,61 @@ void RunSimulation::moveCamera(float deltaTime)
     
     if (notOnGUI(currentMousePos))
     {
-        angleYAxis = 0;
-        angleXZAxis = 0;
         if (IsMouseButtonDown(0))
         {
             angleYAxis += cameraRotationMultiplier * ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
             angleXZAxis += cameraRotationMultiplier * ((currentMousePos.y - previousMousePosition.y)) * deltaTime;
+            if (angleYAxis > 360) {
+                angleYAxis -= 360;
+            } else if (angleYAxis < 0) {
+                angleYAxis += 360;
+            }
+
+            if (angleXZAxis > 360) {
+                angleYAxis -= 360;
+            } else if (angleYAxis < 0) {
+                angleXZAxis += 360;
+            }
         }
 
         if (IsKeyDown(KEY_RIGHT))
         {
             angleYAxis += cameraRotationMultiplier * deltaTime;
+            if (angleYAxis > 360) {
+                angleYAxis -= 360;
+            }
         }
         if (IsKeyDown(KEY_LEFT))
         {
             angleYAxis -= cameraRotationMultiplier * deltaTime;
+            if (angleYAxis < 0) {
+                angleYAxis += 360;
+            }
         }
         if (IsKeyDown(KEY_UP))
         {
             angleXZAxis += cameraRotationMultiplier * deltaTime;
+            if (angleXZAxis > 360) {
+                angleXZAxis -= 360;
+            }
         }
         if (IsKeyDown(KEY_DOWN))
         {
             angleXZAxis -= cameraRotationMultiplier * deltaTime;
+            if (angleXZAxis < 0) {
+                angleXZAxis += 360;
+            }
         }
 
         if (GetMouseWheelMove() > 0)
         {
-            std::cout << "test" << std::endl;
             cameraCircleRadius += cameraZoomMultiplier * deltaTime;
+            cameraPos = {0.0f, 0.0f, cameraCircleRadius};
         }
         else if (GetMouseWheelMove() < 0)
         {
             cameraCircleRadius -= cameraZoomMultiplier * deltaTime;
+            cameraPos = {0.0f, 0.0f, cameraCircleRadius};
         }
 
         // float x, y, z;
@@ -117,7 +139,7 @@ void RunSimulation::moveCamera(float deltaTime)
         // mainCamera.position.z = z;
 
 
-        mainCamera.position = Vector3Transform(mainCamera.position, MatrixRotateXYZ((Vector3){DEG2RAD * angleXZAxis, DEG2RAD * angleYAxis, 0}));
+        mainCamera.position = Vector3Transform(cameraPos, MatrixRotateXYZ((Vector3){DEG2RAD * angleXZAxis, DEG2RAD * angleYAxis, 0}));
         previousMousePosition = currentMousePos;
     }
 }
