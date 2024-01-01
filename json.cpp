@@ -3,36 +3,31 @@
 #include <string>
 #include <iostream>
 
-using json = nlohmann::json;
+// using json = nlohmann::json;
 
 
 void createLiftFile(int steps, float precisionFactor) { // steps has to be greater than 10 but realisticly has to be higher than 200
-    json data;
+    nlohmann::json data;
 
     float pitchAngle = 0;
     float yawAngle = 0;
     float stepSize = 360.0f/(steps-1);
 
     for (int i=0; i < steps; i++) {
-        float roundedPitchAngle = (int)(pitchAngle / precisionFactor) * precisionFactor;
+        int roundedPitchAngle = round(pitchAngle / precisionFactor); // round to closest decimal point with an specific precision so it is as accurate as possible
         std::cout << roundedPitchAngle << " ";
         for (int j=0; j < steps; j++) {
-            float roundedYawAngle = (int)(yawAngle / precisionFactor) * precisionFactor;
+            int roundedYawAngle = round(yawAngle / precisionFactor);
             data["pitch"][std::to_string(roundedPitchAngle)]["yaw"][std::to_string(roundedYawAngle)]["cl"] = 3;
             data["pitch"][std::to_string(roundedPitchAngle)]["yaw"][std::to_string(roundedYawAngle)]["cd"] = 5;
             yawAngle += stepSize;
         }
         pitchAngle += stepSize;
         yawAngle = 0;
-        // pitchAngle += stepsize;
-        // for (int j=0; yawAngle < 360; j++) {
-
-        // }
-        // pitchAngle += 
     }
     std::cout << std::endl;
 
-    data["precisionFactor"] = precisionFactor; // amount of decimal places for pitch angle and yaw angle
+    data["precisionFactor"] = precisionFactor; // the factor by which the values are multiplied to decide how much decimal points to keep
 
     std::ofstream liftfile;
     liftfile.open ("test.json");
@@ -43,7 +38,7 @@ void createLiftFile(int steps, float precisionFactor) { // steps has to be great
 int main() {
     // std::ifstream f("2.json");
     // json data = json::parse(f);
-    json data;
+    // json data;
     // json ex3 = {
     //     {"happy", true},
     //     {"pi", 3.141},
