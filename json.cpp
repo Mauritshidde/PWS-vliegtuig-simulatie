@@ -2,37 +2,84 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <iostream>
+#include <raylib.h>
 
 // using json = nlohmann::json;
 
 
-void createLiftFile(int steps, float precisionFactor) { // steps has to be greater than 10 but realisticly has to be higher than 200
+void createLiftFile(int steps, float precisionFactor, bool simpleStepType) { // steps has to be greater than 2 but realisticly has to be higher than 200
     nlohmann::json data;
 
-    float pitchAngle = 0;
-    float yawAngle = 0;
-    float stepSize = 360.0f/(steps-1);
+    if (simpleStepType) {
+        float stepSize = 1 * precisionFactor * 10;
 
-    for (int i=0; i < steps; i++) {
-        int roundedPitchAngle = round(pitchAngle / precisionFactor); // round to closest decimal point with an specific precision so it is as accurate as possible
-        std::cout << roundedPitchAngle << " ";
-        for (int j=0; j < steps; j++) {
-            int roundedYawAngle = round(yawAngle / precisionFactor);
-            data["pitch"][std::to_string(roundedPitchAngle)]["yaw"][std::to_string(roundedYawAngle)]["cl"] = 3;
-            data["pitch"][std::to_string(roundedPitchAngle)]["yaw"][std::to_string(roundedYawAngle)]["cd"] = 5;
-            yawAngle += stepSize;
+        for (int i=0; i < 360; i+=stepSize) {
+            for (int j=0; j < 360; j+=stepSize) {
+                data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cl"] = 3;
+                data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cd"] = 5;
+            }
         }
-        pitchAngle += stepSize;
-        yawAngle = 0;
-    }
-    std::cout << std::endl;
+        std::cout << "ja" << std::endl;
+        data["simpleSteps"] = simpleStepType;
+        data["precisionFactor"] = precisionFactor; // the factor by which the values are multiplied to decide how much decimal points to keep
+        data["steps"] = 0; 
+        data["spaceBetween"] = round(stepSize / precisionFactor);
+        
+    } else {
+        float pitchAngle = 0;
+        float yawAngle = 0;
+        float stepSize = 360.0f/(steps-1);
 
-    data["precisionFactor"] = precisionFactor; // the factor by which the values are multiplied to decide how much decimal points to keep
+        for (int i=0; i < steps; i++) {
+            int roundedPitchAngle = round(pitchAngle / precisionFactor); // round to closest decimal point with an specific precision so it is as accurate as possible
+            std::cout << roundedPitchAngle << " ";
+            for (int j=0; j < steps; j++) {
+                int roundedYawAngle = round(yawAngle / precisionFactor);
+                data["pitch"][std::to_string(roundedPitchAngle)]["yaw"][std::to_string(roundedYawAngle)]["cl"] = 3;
+                data["pitch"][std::to_string(roundedPitchAngle)]["yaw"][std::to_string(roundedYawAngle)]["cd"] = 5;
+                yawAngle += stepSize;
+            }
+            pitchAngle += stepSize;
+            yawAngle = 0;
+        }
+        std::cout << std::endl;
+
+        data["simpleSteps"] = simpleStepType;
+        data["precisionFactor"] = precisionFactor; // the factor by which the values are multiplied to decide how much decimal points to keep
+        data["steps"] = steps; 
+        data["spaceBetween"] = round(stepSize / precisionFactor);
+    }
 
     std::ofstream liftfile;
     liftfile.open ("test.json");
     liftfile << data;
     liftfile.close();
+}
+
+void getConstFromLiftFile(float pitchAngle, float yawAngle) {
+    float cl, cd;
+    
+    std::ifstream f("test.json");
+    nlohmann::json data = nlohmann::json::parse(f);
+    f.close();
+
+    float precisionFactor = data["precisionFactor"];
+    int stepSize = data["spaceBetween"];
+    
+    if (data["simpleSteps"]) {
+        // pitchAngle 
+    } else {
+        int steps = data["steps"];
+        std::cout << precisionFactor << " " << steps << std::endl;
+        int roundedPitchAngle = round(pitchAngle / precisionFactor);
+
+
+        // modules of pitchangle and yawangle by stepsize
+        std::cout << stepSize << " " << (stepSize * 2) % stepSize << std::endl;
+    }
+
+    // float cl = 
+    // return {cl, cd};
 }
 
 int main() {
@@ -51,8 +98,8 @@ int main() {
     float stepSize = 360.0f/(steps-1);
     // float x = 360.0f/(steps-1);
     float precisionFactor = 0.01;  // i.e. round to nearest one-hundreth
-    createLiftFile(steps, precisionFactor);
-    
+    createLiftFile(steps, precisionFactor, true);
+    getConstFromLiftFile(3, 4);
     // float value = (int)(stepSize / precisionFactor) * precisionFactor;
     // std::cout << value << " " << x<< std::endl;
 
