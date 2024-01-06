@@ -35,8 +35,8 @@ void createLiftFile(int steps, float precisionFactor, bool simpleStepType) { // 
             std::cout << roundedPitchAngle << " ";
             for (int j=0; j < steps; j++) {
                 int roundedYawAngle = round(yawAngle / precisionFactor);
-                data["pitch"][std::to_string(roundedPitchAngle)]["yaw"][std::to_string(roundedYawAngle)]["cl"] = 3;
-                data["pitch"][std::to_string(roundedPitchAngle)]["yaw"][std::to_string(roundedYawAngle)]["cd"] = 5;
+                data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cl"] = 3;
+                data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cd"] = 5;
                 yawAngle += stepSize;
             }
             pitchAngle += stepSize;
@@ -47,7 +47,7 @@ void createLiftFile(int steps, float precisionFactor, bool simpleStepType) { // 
         data["simpleSteps"] = simpleStepType;
         data["precisionFactor"] = precisionFactor; // the factor by which the values are multiplied to decide how much decimal points to keep
         data["steps"] = steps; 
-        data["spaceBetween"] = round(stepSize / precisionFactor);
+        data["spaceBetween"] = stepSize;
     }
 
     std::ofstream liftfile;
@@ -63,19 +63,34 @@ void getConstFromLiftFile(float pitchAngle, float yawAngle) {
     nlohmann::json data = nlohmann::json::parse(f);
     f.close();
 
-    float precisionFactor = data["precisionFactor"];
-    int stepSize = data["spaceBetween"];
+    float precisionFactor = data["precisionFactor"].get<float>();
+    // int stepSize = data["spaceBetween"];
     
-    if (data["simpleSteps"]) {
+    if (data["simpleSteps"].get<bool>()) {
         // pitchAngle 
     } else {
-        int steps = data["steps"];
-        std::cout << precisionFactor << " " << steps << std::endl;
+        float stepSize = data["spaceBetween"].get<float>();
+        float translatedPitch = pitchAngle/stepSize;
+        int pitchIndex = (int) translatedPitch;
+
+        float translatedYaw = yawAngle/stepSize;
+        int yawIndex = (int) translatedPitch;
+
+        float Cl1 = data["pitch"][std::to_string(pitchIndex)]["yaw"][std::to_string(yawIndex)]["cl"].get<float>() * (1 - (translatedPitch - pitchIndex)) * (1 - (translatedYaw - yawIndex));
+        float Cl2 = data["pitch"][std::to_string(pitchIndex + 1)]["yaw"][std::to_string(yawIndex)]["cl"].get<float>() * (translatedPitch - pitchIndex) * (1 - (translatedYaw - yawIndex));
+
+        float Cl3 = data["pitch"][std::to_string(pitchIndex)]["yaw"][std::to_string(yawIndex + 1)]["cl"].get<float>() * (1 - (translatedPitch - pitchIndex)) * (translatedYaw - yawIndex);
+        float Cl4 = data["pitch"][std::to_string(pitchIndex + 1)]["yaw"][std::to_string(yawIndex + 1)]["cl"].get<float>() * (translatedPitch - pitchIndex) * (translatedYaw - yawIndex);
+
+
+        float Cl = Cl1 + Cl2 + Cl3 + Cl4;
+
+        std::cout << precisionFactor << " "  << std::endl;
         int roundedPitchAngle = round(pitchAngle / precisionFactor);
 
 
         // modules of pitchangle and yawangle by stepsize
-        std::cout << stepSize << " " << (stepSize * 2) % stepSize << std::endl;
+        std::cout << translatedPitch << " " << Cl << std::endl;
     }
 
     // float cl = 
@@ -98,7 +113,7 @@ int main() {
     float stepSize = 360.0f/(steps-1);
     // float x = 360.0f/(steps-1);
     float precisionFactor = 0.01;  // i.e. round to nearest one-hundreth
-    createLiftFile(steps, precisionFactor, true);
+    createLiftFile(steps, precisionFactor, false);
     getConstFromLiftFile(3, 4);
     // float value = (int)(stepSize / precisionFactor) * precisionFactor;
     // std::cout << value << " " << x<< std::endl;
