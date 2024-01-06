@@ -35,8 +35,8 @@ void createLiftFile(int steps, float precisionFactor, bool simpleStepType) { // 
             std::cout << roundedPitchAngle << " ";
             for (int j=0; j < steps; j++) {
                 int roundedYawAngle = round(yawAngle / precisionFactor);
-                data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cl"] = 3;
-                data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cd"] = 5;
+                data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cl"] = 0.445;
+                data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cd"] = 0.017;
                 yawAngle += stepSize;
             }
             pitchAngle += stepSize;
@@ -56,7 +56,7 @@ void createLiftFile(int steps, float precisionFactor, bool simpleStepType) { // 
     liftfile.close();
 }
 
-void getConstFromLiftFile(float pitchAngle, float yawAngle) {
+Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle) {
     float cl, cd;
     
     std::ifstream f("test.json");
@@ -82,19 +82,24 @@ void getConstFromLiftFile(float pitchAngle, float yawAngle) {
         float Cl3 = data["pitch"][std::to_string(pitchIndex)]["yaw"][std::to_string(yawIndex + 1)]["cl"].get<float>() * (1 - (translatedPitch - pitchIndex)) * (translatedYaw - yawIndex);
         float Cl4 = data["pitch"][std::to_string(pitchIndex + 1)]["yaw"][std::to_string(yawIndex + 1)]["cl"].get<float>() * (translatedPitch - pitchIndex) * (translatedYaw - yawIndex);
 
+        cl = Cl1 + Cl2 + Cl3 + Cl4;
 
-        float Cl = Cl1 + Cl2 + Cl3 + Cl4;
+        float Cd1 = data["pitch"][std::to_string(pitchIndex)]["yaw"][std::to_string(yawIndex)]["cd"].get<float>() * (1 - (translatedPitch - pitchIndex)) * (1 - (translatedYaw - yawIndex));
+        float Cd2 = data["pitch"][std::to_string(pitchIndex + 1)]["yaw"][std::to_string(yawIndex)]["cd"].get<float>() * (translatedPitch - pitchIndex) * (1 - (translatedYaw - yawIndex));
+
+        float Cd3 = data["pitch"][std::to_string(pitchIndex)]["yaw"][std::to_string(yawIndex + 1)]["cd"].get<float>() * (1 - (translatedPitch - pitchIndex)) * (translatedYaw - yawIndex);
+        float Cd4 = data["pitch"][std::to_string(pitchIndex + 1)]["yaw"][std::to_string(yawIndex + 1)]["cd"].get<float>() * (translatedPitch - pitchIndex) * (translatedYaw - yawIndex);
+
+        cd = Cd1 + Cd2 + Cd3 + Cd4;
 
         std::cout << precisionFactor << " "  << std::endl;
         int roundedPitchAngle = round(pitchAngle / precisionFactor);
 
 
-        // modules of pitchangle and yawangle by stepsize
-        std::cout << translatedPitch << " " << Cl << std::endl;
+        std::cout << translatedPitch << " " << cl << std::endl;
     }
 
-    // float cl = 
-    // return {cl, cd};
+    return {cl, cd};
 }
 
 int main() {
