@@ -31,6 +31,7 @@ int main()
             {
                 RunSimulation simulatie;
                 simulatie.run();
+                running = false;
             }
             else if (menu.buttonPressed == 1)
             {
