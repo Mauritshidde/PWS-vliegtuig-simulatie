@@ -26,7 +26,6 @@ int main()
 
         if (!menu.startScreen)
         {
-            std::cout << "ja" << std::endl;
             if (menu.buttonPressed == 0)
             {
                 RunSimulation simulatie;
@@ -37,15 +36,18 @@ int main()
             {
                 NavierStokes cfd;
                 cfd.calc();
+                running = false;
                 // start cdf program for calculating cl and cd;
             }
             else if (menu.buttonPressed == 2)
             {
                 // load application for loading a model // selecting parts from the model;
+                running = false;
             }
             else if (menu.buttonPressed == 3)
             {
                 // open settings
+                running = false;
             }
             else if (menu.buttonPressed == 4)
             {
