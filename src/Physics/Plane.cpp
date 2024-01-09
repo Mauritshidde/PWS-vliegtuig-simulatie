@@ -11,13 +11,23 @@ Plane::Plane(float givenMass, Vector3 startingPos, float givenrRotationMultiplie
       angleYaw = 0;
       angleRoll = 0;
       rotationMultiplier = givenrRotationMultiplier;
-
+      Vector2 consts = getConsts(anglePitch, angleYaw, true, true);
+      cl = consts.x;
+      cd = consts.y;
       // centerOfLiftWingL = calcCenterOfLiftWing();
       // centerOfLiftWingR = calcCenterOfLiftWing();
 }
 
 Plane::~Plane()
 {
+}
+
+Vector2 Plane::getConsts(float pitch, float yaw, bool usePitch, bool useYaw) {
+      if (!usePitch && !useYaw) {
+            usePitch = true;
+            useYaw = true;
+      }
+      Vector2 consts = getConstFromLiftFile(pitch, yaw, useYaw, usePitch);
 }
 
 Vector3 Plane::calcLift()

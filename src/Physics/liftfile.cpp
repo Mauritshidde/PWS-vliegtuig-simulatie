@@ -140,7 +140,7 @@ Vector2 getClCdWithPitchAndYaw(float pitchAngle, float yawAngle, nlohmann::json 
     return {cl, cd};
 }
 
-Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch, nlohmann::json constFile) {
+Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch) {
     float cl, cd;
     
     if (withYaw || withPitch) {

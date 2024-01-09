@@ -2,6 +2,8 @@
 #include <raylib.h>
 #include <vector>
 #include "physicsvector.h"
+#include "liftfile.h"
+
 class Plane
 {
 private:
@@ -16,6 +18,7 @@ public:
       ~Plane();
       Vector3 calcLift();
       Vector3 calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth);
+      Vector2 getConsts(float pitch, float yaw, bool usePitch, bool useYaw);
 
       void Start();
       void Draw();
@@ -23,6 +26,8 @@ public:
 
       float currentEngineTrust = 0.0f; // in newton
       float maxEngineTrust = 116000;   // in newton
+      float cl;
+      float cd;
       // float leftMotorForce;
       // float rightMotorForce;
       Vector3 pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
