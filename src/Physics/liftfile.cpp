@@ -86,8 +86,6 @@ Vector2 getClCdWithYaw(float yawAngle, nlohmann::json constFile) {
 
     cd = Cd1 + Cd2;
     
-    std::cout << translatedYaw << " " << cl << std::endl;
-
     return {cl, cd};
 }
 
@@ -114,8 +112,6 @@ Vector2 getClCdWithPitch(float pitchAngle, nlohmann::json constFile) {
 
     cd = Cd1 + Cd2;
     
-    std::cout << translatedPitch << " " << cl << std::endl;
-
     return {cl, cd};
 }
 
@@ -154,8 +150,6 @@ Vector2 getClCdWithPitchAndYaw(float pitchAngle, float yawAngle, nlohmann::json 
 
     cd = Cd1 + Cd2 + Cd3 + Cd4;
     
-    std::cout << translatedPitch << " " << cl << std::endl;
-
     return {cl, cd};
 }
 
@@ -171,40 +165,25 @@ Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, boo
         cd = vals.y;
 
         return {cl, cd};
-    // } else if (withYaw) {
-    //     std::ifstream f("planes/liftfiles/Boeing737Yaw.json");
-    //     nlohmann::json constFile = nlohmann::json::parse(f);
-    //     f.close();
-    //     Vector2 vals = getClCdWithYaw(yawAngle, constFile);
-    //     cl = vals.x;
-    //     cd = vals.y;
+    } else if (withYaw) {
+        std::ifstream f("planes/liftfiles/Boeing737Yaw.json");
+        nlohmann::json constFile = nlohmann::json::parse(f);
+        f.close();
+        Vector2 vals = getClCdWithYaw(yawAngle, constFile);
+        cl = vals.x;
+        cd = vals.y;
 
-    //     return {cl, cd};
-    // } else {
-    //     std::ifstream f("planes/liftfiles/Boeing737Pitch.json");
-    //     nlohmann::json constFile = nlohmann::json::parse(f);
-    //     f.close();
-    //     Vector2 vals = getClCdWithPitch(pitchAngle, constFile);
-    //     cl = vals.x;
-    //     cd = vals.y;
+        return {cl, cd};
+    } else {
+        std::ifstream f("planes/liftfiles/Boeing737Pitch.json");
+        nlohmann::json constFile = nlohmann::json::parse(f);
+        f.close();
+        Vector2 vals = getClCdWithPitch(pitchAngle, constFile);
+        cl = vals.x;
+        cd = vals.y;
 
-    //     return {cl, cd};
+        return {cl, cd};
     }
 
     return {0, 0};
 }
-
-// int main() {
-        // std::ifstream f("test.json");
-        // nlohmann::json constFile = nlohmann::json::parse(f);
-        // f.close();
-//     float pitchAngle = 0;
-//     float yawAngle = 0;
-//     int steps = 100;
-
-//     float stepSize = 360.0f/(steps-1);
-//     float precisionFactor = 0.01;  // i.e. round to nearest one-hundreth
-//     createLiftFile(steps, precisionFactor, false);
-//     getConstFromLiftFile(3, 4);
-//     return 0;
-// }

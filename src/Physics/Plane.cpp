@@ -121,5 +121,6 @@ void Plane::Update(float deltaTime)
       if (angleUpdated) {
             airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
             getConsts(anglePitch, angleYaw, true, true);
+            angleUpdated = false;
       }
 }
