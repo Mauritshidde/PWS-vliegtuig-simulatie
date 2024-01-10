@@ -11,7 +11,9 @@ Plane::Plane(float givenMass, Vector3 startingPos, float givenrRotationMultiplie
       angleYaw = 0;
       angleRoll = 0;
       rotationMultiplier = givenrRotationMultiplier;
+      angleUpdated = false;
       Vector2 consts = getConsts(anglePitch, angleYaw, true, true);
+      
       cl = consts.x;
       cd = consts.y;
       // centerOfLiftWingL = calcCenterOfLiftWing();
@@ -28,10 +30,13 @@ Vector2 Plane::getConsts(float pitch, float yaw, bool usePitch, bool useYaw) {
             useYaw = true;
       }
       Vector2 consts = getConstFromLiftFile(pitch, yaw, useYaw, usePitch);
+      return consts;
 }
 
 Vector3 Plane::calcLift()
 {
+      // lift = cl * rho * pow(velocity, 2) * wingArea * 0.5;
+      //Drag = cd * rho * pow(velocity, 2) * planeArea * 0.5
       // TODO lift formula
 }
 
@@ -61,6 +66,7 @@ void Plane::Update(float deltaTime)
             {
                   anglePitch -= 360;
             }
+            angleUpdated = true;
       }
       else if (IsKeyDown(KEY_S))
       {
@@ -69,6 +75,8 @@ void Plane::Update(float deltaTime)
             {
                   anglePitch += 360;
             }
+            angleUpdated = true;
+
       }
 
       if (IsKeyDown(KEY_A))
@@ -78,6 +86,7 @@ void Plane::Update(float deltaTime)
             {
                   angleYaw -= 360;
             }
+            angleUpdated = true;
       }
       else if (IsKeyDown(KEY_D))
       {
@@ -86,6 +95,7 @@ void Plane::Update(float deltaTime)
             {
                   angleYaw += 360;
             }
+            angleUpdated = true;
       }
 
       if (IsKeyDown(KEY_Q))
@@ -95,6 +105,7 @@ void Plane::Update(float deltaTime)
             {
                   angleRoll -= 360;
             }
+            angleUpdated = true;
       }
       else if (IsKeyDown(KEY_E))
       {
@@ -103,6 +114,11 @@ void Plane::Update(float deltaTime)
             {
                   angleRoll += 360;
             }
+            angleUpdated = true;
       }
-      airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
+
+      if (angleUpdated) {
+            airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
+            getConsts(anglePitch, angleYaw, true, true);
+      }
 }

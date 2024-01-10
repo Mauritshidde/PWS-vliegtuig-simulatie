@@ -1,6 +1,7 @@
 #include "simulation.h"
 #include "ui/menu.h"
 #include "navierstokes.h"
+#include "liftfile.h"
 
 #include <raylib.h>
 #include <iostream>
@@ -17,7 +18,7 @@ int main()
 
     SetTargetFPS(60);
     menu = Menu(screenWidth, screenHeight);
-
+    createLiftFiles(200, 0.01);
     while (!WindowShouldClose() && running)
     {
         float deltaTime = GetFrameTime();
