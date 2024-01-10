@@ -37,7 +37,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     mainCamera = {0};
 
     mainCamera.position = cameraPos;                  // Camera position perspective
-    mainCamera.target = (Vector3){0.0f, 20.0f, 0.0f}; // Camera looking at point  20 ?????????????? hier naar nog kijken TODO
+    mainCamera.target = (Vector3){0.0f, 0.0f, 0.0f}; // Camera looking at point  20 ?????????????? hier naar nog kijken TODO
     mainCamera.up = (Vector3){0.0f, 10.0f, 0.0f};     // Camera up vector (rotation towards target)
     mainCamera.fovy = 30.0f;                          // Camera field-of-view Y   effect van dit veranderen bestuderen ?????????????? TODO
     mainCamera.projection = CAMERA_PERSPECTIVE;  /// wat doet dit TODO

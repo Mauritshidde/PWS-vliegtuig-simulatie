@@ -49,7 +49,7 @@ void Plane::Start()
 {
       airplaneTexture = LoadTexture("models/texture/skyboxtexture.png");
       airplane = LoadModel("models/object/plane.obj");
-      airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
+      // airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
 }
 
 void Plane::Draw()
