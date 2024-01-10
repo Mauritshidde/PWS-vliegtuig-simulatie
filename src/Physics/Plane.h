@@ -1,8 +1,10 @@
 #pragma once
 #include <raylib.h>
 #include <vector>
+#include <string>
+
 #include "physicsvector.h"
-#include "liftfile.h"
+#include "../liftFileCode/readFile.h"
 
 class Plane
 {
@@ -10,9 +12,11 @@ private:
       /* data */
       Model airplane;
       Texture2D airplaneTexture;
+      LiftFileReader files;
 
       float rotationMultiplier;
       bool angleUpdated;
+      std::string liftFileName;
 
 public:
       Plane(float givenMass = 10000, Vector3 startingPos = {0, 0, 0}, float givenrRotationMultiplier = 10);

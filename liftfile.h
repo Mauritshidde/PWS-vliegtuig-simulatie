@@ -11,4 +11,4 @@ void createLiftFiles(int steps, float stepSize); // steps has to be greater than
 Vector2 getClCdWithYaw(float yawAngle, nlohmann::json* constFile);
 Vector2 getClCdWithPitch(float pitchAngle, nlohmann::json* constFile);
 Vector2 getClCdWithPitchAndYaw(float pitchAngle, float yawAngle, nlohmann::json* constFile);
-Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch);
+Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch, std::string fileName);

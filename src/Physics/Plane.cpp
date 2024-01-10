@@ -3,19 +3,23 @@
 #define RAYMATH_IMPLEMENTATION
 #include "../../include/modules/raymath.h"
 
-Plane::Plane(float givenMass, Vector3 startingPos, float givenrRotationMultiplier)
+Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier)
 {
       mass = givenMass;
       speedInDirections = {0, 0, 0};
       anglePitch = 0;
       angleYaw = 0;
       angleRoll = 0;
-      rotationMultiplier = givenrRotationMultiplier;
+      rotationMultiplier = givenRotationMultiplier;
       angleUpdated = false;
+
+      liftFileName = "Boeing737";
+      files = LiftFileReader(liftFileName);
       Vector2 consts = getConsts(anglePitch, angleYaw, true, true);
       
       cl = consts.x;
       cd = consts.y;
+
       // centerOfLiftWingL = calcCenterOfLiftWing();
       // centerOfLiftWingR = calcCenterOfLiftWing();
 }
@@ -29,7 +33,7 @@ Vector2 Plane::getConsts(float pitch, float yaw, bool usePitch, bool useYaw) {
             usePitch = true;
             useYaw = true;
       }
-      Vector2 consts = getConstFromLiftFile(pitch, yaw, useYaw, usePitch);
+      Vector2 consts = files.getConstFromLiftFile(pitch, yaw, useYaw, usePitch);
       return consts;
 }
 

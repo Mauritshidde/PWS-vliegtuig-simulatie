@@ -153,11 +153,11 @@ Vector2 getClCdWithPitchAndYaw(float pitchAngle, float yawAngle, nlohmann::json 
     return {cl, cd};
 }
 
-Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch) {
+Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch, std::string fileName) {
     float cl, cd;
     
     if (withYaw || withPitch) {
-        std::ifstream f("planes/liftfiles/Boeing737.json");
+        std::ifstream f("planes/liftfiles/"+fileName+".json");
         nlohmann::json constFile = nlohmann::json::parse(f);
         f.close();
         Vector2 vals = getClCdWithPitchAndYaw(pitchAngle, yawAngle, constFile);
@@ -166,7 +166,7 @@ Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, boo
 
         return {cl, cd};
     } else if (withYaw) {
-        std::ifstream f("planes/liftfiles/Boeing737Yaw.json");
+        std::ifstream f("planes/liftfiles/"+fileName+"Yaw.json");
         nlohmann::json constFile = nlohmann::json::parse(f);
         f.close();
         Vector2 vals = getClCdWithYaw(yawAngle, constFile);
@@ -175,7 +175,7 @@ Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, boo
 
         return {cl, cd};
     } else {
-        std::ifstream f("planes/liftfiles/Boeing737Pitch.json");
+        std::ifstream f("planes/liftfiles/"+fileName+"Pitch.json");
         nlohmann::json constFile = nlohmann::json::parse(f);
         f.close();
         Vector2 vals = getClCdWithPitch(pitchAngle, constFile);
