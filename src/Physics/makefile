@@ -17,3 +17,17 @@ navierstokes.o: navierstokes.cpp navierstokes.h
 
 clean:
 	rm *.o navierstokes
+
+	
+debug:
+	@echo " test$(python_version_full)"	
+	@echo "test $(PYTHON_VERSION)"
+	@echo "test"
+	@echo "test"
+	@echo "test"
+	@echo "/usr/include/$(python_version_major).$(python_version_minor)"
+	@echo ${python_version_full}
+	@echo $(python_version_major)
+	@echo ${python_version_minor}
+	@echo ${python_version_patch}
+	@echo ${my_cmd}

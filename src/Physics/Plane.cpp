@@ -47,14 +47,15 @@ Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, floa
 
 void Plane::Start()
 {
-      airplaneTexture = LoadTexture("models/texture/skyboxtexture.png");
-      airplane = LoadModel("models/object/plane.obj");
-      // airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
+      airplaneTexture = LoadTexture("models/texture/planeTextureBeter.png");
+      airplane = LoadModel("models/object/airplane.obj");
+      airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
 }
 
 void Plane::Draw()
 {
-      DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, RED); // 2de vector geeft aan met welke factor hij met currentangle draait
+      DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); // 2de vector geeft aan met welke factor hij met currentangle draait
+
 }
 
 void Plane::Update(float deltaTime)
