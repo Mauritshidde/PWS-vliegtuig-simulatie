@@ -66,7 +66,7 @@ public:
     RunSimulation();
     ~RunSimulation();
 
-    void Start(int screenHeight, int screenWidth);
+    void Start(int screenHeight, int screenWidth, bool *isLoading);
     bool loading = true;
 
     void run();

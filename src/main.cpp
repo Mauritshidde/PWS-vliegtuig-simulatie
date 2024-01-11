@@ -69,12 +69,16 @@ int main()
         {
             if (menu.buttonPressed == 0)
             {
+                bool it = true;
+                bool *loading = &it;
+                // *loading = true;
+
                 RunSimulation simulatie;
-                std::thread t2(loadingScreen2, 100, screenWidth, screenHeight, &simulatie.loading);
-                std::thread t(&RunSimulation::Start, &simulatie, screenHeight, screenWidth);
-                // loadingScreen2(100, screenWidth, screenHeight, &simulatie.loading);
+                // std::thread t2(loadingScreen2, 100, screenWidth, screenHeight, loading);
+                std::thread t(&RunSimulation::Start, &simulatie, screenHeight, screenWidth, loading);
+                loadingScreen2(100, screenWidth, screenHeight, loading);
                 t.join();
-                t2.join();
+                // t2.join();
                 simulatie.run();
                 running = false;
             }

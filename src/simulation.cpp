@@ -14,7 +14,7 @@ RunSimulation::~RunSimulation()
 {
 }
 
-void RunSimulation::Start(int screenWidth, int screenHeight)
+void RunSimulation::Start(int screenWidth, int screenHeight, bool *isLoading)
 {
     // loadingScreen(100, screenWidth, screenHeight, &loadingScreen);
     // plane.loadObjectModel();
@@ -53,8 +53,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     planePhysicsModel = Plane(41145, {0, 0, 0});
 
     plane.Start();
-    
-    loading = false;
+    *isLoading = false;
 }
 
 bool RunSimulation::notOnGUI(Vector2 mousePosition)
@@ -250,8 +249,8 @@ void RunSimulation::run()
 
     // t1.join();
     // t2.join();
-
-    Start(screenWidth, screenHeight);
+    bool isr = false;
+    // Start(screenWidth, screenHeight, &isr);
 
     while (!WindowShouldClose())
     {
