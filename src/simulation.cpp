@@ -16,6 +16,7 @@ RunSimulation::~RunSimulation()
 
 void RunSimulation::Start(int screenWidth, int screenHeight)
 {
+    // loadingScreen(100, screenWidth, screenHeight, &loadingScreen);
     // plane.loadObjectModel();
     rotationMultiplier = 10;
     maxAngle = 360;
@@ -52,6 +53,8 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     planePhysicsModel = Plane(41145, {0, 0, 0});
 
     plane.Start();
+    
+    loading = false;
 }
 
 bool RunSimulation::notOnGUI(Vector2 mousePosition)
@@ -194,6 +197,40 @@ void RunSimulation::Render()
     EndDrawing();
 }
 
+// void loadingScreen2(float fontSize, float screenWidth, float screenHeight, bool *repeat) {
+//     const char *oneLetter = "A";
+//     const char *text = "Loading";
+
+//     float lenghtOfOneLetter = MeasureText(oneLetter, fontSize);
+    
+//     float startX = (screenWidth / 2) - (MeasureText(text, fontSize) / 2);
+//     float startY = (screenHeight/2 + 50);
+//     float endX = ((screenWidth / 2) + (MeasureText(text, fontSize) / 2));
+//     float endY = (screenHeight/2 - 50);
+
+//     int i = 1;
+//     while (*repeat) {
+//         std::cout << "ja" << std::endl;
+//         int i = i * -1;
+//         switch (i)
+//         {
+//         case 1:
+//             BeginDrawing();
+//                 ClearBackground(WHITE);
+//                 DrawText(text, (screenWidth / 2) - (MeasureText(text, fontSize) / 2), screenHeight/2 - 50, fontSize, RED);
+//                 DrawLine(startX - (lenghtOfOneLetter / 2), startY + (lenghtOfOneLetter / 10), endX + lenghtOfOneLetter, startY + (lenghtOfOneLetter / 10), RED);
+//             EndDrawing();
+//             break;
+//         case -1:
+//             BeginDrawing();
+//                 ClearBackground(WHITE);
+//                 DrawText(text, (screenWidth / 2) - (MeasureText(text, fontSize) / 2), screenHeight/2 - 50, fontSize, RED);
+//             EndDrawing();
+//             break;
+//         }
+//     }
+// }
+
 void RunSimulation::run()
 {
     // InitWindow(0, 0, "airplane simulation");
@@ -205,6 +242,15 @@ void RunSimulation::run()
     const int screenHeight = GetScreenHeight();
 
     SetTargetFPS(60);
+    
+    // loading = true;
+    // loadingScreen2(100, screenWidth, screenHeight, &loading);
+    // std::thread t1(loadingScreen2, 100, screenWidth, screenHeight, &loading);
+    // std::thread t2(Start, screenWidth, screenHeight);
+
+    // t1.join();
+    // t2.join();
+
     Start(screenWidth, screenHeight);
 
     while (!WindowShouldClose())

@@ -5,12 +5,13 @@
 #include <cmath>
 #include <fstream>
 #include <string>
+#include <thread>
 
 // #include "../include/gui/simulationGui.h"
 // #include <json/json.h>
-
 #include "Physics/ModelLoader.h"
 #include "Physics/Plane.h"
+// #include "ui/loadingScreen.h"
 
 class RunSimulation
 {
@@ -56,7 +57,7 @@ private:
 
     bool notOnGUI(Vector2 mousePosition);
     void moveCamera(float deltaTime);
-    void Start(int screenHeight, int screenWidth);
+    void loadSimulationVars();
     void Update(float deltaTime);
     void Render();
     void currentAirDensity();
@@ -64,6 +65,9 @@ private:
 public:
     RunSimulation();
     ~RunSimulation();
+
+    void Start(int screenHeight, int screenWidth);
+    bool loading = true;
 
     void run();
 };

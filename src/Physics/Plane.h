@@ -16,6 +16,7 @@ private:
 
       float rotationMultiplier;
       bool angleUpdated;
+      bool loading = true;
       std::string liftFileName;
 
 public:

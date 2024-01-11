@@ -19,7 +19,7 @@ Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier
       
       cl = consts.x;
       cd = consts.y;
-
+      loading = false;
       // centerOfLiftWingL = calcCenterOfLiftWing();
       // centerOfLiftWingR = calcCenterOfLiftWing();
 }
