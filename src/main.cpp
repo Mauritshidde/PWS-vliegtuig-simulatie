@@ -2,6 +2,7 @@
 #include "ui/menu.h"
 #include "navierstokes.h"
 #include "liftFileCode/createFile.h"
+#include "ui/loadingScreen.h"
 
 #include <raylib.h>
 #include <iostream>
@@ -29,6 +30,7 @@ int main()
         {
             if (menu.buttonPressed == 0)
             {
+                loadingScreen(100, screenWidth, screenHeight);
                 RunSimulation simulatie;
                 simulatie.run();
                 running = false;
