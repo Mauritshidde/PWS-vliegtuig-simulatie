@@ -38,6 +38,7 @@ private:
     float gasConstant;    // the gas constant of air
     float temperature;    // the temperature
     float speedOfSound;   // the speed of sound in the simulation
+    float rho;
 
     float angleYAxis;
     float angleXZAxis;

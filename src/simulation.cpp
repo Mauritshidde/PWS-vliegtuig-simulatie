@@ -148,14 +148,14 @@ void RunSimulation::Update(float deltaTime)
 {
     speedOfSound = sqrt(adiabaticIndex * gasConstant * temperature);
 
-    if (planePhysicsModel.totalSpeed / speedOfSound <= 0.8)
+    if (planePhysicsModel.velocity / speedOfSound <= 0.8)
     {
-        planePhysicsModel.totalSpeed = 0.8 * speedOfSound;
+        planePhysicsModel.velocity = 0.8 * speedOfSound;
     }
     // first value updates over time
     // after that value updates by gui or key inputs
 
-    plane.Update(deltaTime);
+    plane.Update(deltaTime, rho);
 
     moveCamera(deltaTime);
 }

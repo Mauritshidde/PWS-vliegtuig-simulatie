@@ -3,7 +3,7 @@
 #define RAYMATH_IMPLEMENTATION
 #include "../../include/modules/raymath.h"
 
-Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier)
+Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier, float startVelocity, float rho)
 {
       mass = givenMass;
       speedInDirections = {0, 0, 0};
@@ -13,6 +13,10 @@ Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier
       rotationMultiplier = givenRotationMultiplier;
       angleUpdated = false;
 
+      velocity = startVelocity; // m/s
+      wingArea = 10; // surface area of the wing in m2
+      planeFrontalArea = 10;
+
       liftFileName = "Boeing737";
       files = LiftFileReader(liftFileName);
       Vector2 consts = getConsts(anglePitch, angleYaw, true, true);
@@ -20,6 +24,7 @@ Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier
       cl = consts.x;
       cd = consts.y;
 
+      calcLift(rho); // set lift and drag
       // centerOfLiftWingL = calcCenterOfLiftWing();
       // centerOfLiftWingR = calcCenterOfLiftWing();
 }
@@ -37,10 +42,10 @@ Vector2 Plane::getConsts(float pitch, float yaw, bool usePitch, bool useYaw) {
       return consts;
 }
 
-Vector3 Plane::calcLift()
+void Plane::calcLift(float rho)
 {
-      // lift = cl * rho * pow(velocity, 2) * wingArea * 0.5;
-      //Drag = cd * rho * pow(velocity, 2) * planeArea * 0.5
+      lift = cl * pow(velocity, 2) * wingArea * 0.5;
+      drag = cd * rho * pow(velocity, 2) * planeFrontalArea * 0.5;
       // TODO lift formula
 }
 
@@ -62,7 +67,7 @@ void Plane::Draw()
 
 }
 
-void Plane::Update(float deltaTime)
+void Plane::Update(float deltaTime, float rho)
 {
       if (IsKeyDown(KEY_W))
       {
@@ -127,4 +132,6 @@ void Plane::Update(float deltaTime)
             getConsts(anglePitch, angleYaw, true, true);
             angleUpdated = false;
       }
+
+      calcLift(rho);
 }
