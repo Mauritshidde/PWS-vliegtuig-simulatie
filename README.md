@@ -4,7 +4,7 @@
 - [over het project](##over-het-project)
 - [gebruikte library's](##gebruikte-library's)
 - [build and installation](##build-and-installation)
-- [uitleg over de controls](##running-and-controls)
+- [uitleg over de controls](## controls)
 
 ## over het project
 Voor school moesten we een PWS (profielwerkstuk) maken, dit PWS moest te maken hebben met 1 of meer van de vakken die we volgen. 
@@ -25,24 +25,24 @@ Voor de luchtweerstand en de liftkracht van het vliegtuig berekenen we nodige co
 ## gebruikte library's
 We hebben in dit project een aantal library's gemaakt, voor het visualiseren en plotten.
 
-### raylib
+#### raylib
 We hebben gerbuik gemaakt van raylib voor het visualiseren van de simulatie. op de github pagina van raylib staat hoe je het kan instaleren. Hieronder staat ook een van de mogelijke manieren voor het instaleren van raylib. Het project maakt ook gerbuik van raygui en raymath dit zijn sub librarys van raylib en zijn al in het project gestopt.
-#### instalatie voor de static versie:
+##### instalatie voor de static versie:
 Je kan raylib instaleren met de volgende commands of mogelijk via de package manager van je linux distro.
 ```
 git clone https://github.com/raysan5/raylib.git raylib
 cd raylib/src/
 make PLATFORM=PLATFORM_DESKTOP
 ```
-#### de link naar de website van raylib is:
+##### de link naar de website van raylib is:
 https://www.raylib.com/
-#### de link naar de github page van raylib is:
+##### de link naar de github page van raylib is:
 https://github.com/raysan5/raylib
 
-### matplotlib-cpp
+#### matplotlib-cpp
 Het project maakt gerbuik van matplotlib-cpp, voor het plotten van grafieken over het vleigtuig.
 
-#### instalatie
+##### instalatie
 ```
 git clone https://github.com/Microsoft/vcpkg.git
 cd vcpkg
@@ -51,16 +51,16 @@ cd vcpkg
 vcpkg install matplotlib-cpp
 ```
 
-### nlohmann json
+#### nlohmann json
 Voor het opslaan van gegevens over een vliegtuig en het verkrijgen van de lift wordt er gebruik gemaakt van json. Hiervoor is de libray nlohmann json nodig. Je kan de library instaleren via de package manager van de linux distrubutie die je gebruikt.
 
 
-## build and installation
+##### build and installation
 
 Voor het instaleren van het project moet je het project downloaden en unzippen.   
 Voor het builden moet je in de folder van het project zitten en dan ```make``` uitvoeren in de terminal.
 Voor het uitvoeren van het programma moet je dan ```./a.out``` uitvoeren in de terminal.
 
-## running and controls
+## running
 
 
