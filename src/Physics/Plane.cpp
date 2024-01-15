@@ -10,8 +10,11 @@ Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier
       anglePitch = 0;
       angleYaw = 0;
       angleRoll = 0;
+
+      previousAnglePitch = anglePitch;
+      previousAngleYaw = angleYaw;
+      
       rotationMultiplier = givenRotationMultiplier;
-      angleUpdated = false;
 
       velocity = startVelocity; // m/s
       wingArea = 10; // surface area of the wing in m2
@@ -23,7 +26,8 @@ Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier
       
       cl = consts.x;
       cd = consts.y;
-
+      
+      
       calcLift(rho); // set lift and drag
       // centerOfLiftWingL = calcCenterOfLiftWing();
       // centerOfLiftWingR = calcCenterOfLiftWing();
@@ -76,7 +80,6 @@ void Plane::Update(float deltaTime, float rho)
             {
                   anglePitch -= 360;
             }
-            angleUpdated = true;
       }
       else if (IsKeyDown(KEY_S))
       {
@@ -85,8 +88,6 @@ void Plane::Update(float deltaTime, float rho)
             {
                   anglePitch += 360;
             }
-            angleUpdated = true;
-
       }
 
       if (IsKeyDown(KEY_A))
@@ -96,7 +97,6 @@ void Plane::Update(float deltaTime, float rho)
             {
                   angleYaw -= 360;
             }
-            angleUpdated = true;
       }
       else if (IsKeyDown(KEY_D))
       {
@@ -105,7 +105,6 @@ void Plane::Update(float deltaTime, float rho)
             {
                   angleYaw += 360;
             }
-            angleUpdated = true;
       }
 
       if (IsKeyDown(KEY_Q))
@@ -115,7 +114,6 @@ void Plane::Update(float deltaTime, float rho)
             {
                   angleRoll -= 360;
             }
-            angleUpdated = true;
       }
       else if (IsKeyDown(KEY_E))
       {
@@ -124,14 +122,17 @@ void Plane::Update(float deltaTime, float rho)
             {
                   angleRoll += 360;
             }
-            angleUpdated = true;
       }
-
-      if (angleUpdated) {
+      
+      if (previousAnglePitch != anglePitch || previousAngleYaw != angleYaw || previousAngleRoll != angleRoll) {
+            // std::cout << angleYaw << " " << anglePitch << std::endl;
             airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
             getConsts(anglePitch, angleYaw, true, true);
-            angleUpdated = false;
       }
+
+      previousAnglePitch = anglePitch;
+      previousAngleYaw = angleYaw;
+      previousAngleRoll = angleRoll;
 
       calcLift(rho);
 }

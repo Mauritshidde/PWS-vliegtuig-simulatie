@@ -15,7 +15,6 @@ private:
       LiftFileReader files;
 
       float rotationMultiplier;
-      bool angleUpdated;
       std::string liftFileName;
 
 public:
@@ -45,6 +44,7 @@ public:
       float planeFrontalArea; // the surface area of the face of the plane that is parellel to the velocity direction
       // float totalSpeed;
       float anglePitch, angleYaw, angleRoll;
+      float previousAnglePitch, previousAngleYaw, previousAngleRoll;
       float mass; // in kg
       float height;
 };

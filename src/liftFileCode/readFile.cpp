@@ -35,7 +35,7 @@ Vector2 LiftFileReader::getClCdWithPitch(float pitchAngle) {
     int pitchIndex = (int) translatedPitch;
 
     int indexAdition = 1;
-    if (pitchIndex + stepSize > 360) {
+    if (pitchAngle + stepSize > 360) {
         indexAdition = -pitchIndex;
     }
 
@@ -62,12 +62,12 @@ Vector2 LiftFileReader::getClCdWithPitchAndYaw(float pitchAngle, float yawAngle)
     int yawIndex = (int) translatedYaw;
 
     int indexAditionYaw = 1;
-    if (yawIndex + stepSize > 360) {
+    if (yawAngle + stepSize > 360) {
         indexAditionYaw = -yawIndex;
     }
 
     int indexAditionPitch = 1;
-    if (pitchIndex + stepSize > 360) {
+    if (pitchAngle + stepSize > 360) {
         indexAditionPitch = -pitchIndex;
     }
 
