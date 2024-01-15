@@ -16,12 +16,9 @@ RunSimulation::~RunSimulation()
 
 void RunSimulation::Start(int screenWidth, int screenHeight)
 {
-    // plane.loadObjectModel();
     rotationMultiplier = 10;
     maxAngle = 360;
-    // currentPitchAngle = 0;
-    // currentYawAngle = 0;
-    // currentRollAngle = 0;
+    rho = 1.225; // kg / m3
 
     renderWidth = GetRenderWidth();
     renderHeight = GetRenderHeight();
@@ -43,10 +40,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     mainCamera.projection = CAMERA_PERSPECTIVE;  /// wat doet dit TODO
 
     skybox = LoadModel("models/object/skybox.obj");
-    // airplane = LoadModel("models/object/plane.obj");
-    // airplaneTexture = LoadTexture("models/texture/skyboxtexture.png");
     skyboxTexture = LoadTexture("models/texture/skyboxtexture.png");
-    // airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
 
     planePhysicsModel = Plane(41145, {0, 0, 0});
@@ -129,16 +123,6 @@ void RunSimulation::moveCamera(float deltaTime)
             cameraPos = {0.0f, 0.0f, cameraCircleRadius};
         }
 
-        // float x, y, z;
-        // x = cameraCircleRadius * sin(angleYAxis) * cos(angleXZAxis);
-        // y = cameraCircleRadius * sin(angleYAxis) * sin(angleXZAxis);
-        // z = cameraCircleRadius * cos(angleYAxis);
-
-        // mainCamera.position.x = x;
-        // mainCamera.position.y = y;
-        // mainCamera.position.z = z;
-
-
         mainCamera.position = Vector3Transform(cameraPos, MatrixRotateXYZ((Vector3){DEG2RAD * angleXZAxis, DEG2RAD * angleYAxis, 0}));
         previousMousePosition = currentMousePos;
     }
@@ -166,21 +150,17 @@ void RunSimulation::Render()
 
     BeginDrawing();
         ClearBackground(BLACK);
+        DrawFPS(800,600);
 
         BeginMode3D(mainCamera);
             DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
             plane.Draw();
-            // airplane.transform = MatrixRotateXYZ((Vector3){ DEG2RAD*plane.anglePitch, DEG2RAD*plane.angleYaw, DEG2RAD*plane.angleRoll});
-            // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, RED); // 2de vector geeft aan met welke factor hij met currentangle draait
-            // DrawModel(airplane, (Vector3){0.0f, 0.0f, 0.0f}, 0.5f, BLACK);
-            // plane.drawModel();
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
             DrawGrid(10, 10.0f);
         EndMode3D();
 
         Rectangle guiPanelSize = (Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight};
         GuiPanel(guiPanelSize, NULL);
-        // GuiSlider((Rectangle){renderWidth - (renderWidth / 8) + (renderWidth / 38), renderHeight / 3.6, (renderWidth / 8) - (renderWidth / 38) * 2, renderHeight / 54}, NULL, NULL, &planePhysicsModel.maxEngineTrust, 0, planePhysicsModel.currentEngineTrust);
 
         float guiTriangleWidth = guiPanelSize.width - guiPanelSize.x / 25;
         float panelSliderWidthDifference = guiPanelSize.width - guiTriangleWidth; // differnce in width of the panel and the gui slider rectangle
@@ -204,7 +184,6 @@ void RunSimulation::run()
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
 
-    SetTargetFPS(60);
     Start(screenWidth, screenHeight);
 
     while (!WindowShouldClose())
@@ -212,5 +191,6 @@ void RunSimulation::run()
         float deltaTime = GetFrameTime();
         Update(deltaTime);
         Render();
+        std::cout << GetFPS() << std::endl;
     }
 }

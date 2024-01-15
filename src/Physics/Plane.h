@@ -18,7 +18,7 @@ private:
       std::string liftFileName;
 
 public:
-      Plane(float givenMass = 10000, Vector3 startingPos = {0, 0, 0}, float givenrRotationMultiplier = 10, float startVelocity = 100, float rho = 10);
+      Plane(float givenMass = 79000, Vector3 startingPos = {0, 0, 0}, float givenrRotationMultiplier = 10, float startVelocity = 100, float rho = 10);
       ~Plane();
       void calcLift(float rho);
       Vector3 calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth);

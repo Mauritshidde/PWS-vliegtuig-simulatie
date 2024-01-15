@@ -17,6 +17,7 @@ Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier
       rotationMultiplier = givenRotationMultiplier;
 
       velocity = startVelocity; // m/s
+      velocity = 257;
       wingArea = 10; // surface area of the wing in m2
       planeFrontalArea = 10;
 
@@ -48,7 +49,7 @@ Vector2 Plane::getConsts(float pitch, float yaw, bool usePitch, bool useYaw) {
 
 void Plane::calcLift(float rho)
 {
-      lift = cl * pow(velocity, 2) * wingArea * 0.5;
+      lift = cl * rho * pow(velocity, 2) * wingArea * 0.5;
       drag = cd * rho * pow(velocity, 2) * planeFrontalArea * 0.5;
       // TODO lift formula
 }
@@ -56,6 +57,7 @@ void Plane::calcLift(float rho)
 Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth)
 {
       // TODO lift formula
+      return {0,0,0};
 }
 
 void Plane::Start()
@@ -125,7 +127,6 @@ void Plane::Update(float deltaTime, float rho)
       }
       
       if (previousAnglePitch != anglePitch || previousAngleYaw != angleYaw || previousAngleRoll != angleRoll) {
-            // std::cout << angleYaw << " " << anglePitch << std::endl;
             airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
             getConsts(anglePitch, angleYaw, true, true);
       }
@@ -135,4 +136,6 @@ void Plane::Update(float deltaTime, float rho)
       previousAngleRoll = angleRoll;
 
       calcLift(rho);
+
+      std::cout << "speed: " << velocity << " lift: " << lift  << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
 }
