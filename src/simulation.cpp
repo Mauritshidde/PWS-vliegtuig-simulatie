@@ -6,8 +6,9 @@
 #define RAYMATH_IMPLEMENTATION
 #include "../include/modules/raymath.h"
 
-RunSimulation::RunSimulation()
+RunSimulation::RunSimulation(std::string setFileName)
 {
+    fileName = setFileName;
 }
 
 RunSimulation::~RunSimulation()
@@ -43,8 +44,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     skyboxTexture = LoadTexture("models/texture/skyboxtexture.png");
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
 
-    planePhysicsModel = Plane(41145, {0, 0, 0});
-
+    plane = Plane(fileName, 100);
     plane.Start();
 }
 
@@ -132,9 +132,9 @@ void RunSimulation::Update(float deltaTime)
 {
     speedOfSound = sqrt(adiabaticIndex * gasConstant * temperature);
 
-    if (planePhysicsModel.velocity / speedOfSound <= 0.8)
+    if (plane.velocity / speedOfSound <= 0.8)
     {
-        planePhysicsModel.velocity = 0.8 * speedOfSound;
+        plane.velocity = 0.8 * speedOfSound;
     }
     // first value updates over time
     // after that value updates by gui or key inputs

@@ -31,7 +31,7 @@ int main()
             if (menu.buttonPressed == 0)
             {
                 loadingScreen(100, screenWidth, screenHeight);
-                RunSimulation simulatie;
+                RunSimulation simulatie("Boeing737");
                 simulatie.run();
                 running = false;
             }

@@ -20,8 +20,6 @@ private:
     // Model airplane;
     Model skybox;
 
-    Plane planePhysicsModel;
-
     Vector2 previousMousePosition;
 
     // Texture2D airplaneTexture;
@@ -52,6 +50,8 @@ private:
     float airDensity; // ρ = P/(R×T)
     float height;
 
+    std::string fileName;
+
     const char *minText = "0";
     const char *maxText = "360";
 
@@ -63,7 +63,7 @@ private:
     void currentAirDensity();
 
 public:
-    RunSimulation();
+    RunSimulation(std::string setFileName);
     ~RunSimulation();
 
     void run();

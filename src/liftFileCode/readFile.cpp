@@ -109,10 +109,8 @@ Vector2 LiftFileReader::getConstFromLiftFile(float pitchAngle, float yawAngle, b
 }
 
 
-LiftFileReader::LiftFileReader(std::string name)
+LiftFileReader::LiftFileReader(std::string fileName)
 {
-    fileName = name;
-
     std::ifstream f("planes/liftfiles/"+fileName+".json");
     liftData = nlohmann::json::parse(f);
     f.close();

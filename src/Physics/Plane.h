@@ -18,7 +18,7 @@ private:
       std::string liftFileName;
 
 public:
-      Plane(float givenMass = 79000, Vector3 startingPos = {0, 0, 0}, float givenrRotationMultiplier = 10, float startVelocity = 100, float rho = 10);
+      Plane(std::string fileName = "Boeing737", float startVelocity = 100, float rho = 1.225);
       ~Plane();
       void calcLift(float rho);
       Vector3 calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth);
@@ -39,8 +39,8 @@ public:
       Vector3 pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
       Vector3 speedInDirections;
 
-      float velocity; // in m/s
-      float wingArea; // surface area of wing in m2
+      float velocity;         // in m/s
+      float wingArea;         // surface area of wing in m2
       float planeFrontalArea; // the surface area of the face of the plane that is parellel to the velocity direction
       // float totalSpeed;
       float anglePitch, angleYaw, angleRoll;

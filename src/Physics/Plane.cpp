@@ -3,9 +3,12 @@
 #define RAYMATH_IMPLEMENTATION
 #include "../../include/modules/raymath.h"
 
-Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier, float startVelocity, float rho)
+Plane::Plane(std::string planeName, float startVelocity, float rho)
 {
-      mass = givenMass;
+      std::ifstream f("planes/planeData.json");
+      nlohmann::json planeData = nlohmann::json::parse(f);
+      f.close();
+
       speedInDirections = {0, 0, 0};
       anglePitch = 0;
       angleYaw = 0;
@@ -14,14 +17,17 @@ Plane::Plane(float givenMass, Vector3 startingPos, float givenRotationMultiplier
       previousAnglePitch = anglePitch;
       previousAngleYaw = angleYaw;
       
-      rotationMultiplier = givenRotationMultiplier;
+      rotationMultiplier = 10; // multiplier for the speed of rotating the plane using WASD
 
       velocity = startVelocity; // m/s
       velocity = 257;
-      wingArea = 10; // surface area of the wing in m2
       planeFrontalArea = 10;
 
-      liftFileName = "Boeing737";
+      wingArea = planeData["Planes"][planeName]["wing area"].get<float>(); // surface area of the wing in m2
+      mass = planeData["Planes"][planeName]["maximal mass"].get<float>();
+      
+      liftFileName = planeName;
+      
       files = LiftFileReader(liftFileName);
       Vector2 consts = getConsts(anglePitch, angleYaw, true, true);
       
@@ -70,7 +76,6 @@ void Plane::Start()
 void Plane::Draw()
 {
       DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); // 2de vector geeft aan met welke factor hij met currentangle draait
-
 }
 
 void Plane::Update(float deltaTime, float rho)
