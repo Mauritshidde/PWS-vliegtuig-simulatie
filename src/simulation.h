@@ -6,6 +6,8 @@
 #include <fstream>
 #include <string>
 #include "matrix.h"
+
+#define WITHOUT_NUMPY
 #include "matplotlibcpp.h"
 
 // #include "../include/gui/simulationGui.h"
