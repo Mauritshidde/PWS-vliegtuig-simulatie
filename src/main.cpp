@@ -19,7 +19,7 @@ int main()
 
     SetTargetFPS(60);
     menu = Menu(screenWidth, screenHeight);
-    // createLiftFiles(200, 0.01);
+
     while (!WindowShouldClose() && running)
     {
         float deltaTime = GetFrameTime();
@@ -57,9 +57,6 @@ int main()
                 running = false;
             }
         }
-
-        // RunSimulation simulatie;
-        // simulatie.run();
     }
 
     return 0;

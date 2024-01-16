@@ -82,23 +82,6 @@ std::vector<std::vector<float>> invertMatrix(std::vector<std::vector<float>> mat
     return invertedMatrix;
 }
 
-// int main()
-// {
-//     std::vector<std::vector<float>> matrix = {
-//         {1, 2, 3, 4, 5, 6}, {5, 3, 41, 2, 3, 4}, {3, 4, 2, 1, 2, 0}, {23, 4, 45, 3, 2, 1}, {12, 32, 3224, 4, 2, 42}, {42, 42, 42, 42, 2, 2}};
-//     matrix = invertMatrix(matrix, matrix.size());
-
-//     for (int i = 0; i < matrix.size(); i++)
-//     {
-//         for (int j = 0; j < matrix.size(); j++)
-//         {
-//             std::cout << matrix.at(i).at(j) << " ";
-//         }
-//         std::cout << std::endl;
-//     }
-//     return (0);
-// }
-
 float determinantOfMatrix(std::vector<std::vector<float>> mat, int n)
 {
     float num1, num2, det = 1, index, total = 1;

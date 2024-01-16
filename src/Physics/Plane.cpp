@@ -36,8 +36,6 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       
       
       calcLift(rho); // set lift and drag
-      // centerOfLiftWingL = calcCenterOfLiftWing();
-      // centerOfLiftWingR = calcCenterOfLiftWing();
 }
 
 Plane::~Plane()
@@ -57,7 +55,6 @@ void Plane::calcLift(float rho)
 {
       lift = cl * rho * pow(velocity, 2) * wingArea * 0.5;
       drag = cd * rho * pow(velocity, 2) * planeFrontalArea * 0.5;
-      // TODO lift formula
 }
 
 Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth)
