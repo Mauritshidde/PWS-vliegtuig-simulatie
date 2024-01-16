@@ -1,9 +1,6 @@
-test
 .vscode/settings.json
-test
 .gitignore
-test
-*.o
 vcpkg/vcpkg/
+*.o
 *.d
 *.out
