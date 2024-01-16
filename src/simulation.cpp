@@ -48,14 +48,13 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
 
     plane = Plane(fileName, 100);
 
-    plotXRange = linspace(0, 10, 10);
-    for (float x = 0; x < plotXRange.size(); x++)
-    {
-        plotYValues.push_back(sin(x));
-    }
-
     plane.Start();
     
+    plotXRange = linspace(0, 360, 361);
+    for (float x = 0; x < plotXRange.size(); x++)
+    {
+        plotYValues.push_back(plane.cl);
+    }
 }
 
 bool RunSimulation::notOnGUI(Vector2 mousePosition)
