@@ -6,6 +6,7 @@
 #define RAYMATH_IMPLEMENTATION
 #include "../include/modules/raymath.h"
 
+#define WITHOUT_NUMPY
 namespace mat = matplotlibcpp;
 
 RunSimulation::RunSimulation(std::string setFileName)

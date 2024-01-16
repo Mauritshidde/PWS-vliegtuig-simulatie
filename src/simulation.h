@@ -6,7 +6,6 @@
 #include <fstream>
 #include <string>
 #include "matrix.h"
-#include <matplot/matplot.h>
 #include "matplotlibcpp.h"
 
 // #include "../include/gui/simulationGui.h"
