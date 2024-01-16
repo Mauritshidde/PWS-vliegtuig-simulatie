@@ -6,7 +6,9 @@
 #define RAYMATH_IMPLEMENTATION
 #include "../include/modules/raymath.h"
 
-RunSimulation::RunSimulation(std::string setFileName)
+namespace mat = matplotlibcpp;
+
+RunSimulation::RunSimulation()
 {
     fileName = setFileName;
 }
@@ -45,7 +47,15 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
 
     plane = Plane(fileName, 100);
+
+    plotXRange = linspace(0, 10, 10);
+    for (float x = 0; x < plotXRange.size(); x++)
+    {
+        plotYValues.push_back(sin(x));
+    }
+
     plane.Start();
+    
 }
 
 bool RunSimulation::notOnGUI(Vector2 mousePosition)
@@ -134,11 +144,11 @@ void RunSimulation::Update(float deltaTime)
 
     if (plane.velocity / speedOfSound <= 0.8)
     {
-        plane.velocity = 0.8 * speedOfSound;
+        plane.velocity = 0.8 * speedOfSound; //cap the speed of the plane at mach 0.8
     }
     // first value updates over time
     // after that value updates by gui or key inputs
-
+    
     plane.Update(deltaTime, rho);
 
     moveCamera(deltaTime);
@@ -193,4 +203,5 @@ void RunSimulation::run()
         Render();
         std::cout << GetFPS() << std::endl;
     }
+    mat::plot(plotXRange, plotYValues, "-o");
 }

@@ -5,6 +5,9 @@
 #include <cmath>
 #include <fstream>
 #include <string>
+#include "matrix.h"
+#include <matplot/matplot.h>
+#include "matplotlibcpp.h"
 
 // #include "../include/gui/simulationGui.h"
 // #include <json/json.h>
@@ -61,6 +64,9 @@ private:
     void Update(float deltaTime);
     void Render();
     void currentAirDensity();
+
+    std::vector<float> plotXRange;
+    std::vector<float> plotYValues;
 
 public:
     RunSimulation(std::string setFileName);
