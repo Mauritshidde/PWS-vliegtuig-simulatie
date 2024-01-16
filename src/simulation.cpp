@@ -204,4 +204,5 @@ void RunSimulation::run()
         std::cout << GetFPS() << std::endl;
     }
     mat::plot(plotXRange, plotYValues, "-o");
+    mat::save("test.pdf");
 }
