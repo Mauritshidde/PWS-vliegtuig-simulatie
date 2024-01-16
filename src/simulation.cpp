@@ -8,7 +8,7 @@
 
 namespace mat = matplotlibcpp;
 
-RunSimulation::RunSimulation()
+RunSimulation::RunSimulation(std::string setFileName)
 {
     fileName = setFileName;
 }
