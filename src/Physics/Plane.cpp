@@ -16,7 +16,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
 
       previousAnglePitch = anglePitch;
       previousAngleYaw = angleYaw;
-      
+
       rotationMultiplier = 10; // multiplier for the speed of rotating the plane using WASD
 
       velocity = startVelocity; // m/s
@@ -25,16 +25,15 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
 
       wingArea = planeData["Planes"][planeName]["wing area"].get<float>(); // surface area of the wing in m2
       mass = planeData["Planes"][planeName]["maximal mass"].get<float>();
-      
+
       liftFileName = planeName;
-      
+
       files = LiftFileReader(liftFileName);
       Vector2 consts = getConsts(anglePitch, angleYaw, true, true);
-      
+
       cl = consts.x;
       cd = consts.y;
-      
-      
+
       calcLift(rho); // set lift and drag
 }
 
@@ -42,8 +41,10 @@ Plane::~Plane()
 {
 }
 
-Vector2 Plane::getConsts(float pitch, float yaw, bool usePitch, bool useYaw) {
-      if (!usePitch && !useYaw) {
+Vector2 Plane::getConsts(float pitch, float yaw, bool usePitch, bool useYaw)
+{
+      if (!usePitch && !useYaw)
+      {
             usePitch = true;
             useYaw = true;
       }
@@ -60,7 +61,7 @@ void Plane::calcLift(float rho)
 Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth)
 {
       // TODO lift formula
-      return {0,0,0};
+      return {0, 0, 0};
 }
 
 void Plane::Start()
@@ -127,8 +128,9 @@ void Plane::Update(float deltaTime, float rho)
                   angleRoll += 360;
             }
       }
-      
-      if (previousAnglePitch != anglePitch || previousAngleYaw != angleYaw || previousAngleRoll != angleRoll) {
+
+      if (previousAnglePitch != anglePitch || previousAngleYaw != angleYaw || previousAngleRoll != angleRoll)
+      {
             airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
             getConsts(anglePitch, angleYaw, true, true);
       }
@@ -139,5 +141,5 @@ void Plane::Update(float deltaTime, float rho)
 
       calcLift(rho);
 
-      std::cout << "speed: " << velocity << " lift: " << lift  << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
+      std::cout << "speed: " << velocity << " lift: " << lift << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
 }

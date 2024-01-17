@@ -51,9 +51,11 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     plane.Start();
     
     plotXRange = linspace(0, 360, 361);
+    Vector2 aeroConsts;
     for (float x = 0; x < plotXRange.size(); x++)
     {
-        plotYValues.push_back(plane.cl);
+        aeroConsts = plane.getConsts(x, 0, true, true);
+        plotYValues.push_back(aeroConsts.x);
     }
 }
 
