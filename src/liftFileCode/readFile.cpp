@@ -91,7 +91,7 @@ Vector2 LiftFileReader::getClCdWithPitchAndYaw(float pitchAngle, float yawAngle)
 }
 
 Vector2 LiftFileReader::getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch) {
-    if (withYaw || withPitch) {
+    if (withYaw && withPitch) {
         Vector2 vals = getClCdWithPitchAndYaw(pitchAngle, yawAngle);
 
         return vals;

@@ -132,7 +132,7 @@ void Plane::Update(float deltaTime, float rho)
       if (previousAnglePitch != anglePitch || previousAngleYaw != angleYaw || previousAngleRoll != angleRoll)
       {
             airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
-            getConsts(anglePitch, angleYaw, true, true);
+            getConsts(anglePitch, angleYaw, false, true);
       }
 
       previousAnglePitch = anglePitch;
