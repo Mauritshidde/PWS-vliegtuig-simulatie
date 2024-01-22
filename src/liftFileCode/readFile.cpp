@@ -1,11 +1,9 @@
 #include "readFile.h"
 
-Vector2 LiftFileReader::getClCdWithYaw(float yawAngle) {
+Vector2 LiftFileReader::getClCdWithYaw(double yawAngle) {
     float cl, cd;
 
-    int multiplier = liftWithPitchData["multiplier"].get<int>();
-    int stepSize1 = liftWithPitchData["stepSize"].get<int>();
-    float stepSize = stepSize1/multiplier;
+    double stepSize = liftWithPitchData["stepSize"].get<double>();
 
     float translatedYaw = yawAngle/stepSize;
     int yawIndex = (int) translatedYaw;
@@ -28,18 +26,19 @@ Vector2 LiftFileReader::getClCdWithYaw(float yawAngle) {
     return {cl, cd};
 }
 
-Vector2 LiftFileReader::getClCdWithPitch(float pitchAngle) {
+Vector2 LiftFileReader::getClCdWithPitch(double pitchAngle) {
     float cl, cd;
 
-    float multiplier = liftWithPitchData["multiplier"].get<int>();
-    float stepSize1 = liftWithPitchData["stepSize"].get<int>();
-    float stepSize = stepSize1/multiplier;
-    std::cout <<multiplier << " test2 " << stepSize1 << " test " << stepSize << " ???? " << stepSize1/multiplier << std::endl;
+    double stepSize = liftWithPitchData["stepSize"].get<double>();
+
+    // std::cout << " test2 " << pitchAngle + stepSize << " test " << pitchAngle  << " ???? " << stepSize << std::endl;
+
     float translatedPitch = pitchAngle/stepSize;
     int pitchIndex = (int) translatedPitch;
 
     int indexAdition = 1;
     if (pitchAngle + stepSize > 360) {
+        // std::cout << translatedPitch << "kaas"  << pitchIndex << std::endl;
         indexAdition = -pitchIndex;
     }
 
@@ -56,9 +55,10 @@ Vector2 LiftFileReader::getClCdWithPitch(float pitchAngle) {
     return {cl, cd};
 }
 
-Vector2 LiftFileReader::getClCdWithPitchAndYaw(float pitchAngle, float yawAngle) {
+Vector2 LiftFileReader::getClCdWithPitchAndYaw(double pitchAngle, double yawAngle) {
     float cl, cd;
-    float stepSize = liftData["stepSize"].get<float>();
+    double stepSize = liftData["stepSize"].get<float>();
+    
     float translatedPitch = pitchAngle/stepSize;
     int pitchIndex = (int) translatedPitch;
 
@@ -94,7 +94,7 @@ Vector2 LiftFileReader::getClCdWithPitchAndYaw(float pitchAngle, float yawAngle)
     return {cl, cd};
 }
 
-Vector2 LiftFileReader::getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch) {
+Vector2 LiftFileReader::getConstFromLiftFile(double pitchAngle, double yawAngle, bool withYaw, bool withPitch) {
     if (withYaw && withPitch) {
         Vector2 vals = getClCdWithPitchAndYaw(pitchAngle, yawAngle);
 
