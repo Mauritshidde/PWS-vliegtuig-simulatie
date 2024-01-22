@@ -41,7 +41,7 @@ Plane::~Plane()
 {
 }
 
-Vector2 Plane::getConsts(float pitch, float yaw, bool usePitch, bool useYaw)
+Vector2 Plane::getConsts(float pitch, float yaw, bool useYaw, bool usePitch)
 {
       if (!usePitch && !useYaw)
       {
