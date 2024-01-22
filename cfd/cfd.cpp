@@ -92,11 +92,7 @@ void setBoundaryConditions(float velocityXDirectionStart, float velocityYDirecti
         for (int k=0; k < ny; k++) {
             mesh.at(i).at(0).at(k).boundary = true;
             mesh.at(i).at(0).at(k).velocityXDirection = velocityXDirectionStart;
-        }
-    }
 
-    for (int i=0; i < nz; i++) {
-        for (int k=0; k < ny; k++) {
             mesh.at(i).at(nx-1).at(k).boundary = true;
             mesh.at(i).at(nx-1).at(k).velocityXDirection = velocityXDirectionEnd;
         }
@@ -106,11 +102,7 @@ void setBoundaryConditions(float velocityXDirectionStart, float velocityYDirecti
         for (int j=0; j < nx; j++) {
             mesh.at(i).at(j).at(0).boundary = true;
             mesh.at(i).at(j).at(0).velocityYDirection = velocityYDirectionStart;
-        }
-    }
 
-    for (int i=0; i < nz; i++) {
-        for (int j=0; j < nx; j++) {
             mesh.at(i).at(j).at(ny-1).boundary = true;
             mesh.at(i).at(j).at(ny-1).velocityYDirection = velocityYDirectionEnd;
         }
@@ -118,13 +110,9 @@ void setBoundaryConditions(float velocityXDirectionStart, float velocityYDirecti
 
     for (int j=0; j < nx; j++) {
         for (int k=0; k < ny; k++) {
-            mesh.at(0).at(0).at(k).boundary = true;
-            mesh.at(0).at(0).at(k).velocityZDirection = velocityZDirectionStart;
-        }
-    }
+            mesh.at(0).at(j).at(k).boundary = true;
+            mesh.at(0).at(j).at(k).velocityZDirection = velocityZDirectionStart;
 
-    for (int j=0; j < nx; j++) {
-        for (int k=0; k < ny; k++) {
             mesh.at(nz-1).at(j).at(k).boundary = true;
             mesh.at(nz-1).at(j).at(k).velocityZDirection = velocityZDirectionEnd;
         }
@@ -133,6 +121,10 @@ void setBoundaryConditions(float velocityXDirectionStart, float velocityYDirecti
 
 void setPlaneBoundary() {
 
+}
+
+void calc() {
+    
 }
 
 Cfd::Cfd(int setnx, int setny, int setnz)
