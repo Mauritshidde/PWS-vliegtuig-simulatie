@@ -3,7 +3,9 @@
 Vector2 LiftFileReader::getClCdWithYaw(float yawAngle) {
     float cl, cd;
 
-    float stepSize = liftWithYawData["stepSize"].get<float>();
+    int multiplier = liftWithPitchData["multiplier"].get<int>();
+    int stepSize1 = liftWithPitchData["stepSize"].get<int>();
+    float stepSize = stepSize1/multiplier;
 
     float translatedYaw = yawAngle/stepSize;
     int yawIndex = (int) translatedYaw;
@@ -29,8 +31,10 @@ Vector2 LiftFileReader::getClCdWithYaw(float yawAngle) {
 Vector2 LiftFileReader::getClCdWithPitch(float pitchAngle) {
     float cl, cd;
 
-    float stepSize = liftWithPitchData["stepSize"].get<float>();
-
+    float multiplier = liftWithPitchData["multiplier"].get<int>();
+    float stepSize1 = liftWithPitchData["stepSize"].get<int>();
+    float stepSize = stepSize1/multiplier;
+    std::cout <<multiplier << " test2 " << stepSize1 << " test " << stepSize << " ???? " << stepSize1/multiplier << std::endl;
     float translatedPitch = pitchAngle/stepSize;
     int pitchIndex = (int) translatedPitch;
 

@@ -10,7 +10,10 @@ void fileWithoutYaw(float stepSize) {
         index++;
     }
 
-    data["stepSize"] = stepSize;
+    int multiplier = 100;
+    int stepSizeData = stepSize * multiplier;
+    data["multiplier"] = multiplier;
+    data["stepSize"] = stepSizeData;
 
     std::ofstream liftfile;
     liftfile.open ("planes/liftfiles/Boeing737Pitch.json");
@@ -28,7 +31,10 @@ void fileWithoutPitch(float stepSize) {
         index++;
     }
 
-    data["stepSize"] = stepSize;
+    int multiplier = 100;
+    int stepSizeData = stepSize * multiplier;
+    data["multiplier"] = multiplier;
+    data["stepSize"] = stepSizeData;
 
     std::ofstream liftfile;
     liftfile.open ("planes/liftfiles/Boeing737Yaw.json");

@@ -16,7 +16,7 @@ int main()
     ToggleFullscreen();
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
-
+    createLiftFiles(200, 0.01);
     SetTargetFPS(60);
     menu = Menu(screenWidth, screenHeight);
 
