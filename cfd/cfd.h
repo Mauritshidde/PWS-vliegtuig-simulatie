@@ -27,9 +27,6 @@ private:
     float maxTime; // max time for the program untill the program should quit
     float dT; // time steps
 
-    // std::vector<float> boundaryStartX, boundaryEndX, boundaryStartY, boundaryEndY; // X speed in y direction // y speed in x direction // z speed not in x and not in y direction
-    std::vector<std::vector<float>> boundaryStartX, boundaryEndX, boundaryStartY, boundaryEndY; // X speed in y direction // y speed in x direction // z speed not in x and not in y direction
-    // std::vector<std::vector<std::vector<float>>> velocityXDirection, velocityYDirection, velocityZDirection;
     std::vector<std::vector<std::vector<MeshCube>>> mesh;
 
     void createMesh();

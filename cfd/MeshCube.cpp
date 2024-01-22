@@ -2,9 +2,9 @@
 
 MeshCube::MeshCube(float vx, float vy, float vz, float setPressure, bool bound)
 {
-    velocityXDirection = vx;
-    velocityYDirection = vy;
-    velocityZDirection = vz;
+    velocityX = vx;
+    velocityY = vy;
+    velocityZ = vz;
     pressure = setPressure;
     boundary = bound;
 }
