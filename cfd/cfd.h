@@ -36,6 +36,8 @@ private:
     void setBoundaryConditions(float velocityXDirectionStart, float velocityYDirectionStart, float velocityZDirectionStart, float velocityXDirectionEnd, float velocityYDirectionEnd, float velocityZDirectionEnd);
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions
 public:
+    void calc();    
+
     Cfd(int setnx = 100, int setny = 100, int setnz = 100);
     ~Cfd();
 };
