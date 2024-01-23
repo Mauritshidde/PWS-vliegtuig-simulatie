@@ -19,8 +19,9 @@ private:
     float dxi; // 1/dx
     float dyi; // 1/dy
     float dzi; // 1/dz
-    
+
     // calculation consts
+    float k; // const for amount of change of density in each time step
     float nu; // const
     float Re; // reynolds number const
     float rho; // density const
@@ -28,10 +29,13 @@ private:
     float dT; // time steps
 
     std::vector<std::vector<std::vector<MeshCube>>> mesh;
+    std::vector<std::vector<std::vector<double>>> gradientVelocityField;
+    std::vector<std::vector<std::vector<Vector3>>> gradientPressureField;
 
     void createMesh();
     void setBoundaryConditions(float velocityXDirectionStart, float velocityYDirectionStart, float velocityZDirectionStart, float velocityXDirectionEnd, float velocityYDirectionEnd, float velocityZDirectionEnd);
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions
+    void iterativeSolver(double density);
 public:
     void calc();    
 
