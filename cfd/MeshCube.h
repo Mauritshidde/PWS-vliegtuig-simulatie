@@ -11,6 +11,7 @@ public:
     float density;
 
     bool boundary;
+    bool updatedPressure;
 
     void makeBoundary() {boundary = true;};
     void setDensity(float newDensity) {density = newDensity;};
@@ -21,6 +22,6 @@ public:
 
     void makeBoundary() {boundary = true;};
 
-    MeshCube(float vx = 0, float vy = 0, float vz = 0, float setPressure = 0, float setDensity = 1, bool bound = false);
+    MeshCube(float vx = 0, float vy = 0, float vz = 0, float setPressure = 0, float setDensity = 1, bool bound = false, bool updatedPressure = false);
     ~MeshCube();
 };
