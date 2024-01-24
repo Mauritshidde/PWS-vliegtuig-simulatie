@@ -1,6 +1,6 @@
 #include "simulation.h"
 #include "ui/menu.h"
-#include "navierstokes.h"
+#include "cfd.h"
 #include "liftFileCode/createFile.h"
 #include "ui/loadingScreen.h"
 
@@ -37,8 +37,9 @@ int main()
             }
             else if (menu.buttonPressed == 1)
             {
-                NavierStokes cfd;
+                Cfd cfd;
                 cfd.calc();
+                // cfd.Draw();
                 running = false;
                 // start cdf program for calculating cl and cd;
             }
