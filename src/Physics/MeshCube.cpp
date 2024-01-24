@@ -1,6 +1,6 @@
 #include "MeshCube.h"
 
-MeshCube::MeshCube(float vx, float vy, float vz, float setPressure, float setDensity, bool bound, bool updatedPressure)
+MeshCube::MeshCube(double vx, double vy, double vz, double setPressure, double setDensity, bool bound, bool updatedPressure)
 {
     velocityX = vx;
     velocityY = vy;
