@@ -38,7 +38,7 @@ private:
     void iterativeSolver(double density);
     void densityDispersion();
     void removeDivergence();
-    
+
     void solveDensity(int i, int j, int k);
     void solveDensityFirst(int i, int j, int k);
     void solvePressure(int i, int j, int k);
@@ -46,7 +46,7 @@ private:
 public:
     void calc();    
     void Draw();
-    
-    Cfd(int setnx = 100, int setny = 100, int setnz = 100, double deltaTime = 0.1, double setMaxTime = 1000);
+
+    Cfd(int setnx = 100, int setny = 100, int setnz = 100, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293);
     ~Cfd();
 };

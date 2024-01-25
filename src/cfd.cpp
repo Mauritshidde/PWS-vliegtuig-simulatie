@@ -42,7 +42,7 @@ void Cfd::setBoundaryConditions(double velocityXDirectionStart, double velocityY
         {
             mesh.at(i).at(0).at(k).boundary = true;
             mesh.at(i).at(0).at(k).velocityX = velocityXDirectionStart;
-            mesh.at(i).at(0).at(k).pressure = velocityXDirectionStart * (rho/2.0f);
+            mesh.at(i).at(0).at(k).pressure = pow(velocityXDirectionStart,2) * (rho/2.0f);
 
             mesh.at(i).at(nx - 1).at(k).boundary = true;
             mesh.at(i).at(nx - 1).at(k).velocityX = velocityXDirectionEnd;
@@ -294,7 +294,7 @@ void Cfd::calc()
         //           }
         //     }
         removeDivergence();
-        
+
         Draw();
         std::cout << tijd << " " << maxTime << std::endl;
     }
@@ -343,24 +343,19 @@ void Cfd::calc()
 }
 
 void Cfd::Draw() {
-    // InitWindow(0, 0, "airplane simulation");
-    // ToggleFullscreen();
-    // const int screenWidth = GetScreenWidth();
-    // const int screenHeight = GetScreenHeight();
-
-    // SetTargetFPS(60);
-
     while (!WindowShouldClose()) {
         BeginDrawing();
 
+            std::cout << "start" << std::endl;
             for (int j=0; j < 100; j++) {
                 for (int k=0; k < 100; k++) {
-                    double val = mesh.at(1).at(j).at(k).pressure;
-                    double val2 = mesh.at(1).at(j).at(k).pressure * pow(10, 100) * pow(10, 100) * pow(10, 100) * pow(10, 11);
-                    Color col = {255, val, val2, 255};
-                    DrawRectangle(j*30, k*30, 30, 30, col);
-                    DrawLine(j*30, k*30, 30 * j, 30 * k +30, RED);
-                    DrawLine(j*30, k*30, 30 * j +30,30 * k, RED);
+                    double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
+                    double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
+                    double val3 = mesh.at(1).at(j).at(k).pressure;
+                    Color col = {val3, val, val2, 255};
+                    DrawRectangle(j*10, k*10, 10, 10, col);
+                    DrawLine(j*10, k*10, 10 * j, 10 * k +10, RED);
+                    DrawLine(j*10, k*10, 10 * j +10,10 * k, RED);
                     // DrawText()
                     // DrawLine(j*10, k*10, 10 * j +10,10 * k +10, RED);
                     // DrawLine(j*10, k*10, 10 * j +10,10 * k +10, RED);
@@ -369,22 +364,28 @@ void Cfd::Draw() {
         
             // for (int j=0; j< 100; j++) {
             //     for (int k=0; k < 100; k++) {
-            //         std::cout << mesh.at(1).at(j).at(k).pressure << " " << pow(10, 100) << " ";
+            //         std::cout << mesh.at(1).at(j).at(k).pressure << " ";
             //     }
-            //     std::cout << std::endl;
+            //     std::cout << " end " << std::endl;
             // }
+            // std::cout << std::endl;
+            // std::cout << std::endl;
+            // std::cout << std::endl;
+            // std::cout << std::endl;
+
 
         EndDrawing();
     }
 }
 
-Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime)
+Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho)
 {
     nx = setnx;
     ny = setny;
     nz = setnz;
     dT = deltaTime;
     maxTime = setMaxTime;
+    rho = setRho;
 
     createMesh();
     setBoundaryConditions(100,  0,  0,  0,  0,  0);
