@@ -171,14 +171,8 @@ void Cfd::solvePressureFirst(int i, int j, int k)
     mesh.at(i).at(j).at(k+1).pressure = pressure4;
 }
 
-void Cfd::calc()
-{
-    double tijd = 0;
-    while (tijd < maxTime)
-    {
-        tijd += dT;
-        
-        // for (int i=1; i < nz-1; i++) {
+void Cfd::densityDispersion() {
+    // for (int i=1; i < nz-1; i++) {
             for (int j = 1; j < nx - 1; j++)
             {
                 for (int k = 1; k < ny - 1; k++)
@@ -205,6 +199,58 @@ void Cfd::calc()
                 }
             }
         // }
+}
+
+void Cfd::removeDivergence() {
+    // for (int i=1; i < nz-1; i++) {
+        for (int j = 1; j < nx - 1; j++)
+        {
+            for (int k = 1; k < ny - 1; k++)
+            {
+                divergenceVelocityField.at(1).at(j).at(k) = (mesh.at(1).at(j+1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityY - mesh.at(1).at(j).at(k-1).velocityY)/2;
+                // mesh.at(1).at(j).at(k).pressure = iterativeSolver(1, j, k);
+                if (j == 1) {
+                    solvePressureFirst(1, j, k);
+                } else {
+                    solvePressure(1, j, k);
+                }
+                // mesh.at(1).at(j).at(k).newPressure = ((mesh.at(1).at(j-1).at(k).pressure + mesh.at(1).at(j+1).at(k).newPressure + mesh.at(1).at(j).at(k-1).newPressure + mesh.at(1).at(j).at(k+1).newPressure) - divergenceVelocityField.at(1).at(j).at(k)) / 4;
+                // mesh.medianSurroundingDensity = (mesh.at(1).at(j+1).at(k) + mesh.at(1).at(j-1).at(k) + mesh.at(1).at(j).at(k+1) + mesh.at(1).at(j).at(k-1) + 0 + 0)/4;
+            }
+        }
+    // }
+
+    // for (int i=1; i < nz-1; i++) {
+        for (int j = 1; j < nx - 1; j++)
+        {
+            for (int k = 1; k < ny - 1; k++)
+            {
+                mesh.at(1).at(j).at(k).pressure = mesh.at(1).at(j).at(k).newPressure;
+            }
+        }
+    // }
+
+    // for (int i=1; i < nz-1; i++) {
+        for (int j = 1; j < nx - 1; j++)
+        {
+            for (int k = 1; k < ny - 1; k++)
+            {
+                gradientPressureField.at(1).at(j).at(k).x = (mesh.at(1).at(j+1).at(k).pressure - mesh.at(1).at(j-1).at(k).pressure)/2;
+                gradientPressureField.at(1).at(j).at(k).y = (mesh.at(1).at(j).at(k+1).pressure - mesh.at(1).at(j).at(k-1).pressure)/2;
+                // gradientPressureField.at(1).at(j).at(k).z = (mesh.at(0+1).at(j).at(k).pressure - mesh.at(0-1).at(j).at(k).pressure)/2 
+            }
+        }
+    // }
+}
+
+void Cfd::calc()
+{
+    double tijd = 0;
+    while (tijd < maxTime)
+    {
+        tijd += dT;
+        
+        densityDispersion();
 
         // // for (int i=1; i < nz-1; i++) {
         //     for (int j=1; j < nx-1; j++) {
@@ -247,59 +293,62 @@ void Cfd::calc()
         //                 vs.at(i).at(j) = v.at(i).at(j) + dT * (a + b + c + d);
         //           }
         //     }
+        removeDivergence();
+        
+        Draw();
         std::cout << tijd << " " << maxTime << std::endl;
     }
 
     // correction
 
-    // for (int i=1; i < nz-1; i++) {
-        for (int j = 1; j < nx - 1; j++)
-        {
-            for (int k = 1; k < ny - 1; k++)
-            {
-                divergenceVelocityField.at(1).at(j).at(k) = (mesh.at(1).at(j+1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityY - mesh.at(1).at(j).at(k-1).velocityY)/2;
-                // mesh.at(1).at(j).at(k).pressure = iterativeSolver(1, j, k);
-                if (j == 1) {
-                    solvePressureFirst(1, j, k);
-                } else {
-                    solvePressure(1, j, k);
-                }
-                // mesh.at(1).at(j).at(k).newPressure = ((mesh.at(1).at(j-1).at(k).pressure + mesh.at(1).at(j+1).at(k).newPressure + mesh.at(1).at(j).at(k-1).newPressure + mesh.at(1).at(j).at(k+1).newPressure) - divergenceVelocityField.at(1).at(j).at(k)) / 4;
-                // mesh.medianSurroundingDensity = (mesh.at(1).at(j+1).at(k) + mesh.at(1).at(j-1).at(k) + mesh.at(1).at(j).at(k+1) + mesh.at(1).at(j).at(k-1) + 0 + 0)/4;
-            }
-        }
-    // }
+    // // for (int i=1; i < nz-1; i++) {
+    //     for (int j = 1; j < nx - 1; j++)
+    //     {
+    //         for (int k = 1; k < ny - 1; k++)
+    //         {
+    //             divergenceVelocityField.at(1).at(j).at(k) = (mesh.at(1).at(j+1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityY - mesh.at(1).at(j).at(k-1).velocityY)/2;
+    //             // mesh.at(1).at(j).at(k).pressure = iterativeSolver(1, j, k);
+    //             if (j == 1) {
+    //                 solvePressureFirst(1, j, k);
+    //             } else {
+    //                 solvePressure(1, j, k);
+    //             }
+    //             // mesh.at(1).at(j).at(k).newPressure = ((mesh.at(1).at(j-1).at(k).pressure + mesh.at(1).at(j+1).at(k).newPressure + mesh.at(1).at(j).at(k-1).newPressure + mesh.at(1).at(j).at(k+1).newPressure) - divergenceVelocityField.at(1).at(j).at(k)) / 4;
+    //             // mesh.medianSurroundingDensity = (mesh.at(1).at(j+1).at(k) + mesh.at(1).at(j-1).at(k) + mesh.at(1).at(j).at(k+1) + mesh.at(1).at(j).at(k-1) + 0 + 0)/4;
+    //         }
+    //     }
+    // // }
 
-    // for (int i=1; i < nz-1; i++) {
-        for (int j = 1; j < nx - 1; j++)
-        {
-            for (int k = 1; k < ny - 1; k++)
-            {
-                mesh.at(1).at(j).at(k).pressure = mesh.at(1).at(j).at(k).newPressure;
-            }
-        }
-    // }
+    // // for (int i=1; i < nz-1; i++) {
+    //     for (int j = 1; j < nx - 1; j++)
+    //     {
+    //         for (int k = 1; k < ny - 1; k++)
+    //         {
+    //             mesh.at(1).at(j).at(k).pressure = mesh.at(1).at(j).at(k).newPressure;
+    //         }
+    //     }
+    // // }
 
-    // for (int i=1; i < nz-1; i++) {
-        for (int j = 1; j < nx - 1; j++)
-        {
-            for (int k = 1; k < ny - 1; k++)
-            {
-                gradientPressureField.at(1).at(j).at(k).x = (mesh.at(1).at(j+1).at(k).pressure - mesh.at(1).at(j-1).at(k).pressure)/2;
-                gradientPressureField.at(1).at(j).at(k).y = (mesh.at(1).at(j).at(k+1).pressure - mesh.at(1).at(j).at(k-1).pressure)/2;
-                // gradientPressureField.at(1).at(j).at(k).z = (mesh.at(0+1).at(j).at(k).pressure - mesh.at(0-1).at(j).at(k).pressure)/2 
-            }
-        }
-    // }
+    // // for (int i=1; i < nz-1; i++) {
+    //     for (int j = 1; j < nx - 1; j++)
+    //     {
+    //         for (int k = 1; k < ny - 1; k++)
+    //         {
+    //             gradientPressureField.at(1).at(j).at(k).x = (mesh.at(1).at(j+1).at(k).pressure - mesh.at(1).at(j-1).at(k).pressure)/2;
+    //             gradientPressureField.at(1).at(j).at(k).y = (mesh.at(1).at(j).at(k+1).pressure - mesh.at(1).at(j).at(k-1).pressure)/2;
+    //             // gradientPressureField.at(1).at(j).at(k).z = (mesh.at(0+1).at(j).at(k).pressure - mesh.at(0-1).at(j).at(k).pressure)/2 
+    //         }
+    //     }
+    // // }
 }
 
 void Cfd::Draw() {
-    InitWindow(0, 0, "airplane simulation");
-    ToggleFullscreen();
-    const int screenWidth = GetScreenWidth();
-    const int screenHeight = GetScreenHeight();
+    // InitWindow(0, 0, "airplane simulation");
+    // ToggleFullscreen();
+    // const int screenWidth = GetScreenWidth();
+    // const int screenHeight = GetScreenHeight();
 
-    SetTargetFPS(60);
+    // SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -307,7 +356,7 @@ void Cfd::Draw() {
             for (int j=0; j < 100; j++) {
                 for (int k=0; k < 100; k++) {
                     double val = mesh.at(1).at(j).at(k).pressure;
-                    double val2 = mesh.at(1).at(j).at(k).pressure;
+                    double val2 = mesh.at(1).at(j).at(k).pressure * pow(10, 100) * pow(10, 100) * pow(10, 100) * pow(10, 11);
                     Color col = {255, val, val2, 255};
                     DrawRectangle(j*30, k*30, 30, 30, col);
                     DrawLine(j*30, k*30, 30 * j, 30 * k +30, RED);
@@ -317,13 +366,13 @@ void Cfd::Draw() {
                     // DrawLine(j*10, k*10, 10 * j +10,10 * k +10, RED);
                 }
             }
-
-            for (int j=0; j< 100; j++) {
-                for (int k=0; k < 100; k++) {
-                    std::cout << mesh.at(1).at(j).at(k).pressure << " ";
-                }
-                std::cout << std::endl;
-            }
+        
+            // for (int j=0; j< 100; j++) {
+            //     for (int k=0; k < 100; k++) {
+            //         std::cout << mesh.at(1).at(j).at(k).pressure << " " << pow(10, 100) << " ";
+            //     }
+            //     std::cout << std::endl;
+            // }
 
         EndDrawing();
     }
