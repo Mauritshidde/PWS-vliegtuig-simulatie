@@ -9,6 +9,7 @@ public:
     double pressure;
     double newPressure;
     double density;
+    double newDensity;
 
     bool boundary;
     bool updatedPressure;
