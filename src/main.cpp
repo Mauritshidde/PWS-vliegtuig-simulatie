@@ -39,7 +39,7 @@ int main()
             {
                 Cfd cfd;
                 cfd.calc();
-                // cfd.Draw();
+                cfd.Draw();
                 running = false;
                 // start cdf program for calculating cl and cd;
             }
