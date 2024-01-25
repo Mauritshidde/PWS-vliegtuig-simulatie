@@ -3,13 +3,13 @@
 #include <vector>
 #include <string>
 
+#include "Physics/Physics.h"
 #include "physicsvector.h"
 #include "../liftFileCode/readFile.h"
 
 class Plane
 {
 private:
-      /* data */
       Model airplane;
       Texture2D airplaneTexture;
       LiftFileReader files;
@@ -23,10 +23,15 @@ public:
       void calcLift(float rho);
       Vector3 calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth);
       Vector2 getConsts(float pitch, float yaw, bool useYaw, bool usePitch);
+      void evaluateForces(std::vector<physicsVector> forces);
+
+      void updateVel(float deltaTime);
 
       void Start();
       void Draw();
       void Update(float deltaTime, float rho);
+
+      Physics planePhysics;
 
       float currentEngineTrust = 0.0f; // in newton
       float maxEngineTrust = 116000;   // in newton
@@ -37,9 +42,11 @@ public:
       // float leftMotorForce;
       // float rightMotorForce;
       Vector3 pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
-      Vector3 speedInDirections;
+      Vector3 velocity, acceleration, angularAcceleration;
+      std::vector<physicsVector> forces;
+      Vector3 momentOfInertia;
 
-      float velocity;         // in m/s
+      float speed;         // in m/s
       float wingArea;         // surface area of wing in m2
       float planeFrontalArea; // the surface area of the face of the plane that is parellel to the velocity direction
       // float totalSpeed;

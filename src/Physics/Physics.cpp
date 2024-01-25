@@ -1,6 +1,6 @@
 #include "Physics.h"
 
-physicsVector addForces(std::vector<physicsVector> inputVector)
+physicsVector Physics::addForces(std::vector<physicsVector> inputVector)
 {
     physicsVector sumVector = physicsVector({0, 0, 0}, {0, 0, 0});
     for (int i = 0; i < inputVector.size(); i++)
@@ -12,7 +12,7 @@ physicsVector addForces(std::vector<physicsVector> inputVector)
     return sumVector;
 }
 
-Vector3 vectorAddition(Vector3 vec1, Vector3 vec2)
+Vector3 Physics::vectorAddition(Vector3 vec1, Vector3 vec2)
 {
     Vector3 result;
     result.x = vec1.x + vec2.x;
@@ -21,7 +21,7 @@ Vector3 vectorAddition(Vector3 vec1, Vector3 vec2)
     return result;
 }
 
-Vector3 vectorSubtraction(Vector3 vec1, Vector3 vec2)
+Vector3 Physics::vectorSubtraction(Vector3 vec1, Vector3 vec2)
 {
     Vector3 result;
     result.x = vec1.x - vec2.x;
@@ -51,24 +51,36 @@ float Physics::distanceBetweenPoints(Vector3 point1, Vector3 point2)
     return length;
 }
 
-float Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass)
+Vector3 Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass)
 {
-    Vector3 torqueSum = {0, 0, 0};
+    Vector3 torqueTotal = {0, 0, 0}; // resulting torque for pitch yaw and roll
+    float torquePitch, torqueYaw, torqueRoll;
+    Vector3 distance;
+    Vector3 currentForce;
     for (int i = 0; i < forces.size(); i++)
     {
-        Vector3 distance = vectorSubtraction(centerOfMass, forces.at(i).location);
-        Vector3 extraTorque = crossProduct(forces.at(i).components, distance);
-        torqueSum = vectorAddition(torqueSum, extraTorque);
+        currentForce = forces.at(i).components;
+        distance = vectorSubtraction(centerOfMass, forces.at(i).location);
+
+        torquePitch = distance.y * currentForce.y + distance.z * currentForce.z;
+          torqueYaw = distance.x * currentForce.x + distance.z * currentForce.z;
+         torqueRoll = distance.x * currentForce.x + distance.y * currentForce.y;
+
+        torqueTotal.x += torquePitch;
+        torqueTotal.y += torqueYaw;
+        torqueTotal.z += torqueRoll;
     }
-    // for rpm rotatie ook inersia nodig
-    // if (torqueSum.x > 0)
-    // {
-    //     // keep goin straight forward/ without rotation
-    // }
-    // else if (torqueSum.x < 0)
-    // {
-    //     // go right if positive and go left if negative didn't find formula yet
-    // }
+    return torqueTotal;
+}
+
+Vector3 Physics::calcAngularAcceleration(std::vector<physicsVector> forces, float mass, Vector3 centerOfMass, Vector3 momentOfInertia)
+{
+    Vector3 angularAcceleration, torque;
+    torque = calcTorque(forces, centerOfMass);
+
+    angularAcceleration.x = torque.x / momentOfInertia.x;
+    angularAcceleration.y = torque.y / momentOfInertia.y;
+    angularAcceleration.z = torque.z / momentOfInertia.z;
 }
 
 float Physics::calcHypot(Vector3 components)
@@ -76,12 +88,15 @@ float Physics::calcHypot(Vector3 components)
     return sqrt(pow(components.x, 2) + pow(components.y, 2) + pow(components.z, 2));
 }
 
-Vector3 Physics::calcAcceleration(physicsVector force, float mass) // newton: F = m・a ------ a = F/m
+Vector3 Physics::calcAcceleration(std::vector<physicsVector> forces, float mass) // newton: F = m・a ------ a = F/m
 {
     Vector3 acceleration;
-    acceleration.x = force.components.x / mass;
-    acceleration.y = force.components.y / mass;
-    acceleration.z = force.components.z / mass;
+    for (int i = 0; i < forces.size(); i++)
+    {
+        acceleration.x += forces.at(i).components.x / mass;
+        acceleration.y += forces.at(i).components.y / mass;
+        acceleration.z += forces.at(i).components.z / mass;
+    }
     return acceleration;
 }
 
@@ -92,6 +107,13 @@ Vector3 Physics::calcDeltaV(float deltaTime, Vector3 acceleration)
     deltaV.y = acceleration.y * deltaTime;
     deltaV.z = acceleration.z * deltaTime;
     return deltaV;
+}
+
+Vector3 Physics::calcForceGravity(float mass)
+{
+    Vector3 ForceG = {0, 0, 0};
+    ForceG.y = -mass * g;
+    return ForceG;
 }
 
 Physics::Physics(/* args */)

@@ -50,11 +50,11 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
 
     plane.Start();
     
-    plotXRange = linspace(0, 360, 361);
+    plotXRange = linspace(0, 36, 37);
     Vector2 aeroConsts;
     for (float x = 0; x < plotXRange.size(); x++)
     {
-        aeroConsts = plane.getConsts(x, 0, false, true);
+        aeroConsts = plane.getConsts(x*10, 0, false, true);
         plotYValues.push_back(aeroConsts.x);
     }
 }
@@ -143,9 +143,9 @@ void RunSimulation::Update(float deltaTime)
 {
     speedOfSound = sqrt(adiabaticIndex * gasConstant * temperature);
 
-    if (plane.velocity / speedOfSound <= 0.8)
+    if (plane.speed / speedOfSound <= 0.8)
     {
-        plane.velocity = 0.8 * speedOfSound; //cap the speed of the plane at mach 0.8
+        plane.speed = 0.8 * speedOfSound; //cap the speed of the plane at mach 0.8
     }
     // first value updates over time
     // after that value updates by gui or key inputs

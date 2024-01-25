@@ -105,7 +105,6 @@ Vector2 LiftFileReader::getConstFromLiftFile(double pitchAngle, double yawAngle,
         return vals;
     } else {
         Vector2 vals = getClCdWithPitch(pitchAngle);
-
         return vals;
     }
 
