@@ -36,9 +36,11 @@ private:
     void setBoundaryConditions(double velocityXDirectionStart, double velocityYDirectionStart, double velocityZDirectionStart, double velocityXDirectionEnd, double velocityYDirectionEnd, double velocityZDirectionEnd);
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions
     void iterativeSolver(double density);
+    void densityDispersion();
+    void removeDivergence();
+    
     void solveDensity(int i, int j, int k);
     void solveDensityFirst(int i, int j, int k);
-    
     void solvePressure(int i, int j, int k);
     void solvePressureFirst(int i, int j, int k);
 public:

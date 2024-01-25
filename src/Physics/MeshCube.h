@@ -12,7 +12,6 @@ public:
     double newDensity;
 
     bool boundary;
-    bool updatedPressure;
 
     void makeBoundary() {boundary = true;};
     void setDensity(double newDensity) {density = newDensity;};
@@ -21,6 +20,6 @@ public:
     void setVZ(double vz) {velocityZ = vz;};
     void setPressure(double newPressure) {pressure = newPressure;};
 
-    MeshCube(double vx = 0, double vy = 0, double vz = 0, double setPressure = 0, double setDensity = 1, bool bound = false, bool updatedPressure = false);
+    MeshCube(double vx = 0, double vy = 0, double vz = 0, double setPressure = 0, double setDensity = 1, bool bound = false);
     ~MeshCube();
 };
