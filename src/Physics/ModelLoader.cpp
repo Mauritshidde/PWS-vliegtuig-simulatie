@@ -44,7 +44,8 @@ int FluidDynamicsModel::detectCollision(Ray ray) {
     {
         for (int i = 0; i < objectTrianglePoints.size(); i++)
         {
-            if (GetRayCollisionTriangle(ray, objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), objectTrianglePoints.at(i).at(2)).hit) {
+            RayCollision info = GetRayCollisionTriangle(ray, objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), objectTrianglePoints.at(i).at(2));
+            if (info.hit) {
                 hits++;
             }
         }

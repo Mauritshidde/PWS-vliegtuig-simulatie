@@ -25,6 +25,9 @@ private:
     Model airplane;
     Texture airplaneTexture;
 
+    // multi threading
+    int cores;
+
     // mesh variables
     int nx;   // amount of cells in x direction // steps in x direction
     int ny;   // amount of cells in y direction // steps in y direction
@@ -58,7 +61,7 @@ private:
     // functions for setting the plane boundary
     void setPlaneBoundaryHelper(int startIndex, int endIndex);
     void detectColission();
-    void setPlaneBoundary(); // make parts of the plane part of the boundary conditions
+    void setPlaneBoundary(); // make parts of the plane part of the boundary conditions 
 
     // functions for calculating the movement of the fluid
     void densityDispersion();
@@ -75,6 +78,6 @@ private:
 public:
     void run(int steps);
 
-    Cfd(int setnx = 40, int setny = 10, int setnz = 10, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293);
+    Cfd(int setnx = 50, int setny = 40, int setnz = 40, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293);
     ~Cfd();
 };
