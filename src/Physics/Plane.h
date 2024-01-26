@@ -20,16 +20,19 @@ private:
 public:
       Plane(std::string fileName = "Boeing737", float startVelocity = 100, float rho = 1.225);
       ~Plane();
-      void calcLift(float rho);
-      Vector3 calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth);
-      Vector2 getConsts(float pitch, float yaw, bool useYaw, bool usePitch);
-      void evaluateForces(std::vector<physicsVector> forces);
-
-      void updateVel(float deltaTime);
-
       void Start();
       void Draw();
       void Update(float deltaTime, float rho);
+      Vector3 calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth);
+      Vector2 getConsts(float pitch, float yaw, bool useYaw, bool usePitch);
+
+      void calcLift(float rho);
+      void evaluateForces(std::vector<physicsVector> forces);
+      void updateVel(float deltaTime);
+      void updateAngularVel(float deltaTime);
+      void updateRotation(float deltaTime);
+
+      void reduceAngleDegrees();
 
       Physics planePhysics;
 
@@ -42,7 +45,7 @@ public:
       // float leftMotorForce;
       // float rightMotorForce;
       Vector3 pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
-      Vector3 velocity, acceleration, angularAcceleration;
+      Vector3 velocity, angularVelocity, acceleration, angularAcceleration;
       std::vector<physicsVector> forces;
       Vector3 momentOfInertia;
 

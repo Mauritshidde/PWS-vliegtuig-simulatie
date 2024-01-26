@@ -2,7 +2,7 @@
 #include "physicsvector.h"
 #include <vector>
 #include <math.h>
-#define g 9.81
+#define  gAcceleration 9.81
 
 class Physics
 {

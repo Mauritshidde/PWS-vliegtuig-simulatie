@@ -3,7 +3,7 @@
 #define RAYMATH_IMPLEMENTATION
 #include "../../include/modules/raymath.h"
 
-//moments of inertia in kg meter^2
+// moments of inertia in kg meter^2
 #define xMoment 24675886.91
 #define yMoment 44877574.54
 #define zMoment 67384152.71
@@ -15,7 +15,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       f.close();
 
       planePhysics = Physics();
-      velocity = {0, 0, 0};
+      velocity, angularVelocity = {0, 0, 0};
       anglePitch = 0;
       angleYaw = 0;
       angleRoll = 0;
@@ -41,7 +41,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       cl = consts.x;
       cd = consts.y;
       calcLift(rho); // set lift and drag
-      physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), {0, 0, 0}); 
+      physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), {0, 0, 0});
       forces.push_back(fG);
 }
 
@@ -89,54 +89,30 @@ void Plane::Update(float deltaTime, float rho)
       if (IsKeyDown(KEY_W))
       {
             anglePitch += rotationMultiplier * deltaTime;
-            if (anglePitch > 360)
-            {
-                  anglePitch -= 360;
-            }
       }
       else if (IsKeyDown(KEY_S))
       {
             anglePitch -= rotationMultiplier * deltaTime;
-            if (anglePitch < 0)
-            {
-                  anglePitch += 360;
-            }
       }
 
       if (IsKeyDown(KEY_A))
       {
             angleYaw += rotationMultiplier * deltaTime;
-            if (angleYaw > 360)
-            {
-                  angleYaw -= 360;
-            }
       }
       else if (IsKeyDown(KEY_D))
       {
             angleYaw -= rotationMultiplier * deltaTime;
-            if (angleYaw < 0)
-            {
-                  angleYaw += 360;
-            }
       }
 
       if (IsKeyDown(KEY_Q))
       {
             angleRoll += rotationMultiplier * deltaTime;
-            if (angleRoll > 360)
-            {
-                  angleRoll -= 360;
-            }
       }
       else if (IsKeyDown(KEY_E))
       {
             angleRoll -= rotationMultiplier * deltaTime;
-            if (angleRoll < 0)
-            {
-                  angleRoll += 360;
-            }
       }
-
+      reduceAngleDegrees();
       if (previousAnglePitch != anglePitch || previousAngleYaw != angleYaw || previousAngleRoll != angleRoll)
       {
             airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
@@ -148,17 +124,23 @@ void Plane::Update(float deltaTime, float rho)
       previousAngleRoll = angleRoll;
 
       calcLift(rho);
-      
+
       evaluateForces(forces);
       updateVel(deltaTime);
-
+      updateAngularVel(deltaTime);
+      updateRotation(deltaTime);
+      //test prints
+      for (int i = 0; i < forces.size(); i++)
+      {
+            std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
+      }
       // std::cout << "speed: " << velocity << " lift: " << lift << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
 }
 
 void Plane::evaluateForces(std::vector<physicsVector> forces)
 {
-     angularAcceleration = planePhysics.calcAngularAcceleration(forces, mass, centerOfMass, momentOfInertia);
-     acceleration = planePhysics.calcAcceleration(forces, mass);
+      angularAcceleration = planePhysics.calcAngularAcceleration(forces, mass, centerOfMass, momentOfInertia);
+      acceleration = planePhysics.calcAcceleration(forces, mass);
 }
 
 void Plane::updateVel(float deltaTime)
@@ -167,4 +149,51 @@ void Plane::updateVel(float deltaTime)
       velocity.x += deltaVelocity.x;
       velocity.y += deltaVelocity.y;
       velocity.z += deltaVelocity.z;
+      std::cout << "yvel: " << velocity.y << "\n";
+}
+
+void Plane::updateAngularVel(float deltaTime)
+{
+      Vector3 deltaAngularV = planePhysics.calcDeltaV(deltaTime, acceleration);
+      angularVelocity.x += deltaAngularV.x;
+      angularVelocity.y += deltaAngularV.y;
+      angularVelocity.z += deltaAngularV.z;
+      std::cout << " xAn " << angularAcceleration.x << " yAn " << angularAcceleration.y << " zAn " << angularAcceleration.z << "\n";
+      std::cout << " xanvel " << angularVelocity.x << " yanvel " << angularVelocity.y << " zanvel " << angularVelocity.z << "\n";
+}
+
+void Plane::updateRotation(float deltaTime)
+{
+      anglePitch += angularVelocity.x * deltaTime * 360;
+      angleYaw += angularVelocity.y * deltaTime * 360;
+      angleRoll += angularVelocity.y * deltaTime * 360;
+      reduceAngleDegrees();
+}
+
+void Plane::reduceAngleDegrees() // 0 < Angle < 360
+{
+      if (anglePitch > 360)
+      {
+            anglePitch -= 360;
+      }
+      else if (anglePitch < 0)
+      {
+            anglePitch += 360;
+      }
+      if (angleYaw > 360)
+      {
+            angleYaw -= 360;
+      }
+      else if (angleYaw < 0)
+      {
+            angleYaw += 360;
+      }
+      if (angleRoll > 360)
+      {
+            angleRoll -= 360;
+      }
+      else if (angleRoll < 0)
+      {
+            angleRoll += 360;
+      }
 }

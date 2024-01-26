@@ -112,7 +112,7 @@ Vector3 Physics::calcDeltaV(float deltaTime, Vector3 acceleration)
 Vector3 Physics::calcForceGravity(float mass)
 {
     Vector3 ForceG = {0, 0, 0};
-    ForceG.y = -mass * g;
+    ForceG.y = -mass * gAcceleration;
     return ForceG;
 }
 
