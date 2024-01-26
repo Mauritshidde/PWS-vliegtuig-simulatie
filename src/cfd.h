@@ -56,9 +56,8 @@ private:
     void setBoundaryConditions(double velocityXDirectionStart, double velocityYDirectionStart, double velocityZDirectionStart, double velocityXDirectionEnd, double velocityYDirectionEnd, double velocityZDirectionEnd);
 
     // functions for setting the plane boundary
-    void setPlaneBoundary1();
-    void setPlaneBoundary2();
-    void setPlaneBoundary3();
+    void setPlaneBoundaryHelper(int startIndex, int endIndex);
+    void detectColission();
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions
 
     // functions for calculating the movement of the fluid

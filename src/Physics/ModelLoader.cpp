@@ -38,6 +38,20 @@ void FluidDynamicsModel::readObjectModelFile(std::string *as, std::string *bs, s
     }
 }
 
+int FluidDynamicsModel::detectCollision(Ray ray) {
+    int hits = 0;
+    if (objectTrianglePoints.size() >= 1)
+    {
+        for (int i = 0; i < objectTrianglePoints.size(); i++)
+        {
+            if (GetRayCollisionTriangle(ray, objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), objectTrianglePoints.at(i).at(2)).hit) {
+                hits++;
+            }
+        }
+    }
+    return hits;
+}
+
 void FluidDynamicsModel::loadObjectModel()
 {
     float a, b, c;
@@ -85,8 +99,8 @@ void FluidDynamicsModel::drawModel()
     {
         for (int i = 0; i < objectTrianglePoints.size(); i++)
         {
-            DrawTriangle3D(objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), objectTrianglePoints.at(i).at(2), RED);
-            DrawLine3D(objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), BLACK);
+            DrawTriangle3D(objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), objectTrianglePoints.at(i).at(2), BLACK);
+            DrawLine3D(objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), BLUE);
         }
     }
 }
