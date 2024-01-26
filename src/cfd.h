@@ -9,6 +9,17 @@
 class Cfd
 {
 private:
+    // camera variables
+    Vector2 cameraYZPos;
+    Vector3 cameraPos;
+    Vector2 cameraXYPos;
+    Vector2 previousMousePosition;
+    Camera camera;
+    float cameraCircleRadius;
+    float angleYAxis;
+    float angleXZAxis;
+    float p, l, radius;
+
     // mesh variables
     int nx;   // amount of cells in x direction // steps in x direction
     int ny;   // amount of cells in y direction // steps in y direction
@@ -32,21 +43,27 @@ private:
     std::vector<std::vector<std::vector<double>>> divergenceVelocityField;
     std::vector<std::vector<std::vector<Vector3>>> gradientPressureField;
 
+    // functions for the creation of the grid
+    void Start();
     void createMesh();
     void setBoundaryConditions(double velocityXDirectionStart, double velocityYDirectionStart, double velocityZDirectionStart, double velocityXDirectionEnd, double velocityYDirectionEnd, double velocityZDirectionEnd);
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions
-    void iterativeSolver(double density);
+
+    // functions for calculating the movement of the fluid
     void densityDispersion();
     void removeDivergence();
-
     void solveDensity(int i, int j, int k);
     void solveDensityFirst(int i, int j, int k);
     void solvePressure(int i, int j, int k);
     void solvePressureFirst(int i, int j, int k);
-public:
-    void calc();    
-    void Draw();
+    void calc(double anglePitch, double angleYaw);    
 
-    Cfd(int setnx = 100, int setny = 100, int setnz = 100, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293);
+    // graphics functions (these are optionally when running the cfd) 
+    void moveCamera(float deltaTime);
+    void Draw();
+public:
+    void run(int steps);
+
+    Cfd(int setnx = 120, int setny = 50, int setnz = 130, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293);
     ~Cfd();
 };
