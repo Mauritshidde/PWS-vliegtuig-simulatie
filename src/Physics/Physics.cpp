@@ -77,10 +77,12 @@ Vector3 Physics::calcAngularAcceleration(std::vector<physicsVector> forces, floa
 {
     Vector3 angularAcceleration, torque;
     torque = calcTorque(forces, centerOfMass);
-
+    std::cout << "torque xyz" << torque.x << " " << torque.y << " " << torque.z << " \n";
+    std::cout << "moment xyz" << momentOfInertia.x << " " << momentOfInertia.y << " " << momentOfInertia.z << " \n";
     angularAcceleration.x = torque.x / momentOfInertia.x;
     angularAcceleration.y = torque.y / momentOfInertia.y;
     angularAcceleration.z = torque.z / momentOfInertia.z;
+    return angularAcceleration;
 }
 
 float Physics::calcHypot(Vector3 components)

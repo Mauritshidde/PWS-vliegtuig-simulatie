@@ -2,6 +2,7 @@
 #include "physicsvector.h"
 #include <vector>
 #include <math.h>
+#include <iostream>
 #define  gAcceleration 9.81
 
 class Physics

@@ -40,7 +40,7 @@ int main()
                 NavierStokes cfd;
                 cfd.calc();
                 running = false;
-                // start cdf program for calculating cl and cd;
+                // start cfd program for calculating cl and cd;
             }
             else if (menu.buttonPressed == 2)
             {

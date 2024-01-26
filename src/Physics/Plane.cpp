@@ -15,7 +15,8 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       f.close();
 
       planePhysics = Physics();
-      velocity, angularVelocity = {0, 0, 0};
+      velocity, acceleration, angularVelocity, angularAcceleration = {0, 0, 0};
+      angularVelocity.z = 0; // i have no clue why this works but it does
       anglePitch = 0;
       angleYaw = 0;
       angleRoll = 0;
@@ -23,6 +24,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
 
       previousAnglePitch = anglePitch;
       previousAngleYaw = angleYaw;
+      previousAngleRoll = angleRoll;
 
       rotationMultiplier = 10; // multiplier for the speed of rotating the plane using WASD
 
@@ -32,6 +34,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
 
       wingArea = planeData["Planes"][planeName]["wing area"].get<float>(); // surface area of the wing in m2
       mass = planeData["Planes"][planeName]["maximal mass"].get<float>();
+      centerOfMass = {0, 0, 0};
 
       liftFileName = planeName;
 
@@ -41,7 +44,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       cl = consts.x;
       cd = consts.y;
       calcLift(rho); // set lift and drag
-      physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), {0, 0, 0});
+      physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), {10, 0, 0});
       forces.push_back(fG);
 }
 
@@ -133,6 +136,7 @@ void Plane::Update(float deltaTime, float rho)
       for (int i = 0; i < forces.size(); i++)
       {
             std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
+            std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
       }
       // std::cout << "speed: " << velocity << " lift: " << lift << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
 }
@@ -154,10 +158,11 @@ void Plane::updateVel(float deltaTime)
 
 void Plane::updateAngularVel(float deltaTime)
 {
-      Vector3 deltaAngularV = planePhysics.calcDeltaV(deltaTime, acceleration);
+      Vector3 deltaAngularV = planePhysics.calcDeltaV(deltaTime, angularAcceleration);
       angularVelocity.x += deltaAngularV.x;
       angularVelocity.y += deltaAngularV.y;
       angularVelocity.z += deltaAngularV.z;
+      std::cout << " xDanV " << deltaAngularV.x << " yDanV " << deltaAngularV.y << " zDanV " << deltaAngularV.z << "\n";
       std::cout << " xAn " << angularAcceleration.x << " yAn " << angularAcceleration.y << " zAn " << angularAcceleration.z << "\n";
       std::cout << " xanvel " << angularVelocity.x << " yanvel " << angularVelocity.y << " zanvel " << angularVelocity.z << "\n";
 }
@@ -166,7 +171,7 @@ void Plane::updateRotation(float deltaTime)
 {
       anglePitch += angularVelocity.x * deltaTime * 360;
       angleYaw += angularVelocity.y * deltaTime * 360;
-      angleRoll += angularVelocity.y * deltaTime * 360;
+      angleRoll += angularVelocity.z * deltaTime * 360;
       reduceAngleDegrees();
 }
 
