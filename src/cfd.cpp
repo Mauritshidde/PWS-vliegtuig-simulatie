@@ -9,7 +9,7 @@ void Cfd::createMesh()
 {
     for (int i = 0; i < nz; i++)
     {   
-        std::cout << "done " << i << std::endl;
+        // std::cout << "done " << i << std::endl;
         std::vector<std::vector<MeshCube>> helper;
         std::vector<std::vector<double>> helper2;
         std::vector<std::vector<Vector3>> helper3;
@@ -243,7 +243,7 @@ void Cfd::removeDivergence() {
     // }
 }
 
-void Cfd::calc()
+void Cfd::calc(double anglePitch, double angleYaw)
 {
     double tijd = 0;
     while (tijd < maxTime)
@@ -342,51 +342,198 @@ void Cfd::calc()
     // // }
 }
 
+void Cfd::moveCamera(float deltaTime) {
+    // Vector2 currentMousePos = GetMousePosition();
+    
+    // if (IsMouseButtonDown(0))
+    // {
+    //     angleYAxis += 100 * ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
+    //     angleXZAxis += 100 * ((currentMousePos.y - previousMousePosition.y)) * deltaTime;
+    //     if (angleYAxis > 360) {
+    //         angleYAxis -= 360;
+    //     } else if (angleYAxis < 0) {
+    //         angleYAxis += 360;
+    //     }
+
+    //     if (angleXZAxis > 360) {
+    //         angleYAxis -= 360;
+    //     } else if (angleYAxis < 0) {
+    //         angleXZAxis += 360;
+    //     }
+    // }
+
+    // if (IsKeyDown(KEY_RIGHT))
+    // {
+    //     angleYAxis += 100 * deltaTime;
+    //     if (angleYAxis > 360) {
+    //         angleYAxis -= 360;
+    //     }
+    // }
+    // if (IsKeyDown(KEY_LEFT))
+    // {
+    //     angleYAxis -= 100 * deltaTime;
+    //     if (angleYAxis < 0) {
+    //         angleYAxis += 360;
+    //     }
+    // }
+    // if (IsKeyDown(KEY_UP))
+    // {
+    //     angleXZAxis += 100 * deltaTime;
+    //     if (angleXZAxis > 360) {
+    //         angleXZAxis -= 360;
+    //     }
+    // }
+    // if (IsKeyDown(KEY_DOWN))
+    // {
+    //     angleXZAxis -= 100 * deltaTime;
+    //     if (angleXZAxis < 0) {
+    //         angleXZAxis += 360;
+    //     }
+    // }
+
+    // if (GetMouseWheelMove() > 0)
+    // {
+    //     cameraCircleRadius += 100 * deltaTime;
+    //     cameraPos = {0.0f, 0.0f, cameraCircleRadius};
+    // }
+    // else if (GetMouseWheelMove() < 0)
+    // {
+    //     cameraCircleRadius -= 100 * deltaTime;
+    //     cameraPos = {0.0f, 0.0f, cameraCircleRadius};
+    // }
+
+    // // camera.position = Vector3Transform(cameraPos, MatrixRotateXYZ((Vector3){DEG2RAD * angleXZAxis, DEG2RAD * angleYAxis, 0}));
+    // // previousMousePosition = currentMousePos;
+    float x, y, z;
+    Vector2 currentMousePos = GetMousePosition();
+    if (IsMouseButtonDown(0)) {
+        p += ((currentMousePos.x-previousMousePosition.x)) * deltaTime;
+        l += ((currentMousePos.y-previousMousePosition.y))* deltaTime;
+        
+    }
+    if (GetMouseWheelMove() > 0) {
+        radius += 100 * deltaTime;
+    } else if (GetMouseWheelMove() < 0) {
+        radius -= 100 * deltaTime;
+    }
+
+
+    x = radius *  sin(p) * cos(l);
+    y = radius * sin(p) * sin(l);
+    z = radius * cos(p);
+    std::cout << GetMouseWheelMove() << std::endl;
+    camera.position.x = x;
+    camera.position.y = y;
+    camera.position.z = z;
+}
+
 void Cfd::Draw() {
-    while (!WindowShouldClose()) {
-        BeginDrawing();
+    float deltaTime = GetFrameTime();
+    moveCamera(deltaTime);
+    Model airplane;
+    Texture airplaneTexture;
+    airplaneTexture = LoadTexture("models/texture/planeTextureBeter.png");
+    airplane = LoadModel("models/object/airplane.obj");
+    airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
+    Vector3 startingPoint;
+    startingPoint.x = -nx/2;
+    startingPoint.y = -ny/2;
+    startingPoint.z = -nz/2;
+    BeginDrawing();
+        ClearBackground(WHITE);
+        BeginMode3D(camera);
+    DrawModelEx(airplane, (Vector3){0.0f, -10.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); // 2de vector geeft aan met welke factor hij met currentangle draait
+
+            DrawCubeWires({0,0,0}, 20, 40, 40, RED);
 
             std::cout << "start" << std::endl;
-            for (int j=0; j < 100; j++) {
-                for (int k=0; k < 100; k++) {
-                    double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
-                    double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
-                    double val3 = mesh.at(1).at(j).at(k).pressure;
-                    Color col = {val3, val, val2, 255};
-                    DrawRectangle(j*10, k*10, 10, 10, col);
-                    DrawLine(j*10, k*10, 10 * j, 10 * k +10, RED);
-                    DrawLine(j*10, k*10, 10 * j +10,10 * k, RED);
-                    // DrawText()
-                    // DrawLine(j*10, k*10, 10 * j +10,10 * k +10, RED);
-                    // DrawLine(j*10, k*10, 10 * j +10,10 * k +10, RED);
+            for (int i=0; i < nz; i++) {
+            // std::cout << "start" << std::endl;
+                
+                for (int j=0; j < nx; j++) {
+            // std::cout << j << std::endl;
+
+                    for (int k=0; k < ny; k++) {
+                        // double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
+                        // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
+                        // double val3 = mesh.at(1).at(j).at(k).pressure;
+                        // Color col = {val3, val, val2, 255};
+                        // DrawRectangle(j*10, k*10, 10, 10, RED);
+                        // DrawLine(j*10, k*10, 10 * j, 10 * k +10, RED);
+                        // DrawLine(j*10, k*10, 10 * j +10,10 * k, RED);
+                        // DrawText()
+                        // DrawLine(j*10, k*10, 10 * j +10,10 * k +10, RED);
+                        // DrawLine(j*10, k*10, 10 * j +10,10 * k +10, RED);
+                        Vector3 point;
+                        point.x = startingPoint.x + j * dx;
+                        point.y = startingPoint.y + k * dy;
+                        point.z = startingPoint.z + i * dz;
+                        if (mesh.at(i).at(j).at(k).boundary) {
+                            DrawCubeWires(point, dx, dy, dz, BLACK);
+                        } else {
+                            // DrawCubeWires(point, dx, dy, dz, RED);
+                        }
+                    }
                 }
             }
-        
-            // for (int j=0; j< 100; j++) {
-            //     for (int k=0; k < 100; k++) {
-            //         std::cout << mesh.at(1).at(j).at(k).pressure << " ";
-            //     }
-            //     std::cout << " end " << std::endl;
-            // }
-            // std::cout << std::endl;
-            // std::cout << std::endl;
-            // std::cout << std::endl;
-            // std::cout << std::endl;
+        EndMode3D();
+        // for (int j=0; j< 100; j++) {
+        //     for (int k=0; k < 100; k++) {
+        //         std::cout << mesh.at(1).at(j).at(k).pressure << " ";
+        //     }
+        //     std::cout << " end " << std::endl;
+        // }
+        // std::cout << std::endl;
+        // std::cout << std::endl;
+        // std::cout << std::endl;
+        // std::cout << std::endl;
 
 
-        EndDrawing();
+    EndDrawing();
+}
+
+void Cfd::run(int steps) {
+    while (true) {
+        Draw();
     }
+    // for (int i=0; i < 360; i++) { // pitch
+    //     for (int j=0; j < 360; j++) { // yaw
+    //         calc(i, j);
+    //     }
+    // }
 }
 
 Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho)
 {
+    // set camera variables
+    p = 0;
+    l = 0;
+    radius = 100;
+    cameraCircleRadius = 150;
+    cameraPos = {0.0f, 0.0f, cameraCircleRadius};
+    cameraXYPos = {cameraPos.x, cameraPos.y};
+    camera = {0};
+    angleYAxis = 0;
+    angleXZAxis = 0;
+
+    camera.position = cameraPos;                  // Camera position perspective
+    camera.target = (Vector3){0.0f, 0.0f, 0.0f}; // Camera looking at point  20 ?????????????? hier naar nog kijken TODO
+    camera.up = (Vector3){0.0f, 30.0f, 0.0f};     // Camera up vector (rotation towards target)
+    camera.fovy = 30.0f;                          // Camera field-of-view Y   effect van dit veranderen bestuderen ?????????????? TODO
+    camera.projection = CAMERA_PERSPECTIVE;  /// wat doet dit TODO
+
+    // set simulation variables
     nx = setnx;
     ny = setny;
     nz = setnz;
     dT = deltaTime;
     maxTime = setMaxTime;
     rho = setRho;
+    dx = 1;
+    dy = 1;
+    dz = 1;
 
+    // need to be replaced
     createMesh();
     setBoundaryConditions(100,  0,  0,  0,  0,  0);
     setPlaneBoundary();

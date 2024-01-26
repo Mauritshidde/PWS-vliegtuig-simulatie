@@ -38,7 +38,7 @@ int main()
             else if (menu.buttonPressed == 1)
             {
                 Cfd cfd;
-                cfd.calc();
+                cfd.run(100);
                 // cfd.Draw();
                 running = false;
                 // start cdf program for calculating cl and cd;
