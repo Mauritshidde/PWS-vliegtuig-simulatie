@@ -85,9 +85,15 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
                 position.z = dz * i + startingPoint.z;
                 Vector3 test = {0, 1, 0};
                 Ray ray;
+                ray.position = position;
+                ray.direction = test;
                 int collisions = plane.detectCollision(ray);
+
+                // if (collisions > 0) {
+                //     std::cout << collisions << std::endl;
+                // }
+
                 if (collisions % 2 != 0 && collisions > 0) {
-                    std::cout << collisions << std::endl;
                     mesh.at(i).at(j).at(k).boundary = true;
                 }
             }
@@ -96,34 +102,24 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
     }
 }
 
-void Cfd::detectColission() {
-    // ray.direction = test;
-    // float anglePitch = 0;
-    // float angleYaw = 0;
-    // Matrix ma = MatrixRotateXYZ2((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, 0});
-    // RayCollision meshHitInfo = GetRayCollisionMesh(ray, airplane.meshes[0], airplane.transform);
-    // // std::cout << airplane.transform.m4 << std::endl;
-    // // if (!airplane.meshes[0]) {
-    //     std::cout << airplane.meshes[0].vertices[0] << std::endl;
-    // // }
-    // if (meshHitInfo.hit) {
-    //     mesh.at(i).at(j).at(k).boundary = true;
-    //     std::cout << "Collision happened at point" <<  meshHitInfo.point.x << " " << meshHitInfo.point.y << " " <<  meshHitInfo.point.z << std::endl;
-    // }
-}
-
 void Cfd::setPlaneBoundary()
 {
-    int part1 = (int) nz/3.0f;
-    int part2 = (int) 2.0f * nz/3.0f;
+    int part1 = (int) nz/5.0f;
+    int part2 = (int) 2.0f * nz/5.0f;
+    int part3 = (int) 3.0f * nz/3.0f;
+    int part4 = (int) 4.0f * nz/5.0f;
     std::cout << part1 << " " << part2 << " " << nz << std::endl;
     std::thread t1(&Cfd::setPlaneBoundaryHelper, this, 1, part1);
     std::thread t2(&Cfd::setPlaneBoundaryHelper, this, part1, part2);
-    std::thread t3(&Cfd::setPlaneBoundaryHelper, this, part2, nz-1);
+    std::thread t3(&Cfd::setPlaneBoundaryHelper, this, part2, part3);
+    std::thread t4(&Cfd::setPlaneBoundaryHelper, this, part3, part4);
+    std::thread t5(&Cfd::setPlaneBoundaryHelper, this, part4, nz-1);
 
     t1.join();
     t2.join();
     t3.join();
+    t4.join();
+    t5.join();
 }
 
 void Cfd::solveDensity(int i, int j, int k) {
@@ -455,25 +451,36 @@ void Cfd::moveCamera() {
 }
 
 void Cfd::Draw() {
+    Vector3 position;
+    position.x = 0;
+    position.y = 0;
+    position.z = 0;
+    Vector3 test = {0, 100, 0};
+    Ray ray;
+    ray.position = position;
+    ray.direction = test;
+
+    int collisions = plane.detectCollision(ray);
+    // std::cout << collisions << std::endl;
     // float deltaTime = GetFrameTime();
     moveCamera();
     BeginDrawing();
         ClearBackground(WHITE);
         BeginMode3D(camera);
         plane.drawModel();
-
+        // DrawRay(ray, PINK);
     // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); // 2de vector geeft aan met welke factor hij met currentangle draait
 
             DrawCubeWires({0,0,0}, 20, 40, 40, RED);
 
-            std::cout << "start" << std::endl;
-            for (int i=0; i < nz; i++) {
+            // std::cout << "start" << std::endl;
+            for (int i=1; i < nz; i++) {
             // std::cout << "start" << std::endl;
                 
-                for (int j=0; j < nx; j++) {
+                for (int j=1; j < nx; j++) {
             // std::cout << j << std::endl;
 
-                    for (int k=0; k < ny; k++) {
+                    for (int k=1; k < ny; k++) {
                         // double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
                         // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
                         // double val3 = mesh.at(1).at(j).at(k).pressure;
@@ -484,8 +491,9 @@ void Cfd::Draw() {
                         point.z = startingPoint.z + i * dz - 0.5 * dz;
                         if (mesh.at(i).at(j).at(k).boundary) {
                             // DrawCubeWires(point, dx, dy, dz, BLACK);
+                            DrawCube(point, dx, dy, dz, BLACK)
                         } else {
-                            DrawCubeWires(point, dx, dy, dz, RED);
+                            // DrawCubeWires(point, dx, dy, dz, RED);
                         }
                     }
                 }
@@ -519,6 +527,9 @@ void Cfd::run(int steps) {
 
 Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho)
 {
+    // set multithreading variables
+    cores = 6;
+
     // set camera variables
     cameraCircleRadius = 150;
     cameraPos = {0.0f, 0.0f, cameraCircleRadius};
