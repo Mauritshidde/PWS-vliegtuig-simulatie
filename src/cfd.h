@@ -4,6 +4,8 @@
 #include <math.h>
 #include <bits/stdc++.h>
 #include "Physics/MeshCube.h"
+#include "Physics/ModelLoader.h"
+#include "extra/raymath2.h"
 // #include "matrix.h"
 
 class Cfd
@@ -18,7 +20,10 @@ private:
     float cameraCircleRadius;
     float angleYAxis;
     float angleXZAxis;
-    float p, l, radius;
+
+    // drawing variables
+    Model airplane;
+    Texture airplaneTexture;
 
     // mesh variables
     int nx;   // amount of cells in x direction // steps in x direction
@@ -30,6 +35,8 @@ private:
     double dxi; // 1/dx
     double dyi; // 1/dy
     double dzi; // 1/dz
+    Vector3 startingPoint; // starting point of the grid
+    FluidDynamicsModel plane;
 
     // calculation consts
     double k; // const for amount of change of density in each time step
@@ -47,6 +54,11 @@ private:
     void Start();
     void createMesh();
     void setBoundaryConditions(double velocityXDirectionStart, double velocityYDirectionStart, double velocityZDirectionStart, double velocityXDirectionEnd, double velocityYDirectionEnd, double velocityZDirectionEnd);
+
+    // functions for setting the plane boundary
+    void setPlaneBoundary1();
+    void setPlaneBoundary2();
+    void setPlaneBoundary3();
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions
 
     // functions for calculating the movement of the fluid
@@ -59,11 +71,11 @@ private:
     void calc(double anglePitch, double angleYaw);    
 
     // graphics functions (these are optionally when running the cfd) 
-    void moveCamera(float deltaTime);
+    void moveCamera();
     void Draw();
 public:
     void run(int steps);
 
-    Cfd(int setnx = 120, int setny = 50, int setnz = 130, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293);
+    Cfd(int setnx = 40, int setny = 10, int setnz = 10, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293);
     ~Cfd();
 };
