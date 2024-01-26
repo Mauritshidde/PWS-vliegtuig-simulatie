@@ -34,7 +34,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
 
       wingArea = planeData["Planes"][planeName]["wing area"].get<float>(); // surface area of the wing in m2
       mass = planeData["Planes"][planeName]["maximal mass"].get<float>();
-      centerOfMass = {0, 0, 0};
+      centerOfMass = {0, 0, 10};
 
       liftFileName = planeName;
 
@@ -44,7 +44,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       cl = consts.x;
       cd = consts.y;
       calcLift(rho); // set lift and drag
-      physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), {10, 0, 0});
+      physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), centerOfMass);
       forces.push_back(fG);
 }
 
@@ -133,11 +133,11 @@ void Plane::Update(float deltaTime, float rho)
       updateAngularVel(deltaTime);
       updateRotation(deltaTime);
       //test prints
-      for (int i = 0; i < forces.size(); i++)
-      {
-            std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
-            std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
-      }
+      // for (int i = 0; i < forces.size(); i++)
+      // {
+      //       std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
+      //       std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
+      // }
       // std::cout << "speed: " << velocity << " lift: " << lift << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
 }
 
@@ -153,7 +153,7 @@ void Plane::updateVel(float deltaTime)
       velocity.x += deltaVelocity.x;
       velocity.y += deltaVelocity.y;
       velocity.z += deltaVelocity.z;
-      std::cout << "yvel: " << velocity.y << "\n";
+      // std::cout << "yvel: " << velocity.y << "\n";
 }
 
 void Plane::updateAngularVel(float deltaTime)
