@@ -75,41 +75,55 @@ void Cfd::setBoundaryConditions(double velocityXDirectionStart, double velocityY
     }
 }
 
-void Cfd::setPlaneBoundary1() {
-    
-}
-
-void Cfd::setPlaneBoundary2() {
-    
-}
-
-void Cfd::setPlaneBoundary3() {
-    
-}
-
-void Cfd::setPlaneBoundary()
-{
-    // int part1 = nz/3;
-    // int part2 = 2 * nz/3;
-    for (int i=1; i < nz-1; i++) {
+void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
+    for (int i=startIndex; i < endIndex; i++) {
         for (int j=1; j < nx-1; j++) {
             for (int k=1; k < ny-1; k++) {
                 Vector3 position;
                 position.x = dx * j + startingPoint.x;
                 position.y = dy * k + startingPoint.y;
                 position.z = dz * i + startingPoint.z;
-                Vector3 test = {0, 1000, 0};
+                Vector3 test = {0, 1, 0};
                 Ray ray;
-                ray.direction = test;
-                RayCollision meshHitInfo = GetRayCollisionMesh(ray, *airplane.meshes, airplane.transform);
-                if (meshHitInfo.hit) {
+                int collisions = plane.detectCollision(ray);
+                if (collisions % 2 != 0 && collisions > 0) {
+                    std::cout << collisions << std::endl;
                     mesh.at(i).at(j).at(k).boundary = true;
-                    std::cout << " mesh " << 	meshHitInfo.hit;
                 }
             }
         }
         std::cout << "ja" << std::endl;
     }
+}
+
+void Cfd::detectColission() {
+    // ray.direction = test;
+    // float anglePitch = 0;
+    // float angleYaw = 0;
+    // Matrix ma = MatrixRotateXYZ2((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, 0});
+    // RayCollision meshHitInfo = GetRayCollisionMesh(ray, airplane.meshes[0], airplane.transform);
+    // // std::cout << airplane.transform.m4 << std::endl;
+    // // if (!airplane.meshes[0]) {
+    //     std::cout << airplane.meshes[0].vertices[0] << std::endl;
+    // // }
+    // if (meshHitInfo.hit) {
+    //     mesh.at(i).at(j).at(k).boundary = true;
+    //     std::cout << "Collision happened at point" <<  meshHitInfo.point.x << " " << meshHitInfo.point.y << " " <<  meshHitInfo.point.z << std::endl;
+    // }
+}
+
+void Cfd::setPlaneBoundary()
+{
+    int part1 = (int) nz/3.0f;
+    int part2 = (int) 2.0f * nz/3.0f;
+    std::cout << part1 << " " << part2 << " " << nz << std::endl;
+    std::thread t1(&Cfd::setPlaneBoundaryHelper, this, 1, part1);
+    std::thread t2(&Cfd::setPlaneBoundaryHelper, this, part1, part2);
+    std::thread t3(&Cfd::setPlaneBoundaryHelper, this, part2, nz-1);
+
+    t1.join();
+    t2.join();
+    t3.join();
 }
 
 void Cfd::solveDensity(int i, int j, int k) {
@@ -446,7 +460,9 @@ void Cfd::Draw() {
     BeginDrawing();
         ClearBackground(WHITE);
         BeginMode3D(camera);
-    DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); // 2de vector geeft aan met welke factor hij met currentangle draait
+        plane.drawModel();
+
+    // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); // 2de vector geeft aan met welke factor hij met currentangle draait
 
             DrawCubeWires({0,0,0}, 20, 40, 40, RED);
 
@@ -463,9 +479,9 @@ void Cfd::Draw() {
                         // double val3 = mesh.at(1).at(j).at(k).pressure;
                         // Color col = {val3, val, val2, 255};
                         Vector3 point;
-                        point.x = startingPoint.x + j * dx;
-                        point.y = startingPoint.y + k * dy;
-                        point.z = startingPoint.z + i * dz;
+                        point.x = startingPoint.x + j * dx - 0.5 * dx;
+                        point.y = startingPoint.y + k * dy - 0.5 * dy;
+                        point.z = startingPoint.z + i * dz - 0.5 * dz;
                         if (mesh.at(i).at(j).at(k).boundary) {
                             // DrawCubeWires(point, dx, dy, dz, BLACK);
                         } else {
@@ -521,8 +537,10 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
     airplane = LoadModel("models/object/airplane.obj");
     airplaneTexture = LoadTexture("models/texture/planeTextureBeter.png");
     airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
+    airplane.transform = MatrixTranslate2(0, -10.0f, 0);
 
     // set simulation variables
+    plane.loadObjectModel();
     nx = setnx;
     ny = setny;
     nz = setnz;
@@ -533,7 +551,7 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
     dy = 1;
     dz = 5;
     startingPoint.x = -(nx*dx)/2;
-    startingPoint.y = -(ny*dy)/2;
+    startingPoint.y = -(ny*dy)/2 + 10;
     startingPoint.z = -(nz*dz)/2;
 
     // need to be replaced

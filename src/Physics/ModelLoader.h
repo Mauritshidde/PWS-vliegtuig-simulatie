@@ -19,7 +19,7 @@ public:
     FluidDynamicsModel();
     ~FluidDynamicsModel();
 
-    void detectCollision();
+    int detectCollision(Ray ray);
     void loadObjectModel();
     void drawModel();
 

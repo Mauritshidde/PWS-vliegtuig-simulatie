@@ -43,3 +43,13 @@ Vector3 Vector3Transform2(Vector3 v, Matrix mat)
 
     return result;
 }
+
+Matrix MatrixTranslate2(float x, float y, float z)
+{
+    Matrix result = { 1.0f, 0.0f, 0.0f, x,
+                      0.0f, 1.0f, 0.0f, y,
+                      0.0f, 0.0f, 1.0f, z,
+                      0.0f, 0.0f, 0.0f, 1.0f };
+
+    return result;
+}
