@@ -123,16 +123,17 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
 void Cfd::setPlaneBoundary()
 {
     settingPlaneBOundarys = true;
-    int part1 = (int) nz/4.0f;
-    int part2 = (int) 2.0f * nz/4.0f;
-    int part3 = (int) 3.0f * nz/4.0f;
-    // int part4 = (int) 4.0f * nz/5.0f;
+    int part1 = (int) nz/5.0f;
+    int part2 = (int) 2.0f * nz/5.0f;
+    int part3 = (int) 3.0f * nz/5.0f;
+    int part4 = (int) 4.0f * nz/5.0f;
     std::cout << part1 << " " << part2 << " " << nz << std::endl;
     // std::thread td(blinkingLoadingScreen, 100, GetScreenWidth(), GetScreenHeight(), &settingPlaneBOundarys);
     std::thread t1(&Cfd::setPlaneBoundaryHelper, this, 1, part1);
     std::thread t2(&Cfd::setPlaneBoundaryHelper, this, part1, part2);
     std::thread t3(&Cfd::setPlaneBoundaryHelper, this, part2, part3);
-    std::thread t4(&Cfd::setPlaneBoundaryHelper, this, part3, nz-1);
+    std::thread t4(&Cfd::setPlaneBoundaryHelper, this, part3, part4);
+    std::thread t5(&Cfd::setPlaneBoundaryHelper, this, part4, nz-1);
     // std::thread t5(&Cfd::setPlaneBoundaryHelper, this, part4, nz-1);
 
     // blinkingLoadingScreen(100, GetScreenWidth(), GetScreenHeight(), &settingPlaneBOundarys); // so the raylib windows will not says its chrasing because of inactivity 
@@ -140,6 +141,7 @@ void Cfd::setPlaneBoundary()
     t2.join();
     t3.join();
     t4.join();
+    t5.join();
     // t5.join();
     // settingPlaneBOundarys = false;
     // td.join();
