@@ -128,23 +128,18 @@ void Cfd::setPlaneBoundary()
     int part3 = (int) 3.0f * nz/5.0f;
     int part4 = (int) 4.0f * nz/5.0f;
     std::cout << part1 << " " << part2 << " " << nz << std::endl;
-    // std::thread td(blinkingLoadingScreen, 100, GetScreenWidth(), GetScreenHeight(), &settingPlaneBOundarys);
+
     std::thread t1(&Cfd::setPlaneBoundaryHelper, this, 1, part1);
     std::thread t2(&Cfd::setPlaneBoundaryHelper, this, part1, part2);
     std::thread t3(&Cfd::setPlaneBoundaryHelper, this, part2, part3);
     std::thread t4(&Cfd::setPlaneBoundaryHelper, this, part3, part4);
     std::thread t5(&Cfd::setPlaneBoundaryHelper, this, part4, nz-1);
-    // std::thread t5(&Cfd::setPlaneBoundaryHelper, this, part4, nz-1);
 
-    // blinkingLoadingScreen(100, GetScreenWidth(), GetScreenHeight(), &settingPlaneBOundarys); // so the raylib windows will not says its chrasing because of inactivity 
     t1.join();
     t2.join();
     t3.join();
     t4.join();
     t5.join();
-    // t5.join();
-    // settingPlaneBOundarys = false;
-    // td.join();
 }
 
 void Cfd::solveDensity(int i, int j, int k) {
@@ -331,7 +326,9 @@ void Cfd::calc(double anglePitch, double angleYaw)
     {
         tijd += dT;
         
-        densityDispersion();
+        densityDispersion(); // remove this
+        // TODO the movement of the velocity and pressure NOTE density is constant
+
 
         // // for (int i=1; i < nz-1; i++) {
         //     for (int j=1; j < nx-1; j++) {
@@ -381,7 +378,8 @@ void Cfd::calc(double anglePitch, double angleYaw)
         std::cout << tijd << " " << maxTime << std::endl;
     }
 
-    // correction
+    // TODO correction fase
+    // correction 
 
     // // for (int i=1; i < nz-1; i++) {
     //     for (int j = 1; j < nx - 1; j++)
@@ -424,10 +422,9 @@ void Cfd::calc(double anglePitch, double angleYaw)
     // // }
 }
 
-void Cfd::moveCamera() {
-    float deltaTime = 0.01;
+void Cfd::moveCamera(float deltaTime) {
     Vector2 currentMousePos = GetMousePosition();
-    
+
     if (IsMouseButtonDown(0))
     {
         angleYAxis += 100 * ((currentMousePos.x - previousMousePosition.x)) * deltaTime;
@@ -490,14 +487,6 @@ void Cfd::moveCamera() {
 }
 
 void Cfd::Draw() {
-    // CloseWindow();
-    // InitWindow(0, 0, "airplane simulation");
-    // ToggleFullscreen();
-    // const int screenWidth = GetScreenWidth();
-    // const int screenHeight = GetScreenHeight();
-
-    // SetTargetFPS(60);
-    // menu = Menu(screenWidth, screenHeight); 
     Vector3 position;
     position.x = 0;
     position.y = 0;
@@ -508,20 +497,14 @@ void Cfd::Draw() {
     ray.direction = test;
 
     int collisions = plane.detectCollision(ray);
-    // std::cout << collisions << std::endl;
-    // float deltaTime = GetFrameTime();
 
-    moveCamera();
+    moveCamera(GetFrameTime());
     BeginDrawing();
         ClearBackground(WHITE);
         BeginMode3D(camera);
             for (int i=1; i < nz-1; i++) {
                 for (int j=1; j < nx-1; j++) {
                     for (int k=1; k < ny-1; k++) {
-                        // double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
-                        // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
-                        // double val3 = mesh.at(1).at(j).at(k).pressure;
-                        // Color col = {val3, val, val2, 255};
                         Vector3 point;
                         point.x = startingPoint.x + j * dx - 0.5 * dx;
                         point.y = startingPoint.y + k * dy - 0.5 * dy;
@@ -530,23 +513,19 @@ void Cfd::Draw() {
                             // DrawCubeWires(point, dx, dy, dz, BLACK);
                             DrawCube(point, dx, dy, dz, BLACK);
                         } else {
-                            // DrawLine3D(point, {point.x, point.y, point.z+dz}, BLUE);
+                            // TODO make vector that points in direction of velocity with a color depending on size of velocity
+                            // double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
+                            // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
+                            // double val3 = mesh.at(1).at(j).at(k).pressure;
+                            // Color col = {val3, val, val2, 255};
+
+                            DrawLine3D(point, {point.x, point.y, point.z+dz}, BLUE);
                             // DrawCubeWires(point, dx, dy, dz, RED);
                         }
                     }
                 }
             }
         EndMode3D();
-        // for (int j=0; j< 100; j++) {
-        //     for (int k=0; k < 100; k++) {
-        //         std::cout << mesh.at(1).at(j).at(k).pressure << " ";
-        //     }
-        //     std::cout << " end " << std::endl;
-        // }
-        // std::cout << std::endl;
-        // std::cout << std::endl;
-        // std::cout << std::endl;
-        // std::cout << std::endl;
     EndDrawing();
 }
 

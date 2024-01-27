@@ -77,11 +77,11 @@ private:
     void calc(double anglePitch, double angleYaw);    
 
     // graphics functions (these are optionally when running the cfd) 
-    void moveCamera();
+    void moveCamera(float deltaTime);
     void Draw();
 public:
     void run(int steps);
 
-    Cfd(int setnx = 120, int setny = 80, int setnz = 80, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
+    Cfd(int setnx = 10, int setny = 10, int setnz = 12, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
     ~Cfd();
 };
