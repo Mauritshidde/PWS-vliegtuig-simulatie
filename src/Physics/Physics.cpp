@@ -93,7 +93,7 @@ float Physics::calcHypot(Vector3 components)
 
 Vector3 Physics::calcAcceleration(std::vector<physicsVector> forces, float mass) // newton: F = m・a ------ a = F/m
 {
-    Vector3 acceleration;
+    Vector3 acceleration = {0,0,0};
     for (int i = 0; i < forces.size(); i++)
     {
         acceleration.x += forces.at(i).components.x / mass;
