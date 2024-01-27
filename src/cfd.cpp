@@ -13,7 +13,6 @@ void Cfd::createMesh()
 {
     for (int i = 0; i < nz; i++)
     {   
-        // std::cout << "done " << i << std::endl;
         std::vector<std::vector<MeshCube>> helper;
         std::vector<std::vector<double>> helper2;
         std::vector<std::vector<Vector3>> helper3;
@@ -87,19 +86,32 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
                 position.x = dx * j + startingPoint.x;
                 position.y = dy * k + startingPoint.y;
                 position.z = dz * i + startingPoint.z;
-                Vector3 test = {0, 1, 0};
+                Vector3 rayDirection = {0, 1, 0};
                 Ray ray;
                 ray.position = position;
-                ray.direction = test;
+                ray.direction = rayDirection;
                 int collisions = plane.detectCollision(ray);
-
-                // if (collisions > 0) {
-                //     std::cout << collisions << std::endl;
-                // }
 
                 if (collisions % 2 != 0 && collisions > 0) {
                     mesh.at(i).at(j).at(k).boundary = true;
                 }
+                
+                // Vector3 rayDirection2 = {0, -1, 0};
+                // Ray ray2;
+                // ray.position = position;
+                // ray2.position = position;
+                // ray.direction = test;
+                // ray2.direction = test2;
+                // // int collisions = plane.detectCollision(ray);
+                // RayCollision meshHitInfo = GetRayCollisionMesh(ray, *airplane.meshes, airplane.transform);
+                // RayCollision meshHitInfo2 = GetRayCollisionMesh(ray2, *airplane.meshes, airplane.transform);
+                // // if (collisions > 0) {
+                // //     std::cout << collisions << std::endl;
+                // // }
+
+                // if (meshHitInfo.hit && meshHitInfo2.hit) {
+                //     mesh.at(i).at(j).at(k).boundary = true;
+                // }
             }
         }
         std::cout << "ja" << std::endl;
@@ -312,9 +324,6 @@ void Cfd::resetMesh() {
 
 void Cfd::calc(double anglePitch, double angleYaw)
 {
-    resetMesh();
-    setPlaneBoundary();
-
     double tijd = 0;
     while (tijd < maxTime)
     {
@@ -364,8 +373,9 @@ void Cfd::calc(double anglePitch, double angleYaw)
         //           }
         //     }
         removeDivergence();
-
-        // Draw();
+        if (drawing) {
+            Draw();
+        }
         std::cout << tijd << " " << maxTime << std::endl;
     }
 
@@ -410,7 +420,6 @@ void Cfd::calc(double anglePitch, double angleYaw)
     //         }
     //     }
     // // }
-    done = true;
 }
 
 void Cfd::moveCamera() {
@@ -487,7 +496,6 @@ void Cfd::Draw() {
 
     // SetTargetFPS(60);
     // menu = Menu(screenWidth, screenHeight); 
-    std::cout << "start Drawing" << std::endl;
     Vector3 position;
     position.x = 0;
     position.y = 0;
@@ -501,75 +509,59 @@ void Cfd::Draw() {
     // std::cout << collisions << std::endl;
     // float deltaTime = GetFrameTime();
 
-    while (!done) {
-    std::cout << "start Drawing" << std::endl;
-
-        moveCamera();
-        BeginDrawing();
-            ClearBackground(WHITE);
-            BeginMode3D(camera);
-                // plane.drawModel();
-                DrawCubeWires({0,0,0}, 20, 40, 40, RED);
-                for (int i=1; i < nz-1; i++) {
-
-                    for (int j=1; j < nx-1; j++) {
-                        for (int k=1; k < ny-1; k++) {
-    // std::cout << "start Drawing2" << std::endl;
-                            // double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
-                            // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
-                            // double val3 = mesh.at(1).at(j).at(k).pressure;
-                            // Color col = {val3, val, val2, 255};
-                            Vector3 point;
-                            point.x = startingPoint.x + j * dx - 0.5 * dx;
-                            point.y = startingPoint.y + k * dy - 0.5 * dy;
-                            point.z = startingPoint.z + i * dz - 0.5 * dz;
-                            if (mesh.at(i).at(j).at(k).boundary) {
-                                // DrawCubeWires(point, dx, dy, dz, BLACK);
-                                DrawCube(point, dx, dy, dz, BLACK);
-                            } else {
-                                // DrawCubeWires(point, dx, dy, dz, RED);
-                            }
+    moveCamera();
+    BeginDrawing();
+        ClearBackground(WHITE);
+        BeginMode3D(camera);
+            for (int i=1; i < nz-1; i++) {
+                for (int j=1; j < nx-1; j++) {
+                    for (int k=1; k < ny-1; k++) {
+                        // double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
+                        // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
+                        // double val3 = mesh.at(1).at(j).at(k).pressure;
+                        // Color col = {val3, val, val2, 255};
+                        Vector3 point;
+                        point.x = startingPoint.x + j * dx - 0.5 * dx;
+                        point.y = startingPoint.y + k * dy - 0.5 * dy;
+                        point.z = startingPoint.z + i * dz - 0.5 * dz;
+                        if (mesh.at(i).at(j).at(k).boundary) {
+                            // DrawCubeWires(point, dx, dy, dz, BLACK);
+                            DrawCube(point, dx, dy, dz, BLACK);
+                        } else {
+                            // DrawLine3D(point, {point.x, point.y, point.z+dz}, BLUE);
+                            // DrawCubeWires(point, dx, dy, dz, RED);
                         }
                     }
                 }
-            EndMode3D();
-            // for (int j=0; j< 100; j++) {
-            //     for (int k=0; k < 100; k++) {
-            //         std::cout << mesh.at(1).at(j).at(k).pressure << " ";
-            //     }
-            //     std::cout << " end " << std::endl;
-            // }
-            // std::cout << std::endl;
-            // std::cout << std::endl;
-            // std::cout << std::endl;
-            // std::cout << std::endl;
-        EndDrawing();
-    }
+            }
+        EndMode3D();
+        // for (int j=0; j< 100; j++) {
+        //     for (int k=0; k < 100; k++) {
+        //         std::cout << mesh.at(1).at(j).at(k).pressure << " ";
+        //     }
+        //     std::cout << " end " << std::endl;
+        // }
+        // std::cout << std::endl;
+        // std::cout << std::endl;
+        // std::cout << std::endl;
+        // std::cout << std::endl;
+    EndDrawing();
 }
 
 void Cfd::run(int steps) {
-    // while (true) {
-    //     Draw();
-    // }
-    setPlaneBoundary();
-            Draw();
     for (int i=0; i < 360; i++) { // pitch
         for (int j=0; j < 360; j++) { // yaw
-            done = false;
-            // std::thread t1(&Cfd::calc, this, i, j);
-            // std::thread t2(&Cfd::Draw, this);
-            // t1.join();
-            // t2.join();
-            // calc(i, j);
+            resetMesh();
+            setPlaneBoundary();
+            calc(i, j);
         }
     }
 }
 
-Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho)
+Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho, bool drawingEnabled)
 {   
     // set multithreading variables
     cores = 6;
-    done = false;
     settingPlaneBOundarys = false;
 
     // set camera variables
@@ -590,7 +582,7 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
     airplane = LoadModel("models/object/airplane.obj");
     airplaneTexture = LoadTexture("models/texture/planeTextureBeter.png");
     airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
-    airplane.transform = MatrixTranslate2(0, -10.0f, 0);
+    airplane.transform = MatrixTranslate2(0, 0.0f, 0);
 
     // set simulation variables
     plane.loadObjectModel();
@@ -607,7 +599,12 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
     startingPoint.y = -(ny*dy)/2 + 10;
     startingPoint.z = -(nz*dz)/2;
 
-    // need to be replaced
+    drawing = drawingEnabled;
+    if (!drawingEnabled) {
+        CloseWindow();
+    }
+
+    // functions for generating the mesh
     createMesh();
     setBoundaryConditions(100,  0,  0,  0,  0,  0);
 }
