@@ -6,6 +6,7 @@
 #include "Physics/MeshCube.h"
 #include "Physics/ModelLoader.h"
 #include "extra/raymath2.h"
+#include "ui/loadingScreen.h"
 // #include "matrix.h"
 
 class Cfd
@@ -27,6 +28,8 @@ private:
 
     // multi threading
     int cores;
+    bool done;
+    bool settingPlaneBOundarys;
 
     // mesh variables
     int nx;   // amount of cells in x direction // steps in x direction
@@ -56,6 +59,7 @@ private:
     // functions for the creation of the grid
     void Start();
     void createMesh();
+    void resetMesh();
     void setBoundaryConditions(double velocityXDirectionStart, double velocityYDirectionStart, double velocityZDirectionStart, double velocityXDirectionEnd, double velocityYDirectionEnd, double velocityZDirectionEnd);
 
     // functions for setting the plane boundary
@@ -78,6 +82,6 @@ private:
 public:
     void run(int steps);
 
-    Cfd(int setnx = 50, int setny = 40, int setnz = 40, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293);
+    Cfd(int setnx = 90, int setny = 60, int setnz = 80, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293);
     ~Cfd();
 };

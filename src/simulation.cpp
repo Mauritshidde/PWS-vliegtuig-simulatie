@@ -192,6 +192,7 @@ void RunSimulation::run()
     {
         ToggleFullscreen();
     }
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE); 
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
 

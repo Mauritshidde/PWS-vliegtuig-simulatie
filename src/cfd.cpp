@@ -5,6 +5,10 @@
 
 namespace mat = matplotlibcpp;
 
+void Cfd::Start() {
+    
+}
+
 void Cfd::createMesh()
 {
     for (int i = 0; i < nz; i++)
@@ -100,26 +104,33 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
         }
         std::cout << "ja" << std::endl;
     }
+    settingPlaneBOundarys = false;
+
 }
 
 void Cfd::setPlaneBoundary()
 {
-    int part1 = (int) nz/5.0f;
-    int part2 = (int) 2.0f * nz/5.0f;
-    int part3 = (int) 3.0f * nz/3.0f;
-    int part4 = (int) 4.0f * nz/5.0f;
+    settingPlaneBOundarys = true;
+    int part1 = (int) nz/4.0f;
+    int part2 = (int) 2.0f * nz/4.0f;
+    int part3 = (int) 3.0f * nz/4.0f;
+    // int part4 = (int) 4.0f * nz/5.0f;
     std::cout << part1 << " " << part2 << " " << nz << std::endl;
+    // std::thread td(blinkingLoadingScreen, 100, GetScreenWidth(), GetScreenHeight(), &settingPlaneBOundarys);
     std::thread t1(&Cfd::setPlaneBoundaryHelper, this, 1, part1);
     std::thread t2(&Cfd::setPlaneBoundaryHelper, this, part1, part2);
     std::thread t3(&Cfd::setPlaneBoundaryHelper, this, part2, part3);
-    std::thread t4(&Cfd::setPlaneBoundaryHelper, this, part3, part4);
-    std::thread t5(&Cfd::setPlaneBoundaryHelper, this, part4, nz-1);
+    std::thread t4(&Cfd::setPlaneBoundaryHelper, this, part3, nz-1);
+    // std::thread t5(&Cfd::setPlaneBoundaryHelper, this, part4, nz-1);
 
+    // blinkingLoadingScreen(100, GetScreenWidth(), GetScreenHeight(), &settingPlaneBOundarys); // so the raylib windows will not says its chrasing because of inactivity 
     t1.join();
     t2.join();
     t3.join();
     t4.join();
-    t5.join();
+    // t5.join();
+    // settingPlaneBOundarys = false;
+    // td.join();
 }
 
 void Cfd::solveDensity(int i, int j, int k) {
@@ -286,8 +297,24 @@ void Cfd::removeDivergence() {
     // }
 }
 
+void Cfd::resetMesh() {
+    for (int i = 1; i < nz-1; i++)
+    {   
+        for (int j = 1; j < nx-1; j++)
+        {
+            for (int k = 1; k < ny-1; k++)
+            {
+                mesh.at(i).at(j).at(k) = MeshCube();
+            }
+        }
+    }
+}
+
 void Cfd::calc(double anglePitch, double angleYaw)
 {
+    resetMesh();
+    setPlaneBoundary();
+
     double tijd = 0;
     while (tijd < maxTime)
     {
@@ -338,7 +365,7 @@ void Cfd::calc(double anglePitch, double angleYaw)
         //     }
         removeDivergence();
 
-        Draw();
+        // Draw();
         std::cout << tijd << " " << maxTime << std::endl;
     }
 
@@ -383,6 +410,7 @@ void Cfd::calc(double anglePitch, double angleYaw)
     //         }
     //     }
     // // }
+    done = true;
 }
 
 void Cfd::moveCamera() {
@@ -451,6 +479,15 @@ void Cfd::moveCamera() {
 }
 
 void Cfd::Draw() {
+    // CloseWindow();
+    // InitWindow(0, 0, "airplane simulation");
+    // ToggleFullscreen();
+    // const int screenWidth = GetScreenWidth();
+    // const int screenHeight = GetScreenHeight();
+
+    // SetTargetFPS(60);
+    // menu = Menu(screenWidth, screenHeight); 
+    std::cout << "start Drawing" << std::endl;
     Vector3 position;
     position.x = 0;
     position.y = 0;
@@ -463,72 +500,77 @@ void Cfd::Draw() {
     int collisions = plane.detectCollision(ray);
     // std::cout << collisions << std::endl;
     // float deltaTime = GetFrameTime();
-    moveCamera();
-    BeginDrawing();
-        ClearBackground(WHITE);
-        BeginMode3D(camera);
-        plane.drawModel();
-        // DrawRay(ray, PINK);
-    // DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); // 2de vector geeft aan met welke factor hij met currentangle draait
 
-            DrawCubeWires({0,0,0}, 20, 40, 40, RED);
+    while (!done) {
+    std::cout << "start Drawing" << std::endl;
 
-            // std::cout << "start" << std::endl;
-            for (int i=1; i < nz; i++) {
-            // std::cout << "start" << std::endl;
-                
-                for (int j=1; j < nx; j++) {
-            // std::cout << j << std::endl;
+        moveCamera();
+        BeginDrawing();
+            ClearBackground(WHITE);
+            BeginMode3D(camera);
+                // plane.drawModel();
+                DrawCubeWires({0,0,0}, 20, 40, 40, RED);
+                for (int i=1; i < nz-1; i++) {
 
-                    for (int k=1; k < ny; k++) {
-                        // double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
-                        // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
-                        // double val3 = mesh.at(1).at(j).at(k).pressure;
-                        // Color col = {val3, val, val2, 255};
-                        Vector3 point;
-                        point.x = startingPoint.x + j * dx - 0.5 * dx;
-                        point.y = startingPoint.y + k * dy - 0.5 * dy;
-                        point.z = startingPoint.z + i * dz - 0.5 * dz;
-                        if (mesh.at(i).at(j).at(k).boundary) {
-                            // DrawCubeWires(point, dx, dy, dz, BLACK);
-                            DrawCube(point, dx, dy, dz, BLACK)
-                        } else {
-                            // DrawCubeWires(point, dx, dy, dz, RED);
+                    for (int j=1; j < nx-1; j++) {
+                        for (int k=1; k < ny-1; k++) {
+    // std::cout << "start Drawing2" << std::endl;
+                            // double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
+                            // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
+                            // double val3 = mesh.at(1).at(j).at(k).pressure;
+                            // Color col = {val3, val, val2, 255};
+                            Vector3 point;
+                            point.x = startingPoint.x + j * dx - 0.5 * dx;
+                            point.y = startingPoint.y + k * dy - 0.5 * dy;
+                            point.z = startingPoint.z + i * dz - 0.5 * dz;
+                            if (mesh.at(i).at(j).at(k).boundary) {
+                                // DrawCubeWires(point, dx, dy, dz, BLACK);
+                                DrawCube(point, dx, dy, dz, BLACK);
+                            } else {
+                                // DrawCubeWires(point, dx, dy, dz, RED);
+                            }
                         }
                     }
                 }
-            }
-        EndMode3D();
-        // for (int j=0; j< 100; j++) {
-        //     for (int k=0; k < 100; k++) {
-        //         std::cout << mesh.at(1).at(j).at(k).pressure << " ";
-        //     }
-        //     std::cout << " end " << std::endl;
-        // }
-        // std::cout << std::endl;
-        // std::cout << std::endl;
-        // std::cout << std::endl;
-        // std::cout << std::endl;
-
-
-    EndDrawing();
+            EndMode3D();
+            // for (int j=0; j< 100; j++) {
+            //     for (int k=0; k < 100; k++) {
+            //         std::cout << mesh.at(1).at(j).at(k).pressure << " ";
+            //     }
+            //     std::cout << " end " << std::endl;
+            // }
+            // std::cout << std::endl;
+            // std::cout << std::endl;
+            // std::cout << std::endl;
+            // std::cout << std::endl;
+        EndDrawing();
+    }
 }
 
 void Cfd::run(int steps) {
-    while (true) {
-        Draw();
-    }
-    // for (int i=0; i < 360; i++) { // pitch
-    //     for (int j=0; j < 360; j++) { // yaw
-    //         calc(i, j);
-    //     }
+    // while (true) {
+    //     Draw();
     // }
+    setPlaneBoundary();
+            Draw();
+    for (int i=0; i < 360; i++) { // pitch
+        for (int j=0; j < 360; j++) { // yaw
+            done = false;
+            // std::thread t1(&Cfd::calc, this, i, j);
+            // std::thread t2(&Cfd::Draw, this);
+            // t1.join();
+            // t2.join();
+            // calc(i, j);
+        }
+    }
 }
 
 Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho)
-{
+{   
     // set multithreading variables
     cores = 6;
+    done = false;
+    settingPlaneBOundarys = false;
 
     // set camera variables
     cameraCircleRadius = 150;
@@ -568,7 +610,6 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
     // need to be replaced
     createMesh();
     setBoundaryConditions(100,  0,  0,  0,  0,  0);
-    setPlaneBoundary();
 }
  
 Cfd::~Cfd()

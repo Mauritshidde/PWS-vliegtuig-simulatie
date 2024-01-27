@@ -19,7 +19,6 @@ int main()
     // createLiftFiles(200, 0.01);
     SetTargetFPS(60);
     menu = Menu(screenWidth, screenHeight);
-
     while (!WindowShouldClose() && running)
     {
         float deltaTime = GetFrameTime();
