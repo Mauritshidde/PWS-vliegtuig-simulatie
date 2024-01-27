@@ -19,7 +19,6 @@ int main()
 
     SetTargetFPS(60);
     menu = Menu(screenWidth, screenHeight);
-
     while (!WindowShouldClose() && running)
     {
         float deltaTime = GetFrameTime();
