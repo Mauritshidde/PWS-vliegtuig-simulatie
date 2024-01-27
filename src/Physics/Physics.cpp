@@ -64,7 +64,7 @@ Vector3 Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfM
         std::cout << "ditstance xyz" << distance.x << " " << distance.y << " " << distance.z << " \n";
 
         torquePitch = distance.z * currentForce.y + distance.y * currentForce.z;
-          torqueYaw = distance.z * currentForce.x + distance.z * currentForce.x;
+          torqueYaw = distance.z * currentForce.x + distance.x * currentForce.z;
          torqueRoll = distance.y * currentForce.x + distance.x * currentForce.y;
 
         torqueTotal.x += torquePitch;
