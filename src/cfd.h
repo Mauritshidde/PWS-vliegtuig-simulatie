@@ -25,10 +25,10 @@ private:
     // drawing variables
     Model airplane;
     Texture airplaneTexture;
+    bool drawing;
 
     // multi threading
     int cores;
-    bool done;
     bool settingPlaneBOundarys;
 
     // mesh variables
@@ -82,6 +82,6 @@ private:
 public:
     void run(int steps);
 
-    Cfd(int setnx = 90, int setny = 60, int setnz = 80, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293);
+    Cfd(int setnx = 120, int setny = 80, int setnz = 80, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
     ~Cfd();
 };
