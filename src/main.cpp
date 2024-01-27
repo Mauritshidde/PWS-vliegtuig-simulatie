@@ -16,7 +16,7 @@ int main()
     ToggleFullscreen();
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
-
+    // createLiftFiles(200, 0.01);
     SetTargetFPS(60);
     menu = Menu(screenWidth, screenHeight);
     while (!WindowShouldClose() && running)
@@ -40,7 +40,7 @@ int main()
                 cfd.run(100);
                 // cfd.Draw();
                 running = false;
-                // start cdf program for calculating cl and cd;
+                // start cfd program for calculating cl and cd;
             }
             else if (menu.buttonPressed == 2)
             {

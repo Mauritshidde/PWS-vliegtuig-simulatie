@@ -1,10 +1,10 @@
 #include "createFile.h"
 
-void fileWithoutYaw(float stepSize) {
+void fileWithoutYaw(double stepSize) {
     nlohmann::json data;
 
     int index = 0;
-    for (float i=0; i <= 360; i+= stepSize) {
+    for (double i=0; i <= 360; i+= stepSize) {
         data["pitch"][std::to_string(index)]["cl"] = 0.445; // calc lift and cl here
         data["pitch"][std::to_string(index)]["cd"] = 0.017;
         index++;
@@ -18,11 +18,11 @@ void fileWithoutYaw(float stepSize) {
     liftfile.close();
 }
 
-void fileWithoutPitch(float stepSize) {
+void fileWithoutPitch(double stepSize) {
     nlohmann::json data;
 
     int index = 0;
-    for (float i=0; i <= 360; i+= stepSize) {
+    for (double i=0; i <= 360; i+= stepSize) {
         data["yaw"][std::to_string(index)]["cl"] = 0.445;
         data["yaw"][std::to_string(index)]["cd"] = 0.017;
         index++;
@@ -38,7 +38,7 @@ void fileWithoutPitch(float stepSize) {
 
 void fileWithBoth(int steps) {
     nlohmann::json data;
-    float stepSize = 360.0f/(steps-1);
+    double stepSize = 360.0f/(steps-1);
     
     for (int i=0; i < steps; i++) {
         for (int j=0; j < steps; j++) {
@@ -57,7 +57,7 @@ void fileWithBoth(int steps) {
 }
 
 
-void createLiftFiles(int steps, float stepSize) { // steps has to be greater than 2 but realisticly has to be higher than 200
+void createLiftFiles(int steps, double stepSize) { // steps has to be greater than 2 but realisticly has to be higher than 200
     fileWithoutYaw(stepSize); // for the best results x times stepsize should be 360
     fileWithoutPitch(stepSize);
     fileWithBoth(steps);
