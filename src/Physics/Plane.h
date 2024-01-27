@@ -38,6 +38,7 @@ public:
 
       float currentEngineTrust = 0.0f; // in newton
       float maxEngineTrust = 116000;   // in newton
+      float engineOffset; //distance of the engine to the center of mass
       float cl;
       float cd;
       float lift;
