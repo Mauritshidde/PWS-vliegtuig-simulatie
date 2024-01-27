@@ -47,13 +47,13 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
 
     plane = Plane(fileName, 100);
+
+    plane.Start();
     
-    plotXRange = linspace(0, 36, 37);
-    Vector2 aeroConsts;
+    plotXRange = linspace(0, 360, 361);
     for (float x = 0; x < plotXRange.size(); x++)
     {
-        aeroConsts = plane.getConsts(x*10, 0, false, true);
-        plotYValues.push_back(aeroConsts.x);
+        plotYValues.push_back(plane.cl);
     }
 }
 
@@ -141,9 +141,9 @@ void RunSimulation::Update(float deltaTime)
 {
     speedOfSound = sqrt(adiabaticIndex * gasConstant * temperature);
 
-    if (plane.speed / speedOfSound <= 0.8)
+    if (plane.velocity / speedOfSound <= 0.8)
     {
-        plane.speed = 0.8 * speedOfSound; //cap the speed of the plane at mach 0.8
+        plane.velocity = 0.8 * speedOfSound; //cap the speed of the plane at mach 0.8
     }
     // first value updates over time
     // after that value updates by gui or key inputs
