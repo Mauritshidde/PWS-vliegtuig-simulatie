@@ -14,9 +14,11 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       nlohmann::json planeData = nlohmann::json::parse(f);
       f.close();
 
+      airplaneTexture = LoadTexture("models/texture/planeTextureBeter.png");
+      airplane = LoadModel("models/object/airplane.obj");
+      airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
+
       planePhysics = Physics();
-      velocity, acceleration, angularVelocity, angularAcceleration = {0, 0, 0};
-      angularVelocity.z = 0; // i have no clue why this works but it does
       anglePitch = 0;
       angleYaw = 0;
       angleRoll = 0;
@@ -34,7 +36,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
 
       wingArea = planeData["Planes"][planeName]["wing area"].get<float>(); // surface area of the wing in m2
       mass = planeData["Planes"][planeName]["maximal mass"].get<float>();
-      centerOfMass = {0, 0, 10};
+      centerOfMass = {0, 0, 0};
 
       liftFileName = planeName;
 
@@ -44,7 +46,23 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       cl = consts.x;
       cd = consts.y;
       calcLift(rho); // set lift and drag
+      velocity = {0, 0, 0};
+      acceleration = {0, 0, 0};
+      angularVelocity = {0, 0, 0};
+      angularAcceleration = {0, 0, 0};
+      // std::cout << " xVel " << velocity.x << " yVel " << velocity.y << " zVel " << velocity.z << "\n";
+      // std::cout << " xAccel " << acceleration.x << " yAccel " << acceleration.y << " zAccel " << acceleration.z << "\n";
+      // std::cout << " xangvel " << angularAcceleration.x << " yangvel " << angularAcceleration.y << " zangvel " << angularAcceleration.z << "\n";
+      // std::cout << " xangAccel " << angularAcceleration.x << " yangAccel " << angularAcceleration.y << " zangAccel " << angularAcceleration.z << "\n";
+
+      engineOffset = 14;
+
       physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), centerOfMass);
+      // physicsVector forceLeftMotor  = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z});
+      // physicsVector forceRightMotor = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x + engineOffset, centerOfMass.y, centerOfMass.z});
+      
+      // forces.push_back(forceLeftMotor);
+      // forces.push_back(forceRightMotor);
       forces.push_back(fG);
 }
 
@@ -77,9 +95,7 @@ Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, floa
 
 void Plane::Start()
 {
-      airplaneTexture = LoadTexture("models/texture/planeTextureBeter.png");
-      airplane = LoadModel("models/object/airplane.obj");
-      airplane.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = airplaneTexture;
+
 }
 
 void Plane::Draw()
@@ -133,18 +149,20 @@ void Plane::Update(float deltaTime, float rho)
       updateAngularVel(deltaTime);
       updateRotation(deltaTime);
       //test prints
-      // for (int i = 0; i < forces.size(); i++)
-      // {
-      //       std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
-      //       std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
-      // }
+      for (int i = 0; i < forces.size(); i++)
+      {
+            std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
+            std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
+      }
       // std::cout << "speed: " << velocity << " lift: " << lift << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
 }
 
 void Plane::evaluateForces(std::vector<physicsVector> forces)
 {
       angularAcceleration = planePhysics.calcAngularAcceleration(forces, mass, centerOfMass, momentOfInertia);
+      acceleration = {0, 0, 0};
       acceleration = planePhysics.calcAcceleration(forces, mass);
+      std::cout << " xAccel " << acceleration.x << " yAccel " << acceleration.y << " zAccel " << acceleration.z << "\n";
 }
 
 void Plane::updateVel(float deltaTime)
@@ -153,7 +171,7 @@ void Plane::updateVel(float deltaTime)
       velocity.x += deltaVelocity.x;
       velocity.y += deltaVelocity.y;
       velocity.z += deltaVelocity.z;
-      // std::cout << "yvel: " << velocity.y << "\n";
+      std::cout << " xVel " << velocity.x << " yVel " << velocity.y << " zVel " << velocity.z << "\n";
 }
 
 void Plane::updateAngularVel(float deltaTime)
@@ -162,9 +180,9 @@ void Plane::updateAngularVel(float deltaTime)
       angularVelocity.x += deltaAngularV.x;
       angularVelocity.y += deltaAngularV.y;
       angularVelocity.z += deltaAngularV.z;
-      std::cout << " xDanV " << deltaAngularV.x << " yDanV " << deltaAngularV.y << " zDanV " << deltaAngularV.z << "\n";
-      std::cout << " xAn " << angularAcceleration.x << " yAn " << angularAcceleration.y << " zAn " << angularAcceleration.z << "\n";
-      std::cout << " xanvel " << angularVelocity.x << " yanvel " << angularVelocity.y << " zanvel " << angularVelocity.z << "\n";
+      // std::cout << " xDanV " << deltaAngularV.x << " yDanV " << deltaAngularV.y << " zDanV " << deltaAngularV.z << "\n";
+      // std::cout << " xAn " << angularAcceleration.x << " yAn " << angularAcceleration.y << " zAn " << angularAcceleration.z << "\n";
+      // std::cout << " xanvel " << angularVelocity.x << " yanvel " << angularVelocity.y << " zanvel " << angularVelocity.z << "\n";
 }
 
 void Plane::updateRotation(float deltaTime)

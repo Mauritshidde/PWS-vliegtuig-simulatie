@@ -47,8 +47,6 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
 
     plane = Plane(fileName, 100);
-
-    plane.Start();
     
     plotXRange = linspace(0, 36, 37);
     Vector2 aeroConsts;
