@@ -48,7 +48,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
 
     plane = Plane(fileName, 100);
     
-    plotXRange = linspace(0, 10, 101);
+    plotXRange = linspace(0, 100, 101);
     timeElapsed = 0;
     // Vector2 aeroConsts;
     // for (float x = 0; x < plotXRange.size(); x++)
