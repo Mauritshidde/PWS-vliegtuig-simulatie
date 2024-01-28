@@ -32,6 +32,8 @@ public:
       void updateRotation(float deltaTime);
 
       void reduceAngleDegrees();
+      Vector3 translateForcePosition(Vector3 location);
+      Vector3 translateForceComponent(physicsVector force);
 
       Physics planePhysics;
 
@@ -47,6 +49,8 @@ public:
       Vector3 pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
       Vector3 velocity, angularVelocity, acceleration, angularAcceleration;
       std::vector<physicsVector> forces;
+      std::vector<physicsVector*> internalForces, relativeForces;
+      
       Vector3 momentOfInertia;
 
       float speed;         // in m/s

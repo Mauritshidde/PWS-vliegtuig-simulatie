@@ -19,8 +19,8 @@ public:
     // physicsVector createPhysicsVector(std::vector<Vector3> force, std::vector<Vector3> location);
     Vector3 crossProduct(Vector3 vec1, Vector3 vec2);
     float distanceBetweenPoints(Vector3 point1, Vector3 point2);
-    Vector3 calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass);
-    Vector3 calcAngularAcceleration(std::vector<physicsVector> forces, float mass, Vector3 centerOfMass, Vector3 momentOfInertia);
+    Vector3 calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass, Vector3 rotation);
+    Vector3 calcAngularAcceleration(std::vector<physicsVector> forces, float mass, Vector3 centerOfMass, Vector3 momentOfInertia, Vector3 rotation);
     float calcHypot(Vector3 components);
     Vector3 calcAcceleration(std::vector<physicsVector> forces, float mass);
     Vector3 calcDeltaV(float deltaTime, Vector3 acceleration);

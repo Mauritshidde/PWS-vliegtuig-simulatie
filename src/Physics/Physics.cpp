@@ -1,4 +1,6 @@
 #include "Physics.h"
+#define RAYMATH_IMPLEMENTATION
+#include "../../include/modules/raymath.h"
 
 physicsVector Physics::addForces(std::vector<physicsVector> inputVector)
 {
@@ -51,16 +53,17 @@ float Physics::distanceBetweenPoints(Vector3 point1, Vector3 point2)
     return length;
 }
 
-Vector3 Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass)
+Vector3 Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfMass, Vector3 rotation)
 {
     Vector3 torqueTotal = {0, 0, 0}; // resulting torque for pitch yaw and roll
     float torquePitch, torqueYaw, torqueRoll;
     Vector3 distance;
-    Vector3 currentForce;
+    Vector3 currentForce, currentPosition;
     for (int i = 0; i < forces.size(); i++)
     {
         currentForce = forces.at(i).components;
-        distance = vectorSubtraction(centerOfMass, forces.at(i).location);
+        currentPosition = Vector3Transform(forces.at(i).location, MatrixRotateXYZ((Vector3){DEG2RAD * rotation.x, DEG2RAD * rotation.y, DEG2RAD * rotation.z}));
+        distance = vectorSubtraction(centerOfMass, currentPosition);
         std::cout << "ditstance xyz" << distance.x << " " << distance.y << " " << distance.z << " \n";
 
         torquePitch = distance.z * currentForce.y + distance.y * currentForce.z;
@@ -74,10 +77,10 @@ Vector3 Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfM
     return torqueTotal;
 }
 
-Vector3 Physics::calcAngularAcceleration(std::vector<physicsVector> forces, float mass, Vector3 centerOfMass, Vector3 momentOfInertia)
+Vector3 Physics::calcAngularAcceleration(std::vector<physicsVector> forces, float mass, Vector3 centerOfMass, Vector3 momentOfInertia, Vector3 rotation)
 {
     Vector3 angularAcceleration, torque;
-    torque = calcTorque(forces, centerOfMass);
+    torque = calcTorque(forces, centerOfMass, rotation);
     std::cout << "torque xyz" << torque.x << " " << torque.y << " " << torque.z << " \n";
     std::cout << "moment xyz" << momentOfInertia.x << " " << momentOfInertia.y << " " << momentOfInertia.z << " \n";
     angularAcceleration.x = torque.x / momentOfInertia.x;
