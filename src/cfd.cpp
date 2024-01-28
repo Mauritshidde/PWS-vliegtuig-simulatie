@@ -118,24 +118,19 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
 
 void Cfd::setPlaneBoundary() //222
 {
-    settingPlaneBOundarys = true;
-    int part1 = (int) nz/5.0f;
-    int part2 = (int) 2.0f * nz/5.0f;
-    int part3 = (int) 3.0f * nz/5.0f;
-    int part4 = (int) 4.0f * nz/5.0f;
-    std::cout << part1 << " " << part2 << " " << nz << std::endl;
+    std::vector<std::thread> threads;
+    cores = 10;
+    
+    for (int i=0; i < cores; i++) {
+        int part = (i * nz)/cores;
+        int part2 = ((i+1) * nz)/cores;
+        // std::thread t1(&Cfd::setPlaneBoundaryHelper, this, part, part2);
+        threads.emplace_back(&Cfd::setPlaneBoundaryHelper, this, part, part2);
+    }
 
-    std::thread t1(&Cfd::setPlaneBoundaryHelper, this, 1, part1);
-    std::thread t2(&Cfd::setPlaneBoundaryHelper, this, part1, part2);
-    std::thread t3(&Cfd::setPlaneBoundaryHelper, this, part2, part3);
-    std::thread t4(&Cfd::setPlaneBoundaryHelper, this, part3, part4);
-    std::thread t5(&Cfd::setPlaneBoundaryHelper, this, part4, nz-1);
-
-    t1.join();
-    t2.join();
-    t3.join();
-    t4.join();
-    t5.join();
+    for (int i=0; i < cores; i++) {
+        threads.at(i).join();
+    }
 }
 
 void Cfd::solveDensity(int i, int j, int k) {
