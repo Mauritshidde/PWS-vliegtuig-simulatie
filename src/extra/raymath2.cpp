@@ -53,3 +53,20 @@ Matrix MatrixTranslate2(float x, float y, float z)
 
     return result;
 }
+
+Vector3 Vector3Normalize2(Vector3 v)
+{
+    Vector3 result = v;
+
+    float length = sqrtf(v.x*v.x + v.y*v.y + v.z*v.z);
+    if (length != 0.0f)
+    {
+        float ilength = 1.0f/length;
+
+        result.x *= ilength;
+        result.y *= ilength;
+        result.z *= ilength;
+    }
+
+    return result;
+}

@@ -88,30 +88,26 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
                 position.z = dz * i + startingPoint.z;
                 Vector3 rayDirection = {0, 1, 0};
                 Ray ray;
-                ray.position = position;
-                ray.direction = rayDirection;
-                int collisions = plane.detectCollision(ray);
-
-                if (collisions % 2 != 0 && collisions > 0) {
-                    mesh.at(i).at(j).at(k).boundary = true;
-                }
-                
-                // Vector3 rayDirection2 = {0, -1, 0};
-                // Ray ray2;
                 // ray.position = position;
-                // ray2.position = position;
-                // ray.direction = test;
-                // ray2.direction = test2;
-                // // int collisions = plane.detectCollision(ray);
-                // RayCollision meshHitInfo = GetRayCollisionMesh(ray, *airplane.meshes, airplane.transform);
-                // RayCollision meshHitInfo2 = GetRayCollisionMesh(ray2, *airplane.meshes, airplane.transform);
-                // // if (collisions > 0) {
-                // //     std::cout << collisions << std::endl;
-                // // }
+                // ray.direction = rayDirection;
+                // int collisions = plane.detectCollision(ray);
 
-                // if (meshHitInfo.hit && meshHitInfo2.hit) {
+                // if (collisions % 2 != 0 && collisions > 0) {
                 //     mesh.at(i).at(j).at(k).boundary = true;
                 // }
+                
+                Vector3 rayDirection2 = {0, -1, 0};
+                Ray ray2;
+                ray.position = position;
+                ray2.position = position;
+                ray.direction = rayDirection;
+                ray2.direction = rayDirection2;
+                RayCollision meshHitInfo = GetRayCollisionMesh(ray, *airplane.meshes, airplane.transform);
+                RayCollision meshHitInfo2 = GetRayCollisionMesh(ray2, *airplane.meshes, airplane.transform);
+
+                if (meshHitInfo.hit && meshHitInfo2.hit) {
+                    mesh.at(i).at(j).at(k).boundary = true;
+                }
             }
         }
         std::cout << "ja" << std::endl;
@@ -120,7 +116,7 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
 
 }
 
-void Cfd::setPlaneBoundary()
+void Cfd::setPlaneBoundary() //222
 {
     settingPlaneBOundarys = true;
     int part1 = (int) nz/5.0f;
@@ -319,8 +315,9 @@ void Cfd::resetMesh() {
     }
 }
 
-void Cfd::calc(double anglePitch, double angleYaw)
+Vector2 Cfd::calc(double anglePitch, double angleYaw)
 {
+    float cl, cd;
     double tijd = 0;
     while (tijd < maxTime)
     {
@@ -420,6 +417,9 @@ void Cfd::calc(double anglePitch, double angleYaw)
     //         }
     //     }
     // // }
+
+    // TODO use pressure field to calculate lift and drag
+    return {cl, cd};
 }
 
 void Cfd::moveCamera(float deltaTime) {
@@ -513,13 +513,29 @@ void Cfd::Draw() {
                             // DrawCubeWires(point, dx, dy, dz, BLACK);
                             DrawCube(point, dx, dy, dz, BLACK);
                         } else {
-                            // TODO make vector that points in direction of velocity with a color depending on size of velocity
-                            // double val = mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure;
+
+                            float velocityX = mesh.at(i).at(j).at(k).velocityX;
+                            float velocityY = mesh.at(i).at(j).at(k).velocityY;
+                            float velocityZ = mesh.at(i).at(j).at(k).velocityZ;
+                            float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
+                            
+                            // TODO make vector whichs color depends on velocity
+                            double val = (velocity / 200.0f) *30;
+                            double val2 = (velocity / 500.0f);
                             // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
                             // double val3 = mesh.at(1).at(j).at(k).pressure;
-                            // Color col = {val3, val, val2, 255};
-
-                            DrawLine3D(point, {point.x, point.y, point.z+dz}, BLUE);
+                            Color velocityColor = {255, val2, val, 255};
+                            
+                            Vector3 velocityDirection = {velocityX,velocityY,velocityZ};
+                            velocityDirection = Vector3Normalize2(velocityDirection);
+                            velocityDirection.x = velocityDirection.x * 0.5 * dx + point.x;
+                            velocityDirection.y = velocityDirection.y * 0.5 * dy + point.y;
+                            velocityDirection.z = velocityDirection.z * 0.5 * dz + point.z;
+                            // std::cout << point.x << "  x " << velocityDirection.x << std::endl;
+                            // std::cout << point.y << " y " << velocityDirection.y << std::endl;
+                            // std::cout << point.z << " z " << velocityDirection.z << std::endl;
+                            DrawLine3D(point, velocityDirection, velocityColor); //111
+                            // DrawLine3D(point, {point.x, point.y, point.z+dz}, BLUE);
                             // DrawCubeWires(point, dx, dy, dz, RED);
                         }
                     }
@@ -529,12 +545,17 @@ void Cfd::Draw() {
     EndDrawing();
 }
 
-void Cfd::run(int steps) {
-    for (int i=0; i < 360; i++) { // pitch
-        for (int j=0; j < 360; j++) { // yaw
+void Cfd::run(int steps) { //333
+    double stepsize = 360.0f/steps;
+    std::vector<std::vector<Vector2>> cfdResults;
+    for (double i=0; i < 360; i+=stepsize) { // pitch
+        std::vector<Vector2> cfdResultsHelper;
+        for (double j=0; j < 360; j+=stepsize) { // yaw
+            airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * 100, DEG2RAD * 100, DEG2RAD * 0});
             resetMesh();
             setPlaneBoundary();
-            calc(i, j);
+            Vector2 consts = calc(i, j);
+            cfdResultsHelper.push_back({consts.x, consts.y});
         }
     }
 }

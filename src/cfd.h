@@ -74,7 +74,7 @@ private:
     void solveDensityFirst(int i, int j, int k);
     void solvePressure(int i, int j, int k);
     void solvePressureFirst(int i, int j, int k);
-    void calc(double anglePitch, double angleYaw);    
+    Vector2 calc(double anglePitch, double angleYaw);    
 
     // graphics functions (these are optionally when running the cfd) 
     void moveCamera(float deltaTime);
