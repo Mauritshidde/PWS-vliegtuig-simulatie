@@ -58,10 +58,10 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       engineOffset = 14;
 
       physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), centerOfMass);
-      // physicsVector forceLeftMotor  = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z});
+      physicsVector forceLeftMotor  = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z});
       // physicsVector forceRightMotor = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x + engineOffset, centerOfMass.y, centerOfMass.z});
       
-      // forces.push_back(forceLeftMotor);
+      forces.push_back(forceLeftMotor);
       // forces.push_back(forceRightMotor);
       forces.push_back(fG);
 }
@@ -160,7 +160,6 @@ void Plane::Update(float deltaTime, float rho)
 void Plane::evaluateForces(std::vector<physicsVector> forces)
 {
       angularAcceleration = planePhysics.calcAngularAcceleration(forces, mass, centerOfMass, momentOfInertia);
-      acceleration = {0, 0, 0};
       acceleration = planePhysics.calcAcceleration(forces, mass);
       std::cout << " xAccel " << acceleration.x << " yAccel " << acceleration.y << " zAccel " << acceleration.z << "\n";
 }
