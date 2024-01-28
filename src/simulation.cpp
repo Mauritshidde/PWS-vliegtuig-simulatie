@@ -152,7 +152,11 @@ void RunSimulation::Update(float deltaTime)
     // after that value updates by gui or key inputs
     
     plane.Update(deltaTime, rho);
+    //move the environment decorations (birds) with the speed of the plane to create the illusion of plane movement
+    decorations.globalPosition = environmentPhysics.moveWithVelocity(decorations.globalPosition, Vector3Negate(plane.velocity), deltaTime);
+    cameraPos = environmentPhysics.moveWithVelocity(cameraPos, Vector3Negate(plane.velocity), deltaTime); 
 
+    
     moveCamera(deltaTime);
 }
 

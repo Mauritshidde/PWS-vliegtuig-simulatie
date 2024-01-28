@@ -25,6 +25,7 @@ public:
     Vector3 calcAcceleration(std::vector<physicsVector> forces, float mass);
     Vector3 calcDeltaV(float deltaTime, Vector3 acceleration);
     Vector3 calcForceGravity(float mass);
+    Vector3 moveWithVelocity(Vector3 position, Vector3 velocity, float deltaTime);
     Physics(/* args */);
     ~Physics();
 };

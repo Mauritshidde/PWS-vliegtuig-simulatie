@@ -15,6 +15,7 @@ private:
       float anglePitch, angleYaw, angleRoll;
       std::vector<Vector3> allDecorations;
 public:
+      Vector3 globalPosition;
       skyDecoration();
       ~skyDecoration();
       void draw();

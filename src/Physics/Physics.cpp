@@ -122,6 +122,14 @@ Vector3 Physics::calcForceGravity(float mass)
     return ForceG;
 }
 
+Vector3 Physics::moveWithVelocity(Vector3 position, Vector3 velocity, float deltaTime)
+{
+    position.x += velocity.x * deltaTime;
+    position.y += velocity.y * deltaTime;
+    position.z += velocity.z * deltaTime;
+    return position;
+}
+
 Physics::Physics(/* args */)
 {
 }

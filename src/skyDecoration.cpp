@@ -7,6 +7,7 @@ skyDecoration::skyDecoration()
 {
       SetRandomSeed(GetTime());
       birds = LoadModel("models/object/birds.obj");
+      globalPosition = {0, 0, 0};
       anglePitch = 90;
       angleYaw = 0;
       angleRoll = 0;
@@ -27,8 +28,12 @@ skyDecoration::~skyDecoration()
 
 void skyDecoration::draw()
 {
+      Vector3 absolutePosition;
       for (int i = 0; i < allDecorations.size(); i++)
       {
-      DrawModel(birds, allDecorations.at(i), 10.0f, BLACK);
+            absolutePosition.x = allDecorations.at(i).x + globalPosition.x;
+            absolutePosition.y = allDecorations.at(i).y + globalPosition.y;
+            absolutePosition.z = allDecorations.at(i).z + globalPosition.z;
+            DrawModel(birds, absolutePosition, 10.0f, BLACK);
       }      
 }

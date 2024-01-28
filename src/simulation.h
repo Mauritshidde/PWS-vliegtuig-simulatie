@@ -21,6 +21,7 @@ class RunSimulation
 {
 private:
     Plane plane;
+    Physics environmentPhysics;
     // FluidDynamicsModel plane; // use this class instead of the model class for plane, because an error occurs when the model is loaded form the obj file
     // Model airplane;
     Model skybox;
