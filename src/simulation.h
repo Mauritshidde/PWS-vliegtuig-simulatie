@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 #include "matrix.h"
+#include "skyDecoration.h"
 
 #define WITHOUT_NUMPY
 #include "matplotlibcpp.h"
@@ -23,6 +24,7 @@ private:
     // FluidDynamicsModel plane; // use this class instead of the model class for plane, because an error occurs when the model is loaded form the obj file
     // Model airplane;
     Model skybox;
+    skyDecoration decorations;
 
     Vector2 previousMousePosition;
 

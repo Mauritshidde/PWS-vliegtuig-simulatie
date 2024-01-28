@@ -30,7 +30,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     angleXZAxis = 0;
     cameraCircleRadius = 120;
     cameraRotationMultiplier = 10;
-    cameraZoomMultiplier = 30;
+    cameraZoomMultiplier = 400;
     
     cameraPos = {0.0f, 0.0f, cameraCircleRadius};
     cameraXYPos = {cameraPos.x, cameraPos.y};
@@ -45,6 +45,8 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     skybox = LoadModel("models/object/skybox.obj");
     skyboxTexture = LoadTexture("models/texture/skyboxtexture.png");
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
+
+    decorations = skyDecoration();
 
     plane = Plane(fileName, 100);
     
@@ -164,6 +166,7 @@ void RunSimulation::Render()
 
         BeginMode3D(mainCamera);
             DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
+            decorations.draw();
             plane.Draw();
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
             DrawGrid(10, 10.0f);
@@ -196,7 +199,6 @@ void RunSimulation::run()
     const int screenHeight = GetScreenHeight();
 
     Start(screenWidth, screenHeight);
-
     while (!WindowShouldClose())
     {
         float deltaTime = GetFrameTime();
