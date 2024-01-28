@@ -48,13 +48,14 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
 
     plane = Plane(fileName, 100);
     
-    plotXRange = linspace(0, 36, 37);
-    Vector2 aeroConsts;
-    for (float x = 0; x < plotXRange.size(); x++)
-    {
-        aeroConsts = plane.getConsts(x*10, 0, false, true);
-        plotYValues.push_back(aeroConsts.x);
-    }
+    plotXRange = linspace(0, 10, 101);
+    timeElapsed = 0;
+    // Vector2 aeroConsts;
+    // for (float x = 0; x < plotXRange.size(); x++)
+    // {
+    //     aeroConsts = plane.getConsts(x*10, 0, false, true);
+    //     plotYValues.push_back(aeroConsts.x);
+    // }
 }
 
 bool RunSimulation::notOnGUI(Vector2 mousePosition)
@@ -201,6 +202,19 @@ void RunSimulation::run()
         Update(deltaTime);
         Render();
         std::cout << GetFPS() << std::endl;
+        if (plotYValues.size() < plotXRange.size()) 
+        {
+            if (timeElapsed + deltaTime > 0.1)
+            {
+                timeElapsed = 0;
+                std::cout << plotYValues.size() << " size \n";
+                plotYValues.push_back(plane.angleYaw);
+            }
+            else
+            {
+                timeElapsed += deltaTime;
+            }
+        }
     }
     mat::plot(plotXRange, plotYValues, "-o");
     mat::save("test.pdf");

@@ -68,6 +68,7 @@ private:
 
     std::vector<float> plotXRange;
     std::vector<float> plotYValues;
+    float timeElapsed;
 
 public:
     RunSimulation(std::string setFileName);
