@@ -67,6 +67,7 @@ private:
 
     // functions for setting the plane boundary
     void setPlaneBoundaryHelper(int startIndex, int endIndex);
+    bool getCollisionPlaneRay(Vector3 direction, Vector3 oppositeDirection, Ray ray, Ray ray2);
     void detectColission();
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions 
 
@@ -86,6 +87,6 @@ private:
 public:
     void run(int steps);
 
-    Cfd(int setnx = 20, int setny = 100, int setnz = 60, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
+    Cfd(int setnx = 20, int setny = 10, int setnz = 60, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
     ~Cfd();
 };

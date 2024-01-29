@@ -78,6 +78,20 @@ void Cfd::setBoundaryConditions(double velocityXDirectionStart, double velocityY
     }
 }
 
+bool Cfd::getCollisionPlaneRay(Vector3 direction, Vector3 oppositeDirection, Ray ray, Ray ray2) {
+    ray.direction = direction;
+    ray2.direction = oppositeDirection;
+
+    RayCollision meshHitInfo = GetRayCollisionMesh(ray, *airplane.meshes, airplane.transform);
+    RayCollision meshHitInfo2 = GetRayCollisionMesh(ray2, *airplane.meshes, airplane.transform);
+
+    if (meshHitInfo.hit && meshHitInfo2.hit) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
     for (int i=startIndex; i < endIndex; i++) {
         for (int j=1; j < nx-1; j++) {
@@ -86,37 +100,28 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
                 position.x = dx * j + startingPoint.x;
                 position.y = dy * k + startingPoint.y;
                 position.z = dz * i + startingPoint.z;
-                // if (position.x >= boundingBoxPlaneMin.x && position.x <= boundingBoxPlaneMax.x) {
-                //     // std::cout << "test" << std::endl;
-                //     if (position.z >= boundingBoxPlaneMin.z && position.z <= boundingBoxPlaneMax.z) {
-                //     // std::cout << "test2" << std::endl;
-                //         if (position.y >= boundingBoxPlaneMin.y && position.y <= boundingBoxPlaneMax.y) {
-                    // std::cout << "test3" << std::endl;
-                    if (CheckCollisionBoxSphere(boundingBoxPlane, position, dx)) {
-                            Vector3 rayDirection = {0, 1, 0};
-                            Ray ray;
-                            // ray.position = position;
-                            // ray.direction = rayDirection;
-                            // int collisions = plane.detectCollision(ray);
+                if (CheckCollisionBoxSphere(boundingBoxPlane, position, dx)) {
+                        // ray.position = position;
+                        // ray.direction = rayDirection;
+                        // int collisions = plane.detectCollision(ray);
 
-                            // if (collisions % 2 != 0 && collisions > 0) {
-                            //     mesh.at(i).at(j).at(k).boundary = true;
-                            // }
-                            
-                            Vector3 rayDirection2 = {0, -1, 0};
-                            Ray ray2;
-                            ray.position = position;
-                            ray2.position = position;
-                            ray.direction = rayDirection;
-                            ray2.direction = rayDirection2;
-                            RayCollision meshHitInfo = GetRayCollisionMesh(ray, *airplane.meshes, airplane.transform);
-                            RayCollision meshHitInfo2 = GetRayCollisionMesh(ray2, *airplane.meshes, airplane.transform);
-
-                            if (meshHitInfo.hit && meshHitInfo2.hit) {
-                                mesh.at(i).at(j).at(k).boundary = true;
+                        // if (collisions % 2 != 0 && collisions > 0) {
+                        //     mesh.at(i).at(j).at(k).boundary = true;
+                        // }
+                        Ray ray;
+                        Ray ray2;
+                        
+                        ray.position = position;
+                        ray2.position = position;
+                        
+                        // check if the cube is inside the plane
+                        if (getCollisionPlaneRay({1,0,0}, {1,0,0}, ray, ray2)) { 
+                            if (getCollisionPlaneRay({0,1,0}, {0,1,0}, ray, ray2)) {
+                                if (getCollisionPlaneRay({0,0,1}, {0,0,1}, ray, ray2)) {
+                                    mesh.at(i).at(j).at(k).boundary = true;
+                                }
                             }
-                    //     }
-                    // }
+                        }
                 }
             }
         }
