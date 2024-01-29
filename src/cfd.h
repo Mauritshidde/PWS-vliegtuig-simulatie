@@ -84,6 +84,6 @@ private:
 public:
     void run(int steps);
 
-    Cfd(int setnx = 20, int setny = 10, int setnz = 60, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
+    Cfd(int setnx = 200, int setny = 100, int setnz = 60, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
     ~Cfd();
 };

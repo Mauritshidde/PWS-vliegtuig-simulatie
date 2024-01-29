@@ -232,7 +232,7 @@ void Cfd::removeDivergence() {
         for (int j = 1; j < nx - 1; j++)
         {
             for (int k = 1; k < ny - 1; k++)
-            {
+            { // TODO check if boundary for the complete code of the removeDivergence function
                 divergenceVelocityScalarField.at(1).at(j).at(k) = (mesh.at(1).at(j+1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityY - mesh.at(1).at(j).at(k-1).velocityY)/2;
                 // mesh.at(1).at(j).at(k).pressure = iterativeSolver(1, j, k);
                 divergenceVelocityField.at(1).at(j).at(k).x = divergenceVelocityScalarField.at(1).at(j).at(k);
@@ -269,9 +269,6 @@ void Cfd::removeDivergence() {
                 mesh.at(1).at(j).at(k).velocityX = divergenceFreeField.at(1).at(j).at(k).x;
                 mesh.at(1).at(j).at(k).velocityY = divergenceFreeField.at(1).at(j).at(k).y;
                 mesh.at(1).at(j).at(k).velocityZ = divergenceFreeField.at(1).at(j).at(k).z;
-                // mesh.at(1).at(j).at(k).velocityX -= gradientPressureField.at(1).at(j).at(k).x;
-                // mesh.at(1).at(j).at(k).velocityY -= gradientPressureField.at(1).at(j).at(k).y;
-                // mesh.at(1).at(j).at(k).velocityZ -= gradientPressureField.at(1).at(j).at(k).z;
             }
         }
     // } 
@@ -524,28 +521,59 @@ void Cfd::drawVelocityVectors() {
 }
 
 void Cfd::Draw() {
-    Vector3 position;
-    position.x = 0;
-    position.y = 0;
-    position.z = 0;
-    Vector3 test = {0, 100, 0};
-    Ray ray;
-    ray.position = position;
-    ray.direction = test;
+    // Vector3 position;
+    // position.x = 0;
+    // position.y = 0;
+    // position.z = 0;
+    // Vector3 test = {0, 100, 0};
+    // Ray ray;
+    // ray.position = position;
+    // ray.direction = test;
 
-    int collisions = plane.detectCollision(ray);
+    // int collisions = plane.detectCollision(ray);
 
     moveCamera(GetFrameTime());
     BeginDrawing();
         ClearBackground(WHITE);
-        BeginMode3D(camera);
-            // DrawModel(airplane, {0,0,0}, 1.0f, RED);
-            // DrawBoundingBox(boundingBoxPlane, ORANGE);
-            DrawPoint3D(boundingBoxPlaneMax, PINK);
-            DrawPoint3D(boundingBoxPlaneMin, BLACK);
-            // std::cout << boundingBoxPlaneMax.x << " "  << boundingBoxPlaneMax.y << " " << boundingBoxPlaneMax.z << std::endl;
-            drawVelocityVectors();
-        EndMode3D();
+        for (int i=1; i < 2; i++) {
+            for (int j=1; j < nx-1; j++) {
+                for (int k=1; k < ny-1; k++) {
+                    Vector3 point;
+                    point.x = startingPoint.x + j * dx - 0.5 * dx;
+                    point.y = startingPoint.y + k * dy - 0.5 * dy;
+                    point.z = startingPoint.z + i * dz - 0.5 * dz;
+                    if (mesh.at(i).at(j).at(k).boundary) {
+                        DrawRectangle(point.x*10, point.y*10, dx*10, dy*10, BLACK);
+
+                    } else {
+                        
+                        float velocityX = mesh.at(i).at(j).at(k).velocityX;
+                        float velocityY = mesh.at(i).at(j).at(k).velocityY;
+                        float velocityZ = mesh.at(i).at(j).at(k).velocityZ;
+                        float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
+                        
+                        double val = (velocity / 200.0f) *300;
+                        double val2 = (velocity / 500.0f);
+                        Color velocityColor = {255, val2, val, 255};
+                        
+                        DrawRectangle(point.x*10, point.y*10, dx*10, dy*10, velocityColor);
+                        std::cout << velocity << " ";
+                    }
+                }
+                std::cout  << std::endl;
+            }
+        }
+                std::cout  << std::endl;
+                std::cout  << std::endl;
+                std::cout  << std::endl;
+        // BeginMode3D(camera);
+        //     // DrawModel(airplane, {0,0,0}, 1.0f, RED);
+        //     // DrawBoundingBox(boundingBoxPlane, ORANGE);
+        //     DrawPoint3D(boundingBoxPlaneMax, PINK);
+        //     DrawPoint3D(boundingBoxPlaneMin, BLACK);
+        //     // std::cout << boundingBoxPlaneMax.x << " "  << boundingBoxPlaneMax.y << " " << boundingBoxPlaneMax.z << std::endl;
+        //     drawVelocityVectors();
+        // EndMode3D();
     EndDrawing();
 }
 
@@ -558,6 +586,12 @@ void Cfd::run(int steps) { //333
             airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * i, DEG2RAD * j, DEG2RAD * 0});
             resetMesh();
             // setPlaneBoundary();
+            for (int i =nx-25; i < nx-20; i++) {
+                for (int j=1; j < ny-1; j++) {
+                    mesh.at(1).at(i).at(j).boundary = true;
+                }
+
+            }
             Vector2 consts = calc(i, j);
             cfdResultsHelper.push_back({consts.x, consts.y});
         }

@@ -10,6 +10,7 @@ MeshCube::MeshCube(double vx, double vy, double vz, double setPressure, bool bou
     velocityX = 1;
     velocityY = 0;
     velocityZ = 0;
+    pressureChanged = false;
 }
 
 MeshCube::~MeshCube()
