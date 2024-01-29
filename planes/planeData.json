@@ -3,8 +3,8 @@
     {
         "Boeing737": 
         {
-            "minimal mass": 1,
-            "maximal mass": 1,
+            "minimal mass": 41413,
+            "maximal mass": 41413,
             "thrust": 1,
             "moment of inertia": 1,
             "wing area": 125,

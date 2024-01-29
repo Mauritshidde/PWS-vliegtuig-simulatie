@@ -50,6 +50,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       acceleration = {0, 0, 0};
       angularVelocity = {0, 0, 0};
       angularAcceleration = {0, 0, 0};
+      externalPos = {0, 0, 0};
       // std::cout << " xVel " << velocity.x << " yVel " << velocity.y << " zVel " << velocity.z << "\n";
       // std::cout << " xAccel " << acceleration.x << " yAccel " << acceleration.y << " zAccel " << acceleration.z << "\n";
       // std::cout << " xangvel " << angularAcceleration.x << " yangvel " << angularAcceleration.y << " zangvel " << angularAcceleration.z << "\n";
@@ -57,13 +58,15 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
 
       engineOffset = 14;
 
-      physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), {centerOfMass.x + 10000, centerOfMass.y, centerOfMass.z});
-      // physicsVector forceLeftMotor  = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z});
+      // physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), {centerOfMass.x + 10000, centerOfMass.y, centerOfMass.z});
+      physicsVector forceLeftMotor  = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
       // physicsVector forceRightMotor = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x + engineOffset, centerOfMass.y, centerOfMass.z});
-      // 
-      // forces.push_back(forceLeftMotor);
+      
+      Vector3 motorDirection = planePhysics.vectorAddition(forceLeftMotor.location, {Vector3Normalize(forceLeftMotor.components)});
+
+      forces.push_back(forceLeftMotor);
       // forces.push_back(forceRightMotor);
-      forces.push_back(fG);
+      // forces.push_back(fG);
 }
 
 Plane::~Plane()
@@ -95,7 +98,8 @@ Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, floa
 
 void Plane::Draw()
 {
-      DrawModelEx(airplane, (Vector3){0.0f, 0.0f, 0.0f}, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); // 2de vector geeft aan met welke factor hij met currentangle draait
+      // 2de vector geeft aan met welke factor hij met currentangle draait
+      DrawModelEx(airplane, externalPos, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); 
 }
 
 void Plane::Update(float deltaTime, float rho)
@@ -139,20 +143,17 @@ void Plane::Update(float deltaTime, float rho)
 
       calcLift(rho);
 
-      // for (int i = 0; i < forces.size(); i++) forces.at(i).location = translateForcePosition(forces.at(i).location);
-      // forces.at(0).components = translateForceComponent(forces.at(0));
-      // forces.at(1).components = translateForceComponent(forces.at(1));
-
       evaluateForces(forces);
       updateVel(deltaTime);
       updateAngularVel(deltaTime);
       updateRotation(deltaTime);
+      externalPos = planePhysics.moveWithVelocity(externalPos, velocity, deltaTime);
       //test prints
-      for (int i = 0; i < forces.size(); i++)
-      {
-            std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
-            std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
-      }
+      // for (int i = 0; i < forces.size(); i++)
+      // {
+      //       std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
+      //       std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
+      // }
       // std::cout << "speed: " << velocity << " lift: " << lift << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
 }
 
@@ -160,7 +161,7 @@ void Plane::evaluateForces(std::vector<physicsVector> forces)
 {
       angularAcceleration = planePhysics.calcAngularAcceleration(forces, mass, centerOfMass, momentOfInertia, (Vector3){anglePitch, angleYaw, angleRoll});
       acceleration = planePhysics.calcAcceleration(forces, mass);
-      std::cout << " xAccel " << acceleration.x << " yAccel " << acceleration.y << " zAccel " << acceleration.z << "\n";
+      // std::cout << " xAccel " << acceleration.x << " yAccel " << acceleration.y << " zAccel " << acceleration.z << "\n";
 }
 
 void Plane::updateVel(float deltaTime)
@@ -169,7 +170,7 @@ void Plane::updateVel(float deltaTime)
       velocity.x += deltaVelocity.x;
       velocity.y += deltaVelocity.y;
       velocity.z += deltaVelocity.z;
-      std::cout << " xVel " << velocity.x << " yVel " << velocity.y << " zVel " << velocity.z << "\n";
+      // std::cout << " xVel " << velocity.x << " yVel " << velocity.y << " zVel " << velocity.z << "\n";
 }
 
 void Plane::updateAngularVel(float deltaTime)
@@ -217,18 +218,4 @@ void Plane::reduceAngleDegrees() // 0 < Angle < 360
       {
             angleRoll += 360;
       }
-}
-
-// Vector3 Plane::translateForcePosition(Vector3 location)
-// {
-//       std::cout << "    location xyz" << location.x << " " << location.y << " " << location.z << std::endl;
-      // location = Vector3Transform(location, MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll}));
-//       std::cout << "    location2 xyz" << location.x << " " << location.y << " " << location.z << std::endl;
-//       return location;
-// }
-
-Vector3 Plane::translateForceComponent(physicsVector force)
-{
-      force.components = Vector3Transform(force.components, MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll}));
-      return force.components;
 }

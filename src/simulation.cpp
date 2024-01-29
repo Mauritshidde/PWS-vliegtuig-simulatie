@@ -50,7 +50,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
 
     plane = Plane(fileName, 100);
     
-    plotXRange = linspace(0, 2000, 2001);
+    plotXRange = linspace(0, 500, 501);
     timeElapsed = 0;
     // Vector2 aeroConsts;
     // for (float x = 0; x < plotXRange.size(); x++)
@@ -153,9 +153,8 @@ void RunSimulation::Update(float deltaTime)
     
     plane.Update(deltaTime, rho);
     //move the environment decorations (birds) with the speed of the plane to create the illusion of plane movement
-    decorations.globalPosition = environmentPhysics.moveWithVelocity(decorations.globalPosition, Vector3Negate(plane.velocity), deltaTime);
-    cameraPos = environmentPhysics.moveWithVelocity(cameraPos, Vector3Negate(plane.velocity), deltaTime); 
 
+    //TODO add external plane position and move plane
     
     moveCamera(deltaTime);
 }
@@ -215,7 +214,7 @@ void RunSimulation::run()
             {
                 timeElapsed = 0;
                 std::cout << plotYValues.size() << " size \n";
-                plotYValues.push_back(plane.angleRoll);
+                plotYValues.push_back(plane.angleYaw);
             }
             else
             {

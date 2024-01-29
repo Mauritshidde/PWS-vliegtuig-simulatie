@@ -7,7 +7,7 @@ skyDecoration::skyDecoration()
 {
       SetRandomSeed(GetTime());
       globalPosition = {0, 0, 0};
-      birds = LoadModel("../models/object/birds.obj");
+      birds = LoadModel("models/object/birds.obj");
       anglePitch = 90;
       angleYaw = 0;
       angleRoll = 0;
