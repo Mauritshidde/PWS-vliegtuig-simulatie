@@ -239,32 +239,16 @@ void Cfd::removeDivergence() {
                 divergenceVelocityField.at(1).at(j).at(k).y = divergenceVelocityScalarField.at(1).at(j).at(k);
                 divergenceVelocityField.at(1).at(j).at(k).z = divergenceVelocityScalarField.at(1).at(j).at(k);
                 solvePressure(1,j,k);
-                // if (j == 1) {
-                //     solvePressureFirst(1, j, k);
-                // } else {
-                //     solvePressure(1, j, k);
-                // }
-                // mesh.at(1).at(j).at(k).newPressure = ((mesh.at(1).at(j-1).at(k).pressure + mesh.at(1).at(j+1).at(k).newPressure + mesh.at(1).at(j).at(k-1).newPressure + mesh.at(1).at(j).at(k+1).newPressure) - divergenceVelocityScalarField.at(1).at(j).at(k)) / 4;
-                // mesh.medianSurroundingDensity = (mesh.at(1).at(j+1).at(k) + mesh.at(1).at(j-1).at(k) + mesh.at(1).at(j).at(k+1) + mesh.at(1).at(j).at(k-1) + 0 + 0)/4;
             }
         }
     // }
-
-    // // for (int i=1; i < nz-1; i++) {
-    //     for (int j = 1; j < nx - 1; j++)
-    //     {
-    //         for (int k = 1; k < ny - 1; k++)
-    //         {
-    //             mesh.at(1).at(j).at(k).pressure = mesh.at(1).at(j).at(k).newPressure;
-    //         }
-    //     }
-    // // }
 
     // for (int i=1; i < nz-1; i++) {
         for (int j = 1; j < nx - 1; j++)
         {
             for (int k = 1; k < ny - 1; k++)
             {
+                mesh.at(1).at(j).at(k).pressureChanged = false;
                 gradientPressureField.at(1).at(j).at(k).x = (mesh.at(1).at(j+1).at(k).pressure - mesh.at(1).at(j-1).at(k).pressure)/2;
                 gradientPressureField.at(1).at(j).at(k).y = (mesh.at(1).at(j).at(k+1).pressure - mesh.at(1).at(j).at(k-1).pressure)/2;
                 gradientPressureField.at(1).at(j).at(k).z = (mesh.at(0+1).at(j).at(k).pressure - mesh.at(2-1).at(j).at(k).pressure)/2; 
