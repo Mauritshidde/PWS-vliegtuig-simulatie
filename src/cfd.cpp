@@ -86,27 +86,37 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
                 position.x = dx * j + startingPoint.x;
                 position.y = dy * k + startingPoint.y;
                 position.z = dz * i + startingPoint.z;
-                Vector3 rayDirection = {0, 1, 0};
-                Ray ray;
-                // ray.position = position;
-                // ray.direction = rayDirection;
-                // int collisions = plane.detectCollision(ray);
+                // if (position.x >= boundingBoxPlaneMin.x && position.x <= boundingBoxPlaneMax.x) {
+                //     // std::cout << "test" << std::endl;
+                //     if (position.z >= boundingBoxPlaneMin.z && position.z <= boundingBoxPlaneMax.z) {
+                //     // std::cout << "test2" << std::endl;
+                //         if (position.y >= boundingBoxPlaneMin.y && position.y <= boundingBoxPlaneMax.y) {
+                    // std::cout << "test3" << std::endl;
+                    if (CheckCollisionBoxSphere(boundingBoxPlane, position, dx)) {
+                            Vector3 rayDirection = {0, 1, 0};
+                            Ray ray;
+                            // ray.position = position;
+                            // ray.direction = rayDirection;
+                            // int collisions = plane.detectCollision(ray);
 
-                // if (collisions % 2 != 0 && collisions > 0) {
-                //     mesh.at(i).at(j).at(k).boundary = true;
-                // }
-                
-                Vector3 rayDirection2 = {0, -1, 0};
-                Ray ray2;
-                ray.position = position;
-                ray2.position = position;
-                ray.direction = rayDirection;
-                ray2.direction = rayDirection2;
-                RayCollision meshHitInfo = GetRayCollisionMesh(ray, *airplane.meshes, airplane.transform);
-                RayCollision meshHitInfo2 = GetRayCollisionMesh(ray2, *airplane.meshes, airplane.transform);
+                            // if (collisions % 2 != 0 && collisions > 0) {
+                            //     mesh.at(i).at(j).at(k).boundary = true;
+                            // }
+                            
+                            Vector3 rayDirection2 = {0, -1, 0};
+                            Ray ray2;
+                            ray.position = position;
+                            ray2.position = position;
+                            ray.direction = rayDirection;
+                            ray2.direction = rayDirection2;
+                            RayCollision meshHitInfo = GetRayCollisionMesh(ray, *airplane.meshes, airplane.transform);
+                            RayCollision meshHitInfo2 = GetRayCollisionMesh(ray2, *airplane.meshes, airplane.transform);
 
-                if (meshHitInfo.hit && meshHitInfo2.hit) {
-                    mesh.at(i).at(j).at(k).boundary = true;
+                            if (meshHitInfo.hit && meshHitInfo2.hit) {
+                                mesh.at(i).at(j).at(k).boundary = true;
+                            }
+                    //     }
+                    // }
                 }
             }
         }
@@ -483,6 +493,48 @@ void Cfd::moveCamera(float deltaTime) {
     previousMousePosition = currentMousePos;
 }
 
+void Cfd::drawVelocityVectors() {
+    for (int i=1; i < nz-1; i++) {
+        for (int j=1; j < nx-1; j++) {
+            for (int k=1; k < ny-1; k++) {
+                Vector3 point;
+                point.x = startingPoint.x + j * dx - 0.5 * dx;
+                point.y = startingPoint.y + k * dy - 0.5 * dy;
+                point.z = startingPoint.z + i * dz - 0.5 * dz;
+                if (mesh.at(i).at(j).at(k).boundary) {
+                    // DrawCubeWires(point, dx, dy, dz, BLACK);
+                    DrawCube(point, dx, dy, dz, BLACK);
+                } else {
+
+                    float velocityX = mesh.at(i).at(j).at(k).velocityX;
+                    float velocityY = mesh.at(i).at(j).at(k).velocityY;
+                    float velocityZ = mesh.at(i).at(j).at(k).velocityZ;
+                    float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
+                    
+                    // TODO make vector whichs color depends on velocity
+                    double val = (velocity / 200.0f) *30;
+                    double val2 = (velocity / 500.0f);
+                    // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
+                    // double val3 = mesh.at(1).at(j).at(k).pressure;
+                    Color velocityColor = {255, val2, val, 255};
+                    
+                    Vector3 velocityDirection = {velocityX,velocityY,velocityZ};
+                    velocityDirection = Vector3Normalize2(velocityDirection);
+                    velocityDirection.x = velocityDirection.x * 0.5 * dx + point.x;
+                    velocityDirection.y = velocityDirection.y * 0.5 * dy + point.y;
+                    velocityDirection.z = velocityDirection.z * 0.5 * dz + point.z;
+                    // std::cout << point.x << "  x " << velocityDirection.x << std::endl;
+                    // std::cout << point.y << " y " << velocityDirection.y << std::endl;
+                    // std::cout << point.z << " z " << velocityDirection.z << std::endl;
+                    // DrawLine3D(point, velocityDirection, velocityColor); //111
+                    // DrawLine3D(point, {point.x, point.y, point.z+dz}, BLUE);
+                    // DrawCubeWires(point, dx, dy, dz, RED);
+                }
+            }
+        }
+    }
+}
+
 void Cfd::Draw() {
     Vector3 position;
     position.x = 0;
@@ -499,45 +551,12 @@ void Cfd::Draw() {
     BeginDrawing();
         ClearBackground(WHITE);
         BeginMode3D(camera);
-            for (int i=1; i < nz-1; i++) {
-                for (int j=1; j < nx-1; j++) {
-                    for (int k=1; k < ny-1; k++) {
-                        Vector3 point;
-                        point.x = startingPoint.x + j * dx - 0.5 * dx;
-                        point.y = startingPoint.y + k * dy - 0.5 * dy;
-                        point.z = startingPoint.z + i * dz - 0.5 * dz;
-                        if (mesh.at(i).at(j).at(k).boundary) {
-                            // DrawCubeWires(point, dx, dy, dz, BLACK);
-                            DrawCube(point, dx, dy, dz, BLACK);
-                        } else {
-
-                            float velocityX = mesh.at(i).at(j).at(k).velocityX;
-                            float velocityY = mesh.at(i).at(j).at(k).velocityY;
-                            float velocityZ = mesh.at(i).at(j).at(k).velocityZ;
-                            float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
-                            
-                            // TODO make vector whichs color depends on velocity
-                            double val = (velocity / 200.0f) *30;
-                            double val2 = (velocity / 500.0f);
-                            // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
-                            // double val3 = mesh.at(1).at(j).at(k).pressure;
-                            Color velocityColor = {255, val2, val, 255};
-                            
-                            Vector3 velocityDirection = {velocityX,velocityY,velocityZ};
-                            velocityDirection = Vector3Normalize2(velocityDirection);
-                            velocityDirection.x = velocityDirection.x * 0.5 * dx + point.x;
-                            velocityDirection.y = velocityDirection.y * 0.5 * dy + point.y;
-                            velocityDirection.z = velocityDirection.z * 0.5 * dz + point.z;
-                            // std::cout << point.x << "  x " << velocityDirection.x << std::endl;
-                            // std::cout << point.y << " y " << velocityDirection.y << std::endl;
-                            // std::cout << point.z << " z " << velocityDirection.z << std::endl;
-                            DrawLine3D(point, velocityDirection, velocityColor); //111
-                            // DrawLine3D(point, {point.x, point.y, point.z+dz}, BLUE);
-                            // DrawCubeWires(point, dx, dy, dz, RED);
-                        }
-                    }
-                }
-            }
+            // DrawModel(airplane, {0,0,0}, 1.0f, RED);
+            // DrawBoundingBox(boundingBoxPlane, ORANGE);
+            DrawPoint3D(boundingBoxPlaneMax, PINK);
+            DrawPoint3D(boundingBoxPlaneMin, BLACK);
+            // std::cout << boundingBoxPlaneMax.x << " "  << boundingBoxPlaneMax.y << " " << boundingBoxPlaneMax.z << std::endl;
+            drawVelocityVectors();
         EndMode3D();
     EndDrawing();
 }
@@ -548,7 +567,7 @@ void Cfd::run(int steps) { //333
     for (double i=0; i < 360; i+=stepsize) { // pitch
         std::vector<Vector2> cfdResultsHelper;
         for (double j=0; j < 360; j+=stepsize) { // yaw
-            airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * 100, DEG2RAD * 100, DEG2RAD * 0});
+            airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * i, DEG2RAD * j, DEG2RAD * 0});
             resetMesh();
             setPlaneBoundary();
             Vector2 consts = calc(i, j);
@@ -585,6 +604,11 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
 
     // set simulation variables
     plane.loadObjectModel();
+
+    boundingBoxPlane = GetModelBoundingBox(airplane);
+    Vector3 boundingBoxPlaneMin = boundingBoxPlane.min;
+    Vector3 boundingBoxPlaneMax = boundingBoxPlane.max;
+
     nx = setnx;
     ny = setny;
     nz = setnz;

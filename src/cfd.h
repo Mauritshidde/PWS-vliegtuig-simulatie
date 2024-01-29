@@ -26,6 +26,9 @@ private:
     Model airplane;
     Texture airplaneTexture;
     bool drawing;
+    BoundingBox boundingBoxPlane;
+    Vector3 boundingBoxPlaneMin;
+    Vector3 boundingBoxPlaneMax;
 
     // multi threading
     int cores;
@@ -78,10 +81,11 @@ private:
 
     // graphics functions (these are optionally when running the cfd) 
     void moveCamera(float deltaTime);
+    void drawVelocityVectors();
     void Draw();
 public:
     void run(int steps);
 
-    Cfd(int setnx = 10, int setny = 10, int setnz = 12, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
+    Cfd(int setnx = 20, int setny = 100, int setnz = 60, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
     ~Cfd();
 };
