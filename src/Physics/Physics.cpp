@@ -61,11 +61,9 @@ Vector3 Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfM
     Vector3 currentForce, currentPosition;
     for (int i = 0; i < forces.size(); i++)
     {
+        currentForce = forces.at(i).components;
         currentPosition = Vector3Transform(forces.at(i).location, MatrixRotateXYZ((Vector3){DEG2RAD * rotation.x, DEG2RAD * rotation.y, DEG2RAD * rotation.z}));
-        DrawLine3D(currentPosition, vectorAddition(currentPosition, currentForce), BLACK);
         distance = vectorSubtraction(centerOfMass, currentPosition);
-        std::cout << "ditstance xyz" << distance.x << " " << distance.y << " " << distance.z << " \n";
-//TODO vector pointing to centre
         torquePitch = distance.z * currentForce.y + distance.y * currentForce.z;
           torqueYaw = distance.z * currentForce.x + distance.x * currentForce.z;
          torqueRoll = distance.y * currentForce.x + distance.x * currentForce.y;

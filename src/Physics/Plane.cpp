@@ -62,8 +62,8 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       physicsVector forceLeftMotor  = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
       // physicsVector forceRightMotor = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x + engineOffset, centerOfMass.y, centerOfMass.z});
       
-      Vector3 motorDirection = planePhysics.vectorAddition(forceLeftMotor.location, {Vector3Normalize(forceLeftMotor.components)});
-
+      leftMotorDirectionPoint = planePhysics.vectorAddition(forceLeftMotor.location, forceLeftMotor.components);
+      // rightMotorDirectionPoint = planePhysics.vectorAddition(forceRightMotor.location, {Vector3Normalize(forceRightMotor.components)});
       forces.push_back(forceLeftMotor);
       // forces.push_back(forceRightMotor);
       // forces.push_back(fG);
@@ -134,6 +134,7 @@ void Plane::Update(float deltaTime, float rho)
       if (previousAnglePitch != anglePitch || previousAngleYaw != angleYaw || previousAngleRoll != angleRoll)
       {
             airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
+            rotatePoints();
             getConsts(anglePitch, angleYaw, false, true);
       }
 
@@ -143,11 +144,12 @@ void Plane::Update(float deltaTime, float rho)
 
       calcLift(rho);
 
+      rotateVector();
       evaluateForces(forces);
       updateVel(deltaTime);
       updateAngularVel(deltaTime);
       updateRotation(deltaTime);
-      externalPos = planePhysics.moveWithVelocity(externalPos, velocity, deltaTime);
+      externalPos = planePhysics.moveWithVelocity(externalPos, velocity, deltaTime); //TODO update pos in torque
       //test prints
       // for (int i = 0; i < forces.size(); i++)
       // {
@@ -218,4 +220,15 @@ void Plane::reduceAngleDegrees() // 0 < Angle < 360
       {
             angleRoll += 360;
       }
+}
+
+void Plane::rotatePoints()
+{
+      leftMotorDirectionPoint = Vector3Transform(leftMotorDirectionPoint, MatrixRotateXYZ((Vector3){DEG2RAD *anglePitch, DEG2RAD *angleYaw, DEG2RAD *angleRoll}));
+}
+
+void Plane::rotateVector()
+{
+      rotatePoints();
+      forces.at(0).components = planePhysics.vectorSubtraction(leftMotorDirectionPoint, forces.at(0).location);
 }
