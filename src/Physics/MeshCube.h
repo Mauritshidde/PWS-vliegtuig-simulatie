@@ -6,6 +6,10 @@ public:
     double velocityX; // velocity in x direction
     double velocityY; // velocity in y direction
     double velocityZ; // velocity in z direction
+    double newVelocityX;
+    double newVelocityY;
+    double newVelocityZ;
+    
     double pressure;
     double newPressure;
     double density;

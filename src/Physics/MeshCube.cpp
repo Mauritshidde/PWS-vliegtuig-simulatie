@@ -8,6 +8,9 @@ MeshCube::MeshCube(double vx, double vy, double vz, double setPressure, double s
     pressure = setPressure;
     density = setDensity;
     boundary = bound;
+    velocityX = 1;
+    velocityY = 0;
+    velocityZ = 0;
 }
 
 MeshCube::~MeshCube()
