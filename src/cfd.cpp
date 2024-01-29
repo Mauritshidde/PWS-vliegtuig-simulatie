@@ -120,10 +120,12 @@ void Cfd::setPlaneBoundary() //222
 {
     std::vector<std::thread> threads;
     cores = 10;
+    int newNz = nz - 2;
     
     for (int i=0; i < cores; i++) {
-        int part = (i * nz)/cores;
-        int part2 = ((i+1) * nz)/cores;
+        int part = 1 + (i * newNz)/cores;
+        int part2 = 1 + ((i+1) * newNz)/cores;
+        // std::cout << part << " " << part2 << " " << cores << " " << nz << std::endl;
         // std::thread t1(&Cfd::setPlaneBoundaryHelper, this, part, part2);
         threads.emplace_back(&Cfd::setPlaneBoundaryHelper, this, part, part2);
     }
