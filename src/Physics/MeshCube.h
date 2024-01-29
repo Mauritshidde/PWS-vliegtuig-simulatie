@@ -13,6 +13,7 @@ public:
     double pressure;
     double newPressure;
 
+    bool pressureChanged;
     bool boundary;
 
     void makeBoundary() {boundary = true;};

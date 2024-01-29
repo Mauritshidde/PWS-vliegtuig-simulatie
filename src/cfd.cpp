@@ -152,50 +152,79 @@ void Cfd::setPlaneBoundary() //222
     }
 }
 
-void Cfd::solvePressure(int i, int j, int k) {
-    double pressure1 = mesh.at(i).at(j).at(k).pressure; // Pn(x,y) known
-    double pressure2 = 0; // Pn(x+1,y)
-    double pressure3 = mesh.at(i).at(j-1).at(k).pressure; // Pn(x-1,y) known
-    double pressure4 = 0; // Pn(x,y+1)
-    double pressure5 = mesh.at(i).at(j).at(k-1).pressure; // Pn(x,y-1) known
-
-    double previousPressure2, previousPressure4;
-
-    int times = 0;
-    while (times < 100 && (pressure2 == previousPressure2 || pressure4 == previousPressure4)) {
-        pressure2 = 4.0f * pressure1 + divergenceVelocityScalarField.at(i).at(j).at(k) - pressure3 - pressure4 - pressure5;
-        pressure4 = 4.0f * pressure1 + divergenceVelocityScalarField.at(i).at(j).at(k) - pressure2 - pressure3 - pressure5;
-        previousPressure2 = pressure2;
-        previousPressure4 = pressure4;
-        times++;
-    }
-
-    mesh.at(i).at(j+1).at(k).pressure = pressure2;
-    mesh.at(i).at(j).at(k+1).pressure = pressure4;
-}
-
-void Cfd::solvePressureFirst(int i, int j, int k)
+void Cfd::solvePressure(int i, int j, int k)
 {
-    double pressure1 = 0; ; // Dn(x,y)
-    double pressure2 = 0; // Dn(x+1,y)
-    double pressure3 =  mesh.at(i).at(j-1).at(k).pressure; // Dn(x-1,y)
-    double pressure4 = 0; // Dn(x,y+1)
-    double pressure5 =  mesh.at(i).at(j).at(k-1).pressure; // Dn(x,y-1)
+    if (!mesh.at(i).at(j).at(k).boundary) {
+        std::vector<Vector3> toUse;
+        if (!mesh.at(i).at(j+1).at(k).boundary) {
+            toUse.push_back({i,j+1,k});
+        }
+        if (!mesh.at(i).at(j-1).at(k).boundary) {
+            toUse.push_back({i,j-1,k});
+        }
+        if (!mesh.at(i).at(j).at(k+1).boundary) {
+            toUse.push_back({i,j,k+1});
+        }
+        if (!mesh.at(i).at(j).at(k-1).boundary) {
+            toUse.push_back({i,j,k-1});
+        }
+        // if (!mesh.at(i+1).at(j).at(k).boundary) {
+        //     toCalc.push_back({i+1,j,k});
+        // }
+        // if (!mesh.at(i-1).at(j).at(k).boundary) {
+        //     toCalc.push_back({i-1,j,k});
+        // }
+        Vector3 indexes;
+        std::vector<Vector3> toCalc;
+        std::vector<double> values;
+        std::vector<double> previousValues;
+        for (int l=0; l < toUse.size(); l++) {
+            indexes = toUse.at(l);
+            if (!mesh.at(indexes.x).at(indexes.y).at(indexes.z).pressureChanged) {
+                toCalc.push_back(indexes);
+                values.push_back(0);
+                previousValues.push_back(0);
+            }
+        }
 
-    double previousPressure1, previousPressure2, previousPressure4;
+        double pressure1 = 0; // Dn(x,y)
 
-    int times = 0;
-    while (times < 100 && (pressure1 == previousPressure1 || pressure2 == previousPressure2 || pressure4 == previousPressure4)) {
-        std::cout << pressure1 << " " << pressure2 << " " << pressure3  << " " << pressure4 << " " << pressure5 << std::endl;
-        pressure1 = (pressure2 + pressure3 + pressure4 + pressure5 - divergenceVelocityScalarField.at(i).at(j).at(k)) / 4.0f;
-        pressure2 = 4.0f * pressure1 + divergenceVelocityScalarField.at(i).at(j).at(k) - pressure3 - pressure4 - pressure5;
-        pressure4 = 4.0f * pressure1 + divergenceVelocityScalarField.at(i).at(j).at(k) - pressure2 - pressure3 - pressure5;
-        times++;
+        int times = 0;
+        bool end = false;
+        while (times < 100 && !end) {
+            if (!mesh.at(indexes.x).at(indexes.y).at(indexes.z).pressureChanged) {
+                double val = 0;
+                for (int l=0; l < toUse.size(); l++) {
+                    indexes = toUse.at(l);
+                    val += mesh.at(indexes.x).at(indexes.y).at(indexes.z).pressure;
+                }
+                pressure1 = (val - divergenceVelocityScalarField.at(i).at(j).at(k)) / 4.0f;
+            }   
+
+            for (int l=0; l < toCalc.size(); l++) {
+                double val = 0;
+                for (int m=0; m < toUse.size(); m++) {
+                    indexes = toUse.at(m);
+                    val += mesh.at(indexes.x).at(indexes.y).at(indexes.z).pressure;
+                }
+                values.at(l) = 4.0f * pressure1 + divergenceVelocityScalarField.at(i).at(j).at(k) - val;
+            }
+
+            for (int l=0; l < toCalc.size(); l++) {
+                end = true;
+                if (values.at(l) != previousValues.at(l)) {
+                    end = false;
+                }
+            } 
+
+            times++;
+        }
+
+        for (int l=0; l < toCalc.size(); l++) {
+            indexes = toUse.at(l);
+            mesh.at(indexes.x).at(indexes.y).at(indexes.z).pressureChanged = true;
+        }
     }
-
-    mesh.at(i).at(j).at(k).pressure = pressure1;
-    mesh.at(i).at(j+1).at(k).pressure = pressure2;
-    mesh.at(i).at(j).at(k+1).pressure = pressure4;
 }
 
 void Cfd::removeDivergence() {
@@ -209,11 +238,12 @@ void Cfd::removeDivergence() {
                 divergenceVelocityField.at(1).at(j).at(k).x = divergenceVelocityScalarField.at(1).at(j).at(k);
                 divergenceVelocityField.at(1).at(j).at(k).y = divergenceVelocityScalarField.at(1).at(j).at(k);
                 divergenceVelocityField.at(1).at(j).at(k).z = divergenceVelocityScalarField.at(1).at(j).at(k);
-                if (j == 1) {
-                    solvePressureFirst(1, j, k);
-                } else {
-                    solvePressure(1, j, k);
-                }
+                solvePressure(1,j,k);
+                // if (j == 1) {
+                //     solvePressureFirst(1, j, k);
+                // } else {
+                //     solvePressure(1, j, k);
+                // }
                 // mesh.at(1).at(j).at(k).newPressure = ((mesh.at(1).at(j-1).at(k).pressure + mesh.at(1).at(j+1).at(k).newPressure + mesh.at(1).at(j).at(k-1).newPressure + mesh.at(1).at(j).at(k+1).newPressure) - divergenceVelocityScalarField.at(1).at(j).at(k)) / 4;
                 // mesh.medianSurroundingDensity = (mesh.at(1).at(j+1).at(k) + mesh.at(1).at(j-1).at(k) + mesh.at(1).at(j).at(k+1) + mesh.at(1).at(j).at(k-1) + 0 + 0)/4;
             }

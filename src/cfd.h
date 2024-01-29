@@ -75,7 +75,6 @@ private:
     void removeDivergence();
     void velocityMovement(float dT);
     void solvePressure(int i, int j, int k);
-    void solvePressureFirst(int i, int j, int k);
     Vector2 calc(double anglePitch, double angleYaw);    
 
     // graphics functions (these are optionally when running the cfd) 
