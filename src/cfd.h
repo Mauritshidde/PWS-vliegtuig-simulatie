@@ -72,11 +72,8 @@ private:
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions 
 
     // functions for calculating the movement of the fluid
-    // void densityDispersion();
     void removeDivergence();
-    // void solveDensity(int i, int j, int k);
-    // void solveDensityFirst(int i, int j, int k);
-    void velocityMovement(float dT)
+    void velocityMovement(float dT);
     void solvePressure(int i, int j, int k);
     void solvePressureFirst(int i, int j, int k);
     Vector2 calc(double anglePitch, double angleYaw);    

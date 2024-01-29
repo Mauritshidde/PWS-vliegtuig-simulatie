@@ -150,52 +150,6 @@ void Cfd::setPlaneBoundary() //222
     }
 }
 
-// void Cfd::solveDensity(int i, int j, int k) {
-//     double currentDensity = mesh.at(i).at(j).at(k).density;
-//     double density1 = mesh.at(i).at(j).at(k).density; // Pn(x,y) known
-//     double density2 = 0; // Pn(x+1,y)
-//     double density3 = mesh.at(i).at(j-1).at(k).density; // Pn(x-1,y) known
-//     double density4 = 0; // Pn(x,y+1)
-//     double density5 = mesh.at(i).at(j).at(k-1).density; // Pn(x,y-1) known
-
-//     double previousDensity2, previousDensity4;
-
-//     int times = 0;
-//     while (times < 100 && (density2 == previousDensity2 || density4 == previousDensity4)) {
-//         density2 = (4.0f * density1 * (1.0f + k) - 4.0f * currentDensity) / k - density3 - density4 - density5;
-//         density4 = (4.0f * density1 * (1.0f + k) - 4.0f * currentDensity) / k - density2 - density3 - density5;
-
-//         times++;
-//     }
-
-//     mesh.at(i).at(j+1).at(k).newDensity = density2;
-//     mesh.at(i).at(j).at(k+1).newDensity = density4;
-// }
-
-// void Cfd::solveDensityFirst(int i, int j, int k) {
-//     double currentDensity = mesh.at(i).at(j).at(k).density;
-//     double density1 = 0; // Pn(x,y) known
-//     double density2 = 0; // Pn(x+1,y)
-//     double density3 = mesh.at(i).at(j-1).at(k).density; // Pn(x-1,y) known
-//     double density4 = 0; // Pn(x,y+1)
-//     double density5 = mesh.at(i).at(j).at(k-1).density; // Pn(x,y-1) known
-
-//     double previousDensity1, previousDensity2, previousDensity4;
-
-//     int times = 0;
-//     while (times < 100 && (density1 == previousDensity1 || density2 == previousDensity2 || density4 == previousDensity4)) {
-//         density1 = (currentDensity + k * ((density2 + density3 + density4 + density5) / 4.0f)) / (1.0f + k);
-//         density2 = (4.0f * density1 * (1.0f + k) - 4.0f * currentDensity) / k - density3 - density4 - density5;
-//         density4 = (4.0f * density1 * (1.0f + k) - 4.0f * currentDensity) / k - density2 - density3 - density5;
-
-//         times++;
-//     }
-    
-//     mesh.at(i).at(j).at(k).newDensity = density1;
-//     mesh.at(i).at(j+1).at(k).newDensity = density2;
-//     mesh.at(i).at(j).at(k+1).newDensity = density4;
-// }
-
 void Cfd::solvePressure(int i, int j, int k) {
     double pressure1 = mesh.at(i).at(j).at(k).pressure; // Pn(x,y) known
     double pressure2 = 0; // Pn(x+1,y)
@@ -241,36 +195,6 @@ void Cfd::solvePressureFirst(int i, int j, int k)
     mesh.at(i).at(j+1).at(k).pressure = pressure2;
     mesh.at(i).at(j).at(k+1).pressure = pressure4;
 }
-
-// void Cfd::densityDispersion() {
-//     // for (int i=1; i < nz-1; i++) {
-//             for (int j = 1; j < nx - 1; j++)
-//             {
-//                 for (int k = 1; k < ny - 1; k++)
-//                 {
-//                     if (j == 1) {
-//                         solveDensityFirst(1, j, k);
-//                     } else {
-//                         solveDensity(1, j, k);
-//                     }
-//                     // mesh.at(1).at(j).at(k).updatedPressure = false;
-                    
-//                     // mesh.at(1).at(j).at(k).density = iterativeSolver(mesh.at(1).at(j).at(k));
-//                     // mesh.medianSurroundingDensity = (mesh.at(1).at(j+1).at(k) + mesh.at(1).at(j-1).at(k) + mesh.at(1).at(j).at(k+1) + mesh.at(1).at(j).at(k-1) + 0 + 0)/4;
-//                 }
-//             }
-//         // }
-
-//         // for (int i=1; i < nz-1; i++) {
-//             for (int j = 1; j < nx - 1; j++)
-//             {
-//                 for (int k = 1; k < ny - 1; k++)
-//                 {
-//                     mesh.at(1).at(j).at(k).density == mesh.at(1).at(j).at(k).newDensity;
-//                 }
-//             }
-//         // }
-// }
 
 void Cfd::removeDivergence() {
     // for (int i=1; i < nz-1; i++) {
