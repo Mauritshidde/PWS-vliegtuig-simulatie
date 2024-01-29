@@ -56,8 +56,8 @@ private:
     double dT; // time steps
 
     std::vector<std::vector<std::vector<MeshCube>>> mesh;
-    std::vector<std::vector<std::vector<double>>> divergenceVelocityField;
-    std::vector<std::vector<std::vector<Vector3>>> gradientPressureField;
+    std::vector<std::vector<std::vector<double>>> divergenceVelocityScalarField;
+    std::vector<std::vector<std::vector<Vector3>>> gradientPressureField, divergenceVelocityField, divergenceFreeField;
 
     // functions for the creation of the grid
     void Start();

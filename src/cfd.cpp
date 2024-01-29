@@ -32,8 +32,10 @@ void Cfd::createMesh()
             helper3.push_back(helperHelper3);
         }
         mesh.push_back(helper);
-        divergenceVelocityField.push_back(helper2);
+        divergenceVelocityScalarField.push_back(helper2);
         gradientPressureField.push_back(helper3);
+        divergenceVelocityField.push_back(helper3);
+        divergenceFreeField.push_back(helper3);
     }
 }
 
@@ -161,8 +163,8 @@ void Cfd::solvePressure(int i, int j, int k) {
 
     int times = 0;
     while (times < 100 && (pressure2 == previousPressure2 || pressure4 == previousPressure4)) {
-        pressure2 = 4.0f * pressure1 + divergenceVelocityField.at(i).at(j).at(k) - pressure3 - pressure4 - pressure5;
-        pressure4 = 4.0f * pressure1 + divergenceVelocityField.at(i).at(j).at(k) - pressure2 - pressure3 - pressure5;
+        pressure2 = 4.0f * pressure1 + divergenceVelocityScalarField.at(i).at(j).at(k) - pressure3 - pressure4 - pressure5;
+        pressure4 = 4.0f * pressure1 + divergenceVelocityScalarField.at(i).at(j).at(k) - pressure2 - pressure3 - pressure5;
         previousPressure2 = pressure2;
         previousPressure4 = pressure4;
         times++;
@@ -185,9 +187,9 @@ void Cfd::solvePressureFirst(int i, int j, int k)
     int times = 0;
     while (times < 100 && (pressure1 == previousPressure1 || pressure2 == previousPressure2 || pressure4 == previousPressure4)) {
         std::cout << pressure1 << " " << pressure2 << " " << pressure3  << " " << pressure4 << " " << pressure5 << std::endl;
-        pressure1 = (pressure2 + pressure3 + pressure4 + pressure5 - divergenceVelocityField.at(i).at(j).at(k)) / 4.0f;
-        pressure2 = 4.0f * pressure1 + divergenceVelocityField.at(i).at(j).at(k) - pressure3 - pressure4 - pressure5;
-        pressure4 = 4.0f * pressure1 + divergenceVelocityField.at(i).at(j).at(k) - pressure2 - pressure3 - pressure5;
+        pressure1 = (pressure2 + pressure3 + pressure4 + pressure5 - divergenceVelocityScalarField.at(i).at(j).at(k)) / 4.0f;
+        pressure2 = 4.0f * pressure1 + divergenceVelocityScalarField.at(i).at(j).at(k) - pressure3 - pressure4 - pressure5;
+        pressure4 = 4.0f * pressure1 + divergenceVelocityScalarField.at(i).at(j).at(k) - pressure2 - pressure3 - pressure5;
         times++;
     }
 
@@ -202,28 +204,31 @@ void Cfd::removeDivergence() {
         {
             for (int k = 1; k < ny - 1; k++)
             {
-                divergenceVelocityField.at(1).at(j).at(k) = (mesh.at(1).at(j+1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityY - mesh.at(1).at(j).at(k-1).velocityY)/2;
+                divergenceVelocityScalarField.at(1).at(j).at(k) = (mesh.at(1).at(j+1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityY - mesh.at(1).at(j).at(k-1).velocityY)/2;
                 // mesh.at(1).at(j).at(k).pressure = iterativeSolver(1, j, k);
+                divergenceVelocityField.at(1).at(j).at(k).x = divergenceVelocityScalarField.at(1).at(j).at(k);
+                divergenceVelocityField.at(1).at(j).at(k).y = divergenceVelocityScalarField.at(1).at(j).at(k);
+                divergenceVelocityField.at(1).at(j).at(k).z = divergenceVelocityScalarField.at(1).at(j).at(k);
                 if (j == 1) {
                     solvePressureFirst(1, j, k);
                 } else {
                     solvePressure(1, j, k);
                 }
-                // mesh.at(1).at(j).at(k).newPressure = ((mesh.at(1).at(j-1).at(k).pressure + mesh.at(1).at(j+1).at(k).newPressure + mesh.at(1).at(j).at(k-1).newPressure + mesh.at(1).at(j).at(k+1).newPressure) - divergenceVelocityField.at(1).at(j).at(k)) / 4;
+                // mesh.at(1).at(j).at(k).newPressure = ((mesh.at(1).at(j-1).at(k).pressure + mesh.at(1).at(j+1).at(k).newPressure + mesh.at(1).at(j).at(k-1).newPressure + mesh.at(1).at(j).at(k+1).newPressure) - divergenceVelocityScalarField.at(1).at(j).at(k)) / 4;
                 // mesh.medianSurroundingDensity = (mesh.at(1).at(j+1).at(k) + mesh.at(1).at(j-1).at(k) + mesh.at(1).at(j).at(k+1) + mesh.at(1).at(j).at(k-1) + 0 + 0)/4;
             }
         }
     // }
 
-    // for (int i=1; i < nz-1; i++) {
-        for (int j = 1; j < nx - 1; j++)
-        {
-            for (int k = 1; k < ny - 1; k++)
-            {
-                mesh.at(1).at(j).at(k).pressure = mesh.at(1).at(j).at(k).newPressure;
-            }
-        }
-    // }
+    // // for (int i=1; i < nz-1; i++) {
+    //     for (int j = 1; j < nx - 1; j++)
+    //     {
+    //         for (int k = 1; k < ny - 1; k++)
+    //         {
+    //             mesh.at(1).at(j).at(k).pressure = mesh.at(1).at(j).at(k).newPressure;
+    //         }
+    //     }
+    // // }
 
     // for (int i=1; i < nz-1; i++) {
         for (int j = 1; j < nx - 1; j++)
@@ -232,22 +237,32 @@ void Cfd::removeDivergence() {
             {
                 gradientPressureField.at(1).at(j).at(k).x = (mesh.at(1).at(j+1).at(k).pressure - mesh.at(1).at(j-1).at(k).pressure)/2;
                 gradientPressureField.at(1).at(j).at(k).y = (mesh.at(1).at(j).at(k+1).pressure - mesh.at(1).at(j).at(k-1).pressure)/2;
-                // gradientPressureField.at(1).at(j).at(k).z = (mesh.at(0+1).at(j).at(k).pressure - mesh.at(0-1).at(j).at(k).pressure)/2 
+                gradientPressureField.at(1).at(j).at(k).z = (mesh.at(0+1).at(j).at(k).pressure - mesh.at(2-1).at(j).at(k).pressure)/2; 
             }
         }
     // }
+
+
 
     // for (int i=1; i < nz-1; i++) {
         for (int j = 1; j < nx - 1; j++)
         {
             for (int k = 1; k < ny - 1; k++)
             {
-                mesh.at(1).at(j).at(k).velocityX -= gradientPressureField.at(1).at(j).at(k).x;
-                mesh.at(1).at(j).at(k).velocityY -= gradientPressureField.at(1).at(j).at(k).y;
+                divergenceFreeField.at(1).at(j).at(k).x = divergenceVelocityField.at(1).at(j).at(k).x - gradientPressureField.at(1).at(j).at(k).x;
+                divergenceFreeField.at(1).at(j).at(k).y = divergenceVelocityField.at(1).at(j).at(k).y - gradientPressureField.at(1).at(j).at(k).y;
+                divergenceFreeField.at(1).at(j).at(k).z = divergenceVelocityField.at(1).at(j).at(k).z - gradientPressureField.at(1).at(j).at(k).z;
+                mesh.at(1).at(j).at(k).velocityX = divergenceFreeField.at(1).at(j).at(k).x;
+                mesh.at(1).at(j).at(k).velocityY = divergenceFreeField.at(1).at(j).at(k).y;
+                mesh.at(1).at(j).at(k).velocityZ = divergenceFreeField.at(1).at(j).at(k).z;
+                // mesh.at(1).at(j).at(k).velocityX -= gradientPressureField.at(1).at(j).at(k).x;
+                // mesh.at(1).at(j).at(k).velocityY -= gradientPressureField.at(1).at(j).at(k).y;
                 // mesh.at(1).at(j).at(k).velocityZ -= gradientPressureField.at(1).at(j).at(k).z;
             }
         }
-    // }
+    // } 
+
+    
 }
 
 void Cfd::resetMesh() {
@@ -258,6 +273,7 @@ void Cfd::resetMesh() {
             for (int k = 1; k < ny-1; k++)
             {
                 mesh.at(i).at(j).at(k) = MeshCube();
+                divergenceVelocityField.at(i).at(j).at(k) = {0,0,0};
             }
         }
     }
@@ -342,14 +358,14 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
     //     {
     //         for (int k = 1; k < ny - 1; k++)
     //         {
-    //             divergenceVelocityField.at(1).at(j).at(k) = (mesh.at(1).at(j+1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityY - mesh.at(1).at(j).at(k-1).velocityY)/2;
+    //             divergenceVelocityScalarField.at(1).at(j).at(k) = (mesh.at(1).at(j+1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityY - mesh.at(1).at(j).at(k-1).velocityY)/2;
     //             // mesh.at(1).at(j).at(k).pressure = iterativeSolver(1, j, k);
     //             if (j == 1) {
     //                 solvePressureFirst(1, j, k);
     //             } else {
     //                 solvePressure(1, j, k);
     //             }
-    //             // mesh.at(1).at(j).at(k).newPressure = ((mesh.at(1).at(j-1).at(k).pressure + mesh.at(1).at(j+1).at(k).newPressure + mesh.at(1).at(j).at(k-1).newPressure + mesh.at(1).at(j).at(k+1).newPressure) - divergenceVelocityField.at(1).at(j).at(k)) / 4;
+    //             // mesh.at(1).at(j).at(k).newPressure = ((mesh.at(1).at(j-1).at(k).pressure + mesh.at(1).at(j+1).at(k).newPressure + mesh.at(1).at(j).at(k-1).newPressure + mesh.at(1).at(j).at(k+1).newPressure) - divergenceVelocityScalarField.at(1).at(j).at(k)) / 4;
     //             // mesh.medianSurroundingDensity = (mesh.at(1).at(j+1).at(k) + mesh.at(1).at(j-1).at(k) + mesh.at(1).at(j).at(k+1) + mesh.at(1).at(j).at(k-1) + 0 + 0)/4;
     //         }
     //     }
