@@ -16,6 +16,8 @@ int main()
     ToggleFullscreen();
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
+    // SetConfigFlags(FLAG_MSAA_4X_HINT);
+    SetConfigFlags(FLAG_FULLSCREEN_MODE | FLAG_WINDOW_RESIZABLE);
     // createLiftFiles(200, 0.01);
     SetTargetFPS(60);
     menu = Menu(screenWidth, screenHeight);
