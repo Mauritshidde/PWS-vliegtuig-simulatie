@@ -80,10 +80,11 @@ private:
     // graphics functions (these are optionally when running the cfd) 
     void moveCamera(float deltaTime);
     void drawVelocityVectors();
+    void draw2DGrid();
     void Draw();
 public:
     void run(int steps);
 
-    Cfd(int setnx = 200, int setny = 100, int setnz = 60, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
+    Cfd(int setnx = 150, int setny = 150, int setnz = 150, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
     ~Cfd();
 };

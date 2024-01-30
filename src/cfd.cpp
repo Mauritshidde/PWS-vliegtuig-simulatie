@@ -366,8 +366,7 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         
         // TODO the movement of the velocity and pressure NOTE density is constant
 
-        velocityMovement(0.1);
-        // removeDivergence();
+        velocityMovement(dT);
 
 
         // for (int j = jMin + 1; j < jMax + 1; j++)
@@ -389,6 +388,7 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         }
         std::cout << tijd << " " << maxTime << std::endl;
     }
+        removeDivergence();
 
     // TODO correction fase
     // correction 
@@ -502,9 +502,9 @@ void Cfd::moveCamera(float deltaTime) {
 }
 
 void Cfd::drawVelocityVectors() {
-    for (int i=1; i < 2; i++) {
-        for (int j=1; j < nx-1; j++) {
-            for (int k=1; k < ny-1; k++) {
+    for (int i=1; i < nz-1; i+=(nz/30)) {
+        for (int j=1; j < nx-1; j+=(nx/(nx/2))) {
+            for (int k=1; k < ny-1; k+=(ny/(ny/4))) {
                 Vector3 point;
                 point.x = startingPoint.x + j * dx - 0.5 * dx;
                 point.y = startingPoint.y + k * dy - 0.5 * dy;
@@ -519,87 +519,76 @@ void Cfd::drawVelocityVectors() {
                     float velocityZ = mesh.at(i).at(j).at(k).velocityZ;
                     float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
                     
-                    // TODO make vector whichs color depends on velocity
-                    double val = (velocity / 200.0f) *30;
+                    double val = (velocity / 200.0f) *300;
                     double val2 = (velocity / 500.0f);
-                    // double val2 = (mesh.at(1).at(j).at(k).pressure / mesh.at(1).at(1).at(1).pressure) * 10;
-                    // double val3 = mesh.at(1).at(j).at(k).pressure;
-                    Color velocityColor = {255, val2, val, 255};
+                    double val3 = velocity * 180;
+                    
+                    Color velocityColor = {255, val2, val3, 255};
                     
                     Vector3 velocityDirection = {velocityX,velocityY,velocityZ};
                     velocityDirection = Vector3Normalize2(velocityDirection);
-                    velocityDirection.x = (velocityDirection.x * 0.5 * dx + point.x) * 10;
-                    velocityDirection.y = (velocityDirection.y * 0.5 * dy + point.y) * 10;
-                    velocityDirection.z = (velocityDirection.z * 0.5 * dz + point.z) * 10;
+                    velocityDirection.x = (velocityDirection.x * 0.5 * dx + point.x);
+                    velocityDirection.y = (velocityDirection.y * 0.5 * dy + point.y);
+                    velocityDirection.z = (velocityDirection.z * 0.5 * dz + point.z);
                     // std::cout << point.x << "  x " << velocityDirection.x << std::endl;
                     // std::cout << point.y << " y " << velocityDirection.y << std::endl;
                     // std::cout << point.z << " z " << velocityDirection.z << std::endl;
                     DrawLine3D(point, velocityDirection, velocityColor); //111
                     // DrawLine3D(point, {point.x, point.y, point.z+dz}, BLUE);
                     // DrawCubeWires(point, dx, dy, dz, RED);
+                    // std::cout << velocity << " ";
+                }
+            }
+            // std::cout  << std::endl;
+            // std::cout << "velocity start " << mesh.at(1).at(0).at(0).velocityX << std::endl; 
+        }
+    }
+            // std::cout  << std::endl;
+            // std::cout  << std::endl;
+            // std::cout  << std::endl;
+}
+
+void Cfd::draw2DGrid() {
+    for (int i=1; i < 2; i++) {
+        for (int j=0; j < nx-1; j++) {
+            for (int k=1; k < ny-1; k++) {
+                Vector3 point;
+                point.x = j * dx - 0.5 * dx;
+                point.y = k * dy - 0.5 * dy;
+                point.z = startingPoint.z + i * dz - 0.5 * dz;
+
+                if (mesh.at(i).at(j).at(k).boundary) {
+                    DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, BLACK);
+
+                } else {
+                    float velocityX = mesh.at(i).at(j).at(k).velocityX;
+                    float velocityY = mesh.at(i).at(j).at(k).velocityY;
+                    float velocityZ = mesh.at(i).at(j).at(k).velocityZ;
+                    float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
+                    
+                    double val = (velocity / 200.0f) *300;
+                    double val2 = (velocity / 500.0f);
+                    double val3 = velocity * 180;
+                    
+                    Color velocityColor = {255, val2, val3, 255};
+                    DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, velocityColor);
                     std::cout << velocity << " ";
                 }
             }
             std::cout  << std::endl;
-            // std::cout << "velocity start " << mesh.at(1).at(0).at(0).velocityX << std::endl; 
         }
     }
-            std::cout  << std::endl;
-            std::cout  << std::endl;
-            std::cout  << std::endl;
+    std::cout  << std::endl;
+    std::cout  << std::endl;
+    std::cout  << std::endl;
 }
 
 void Cfd::Draw() {
     moveCamera(GetFrameTime());
     BeginDrawing();
         ClearBackground(WHITE);
-        for (int i=1; i < 2; i++) {
-            for (int j=0; j < nx-1; j++) {
-                for (int k=1; k < ny-1; k++) {
-                    Vector3 point;
-                    point.x = j * dx - 0.5 * dx;
-                    point.y = k * dy - 0.5 * dy;
-                    point.z = startingPoint.z + i * dz - 0.5 * dz;
-                    if (j == 0) {
-                        DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, BLACK);
-                    }
-                    else if (mesh.at(i).at(j).at(k).boundary) {
-                        DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, BLACK);
-
-                    } else {
-                        
-                        float velocityX = mesh.at(i).at(j).at(k).velocityX;
-                        float velocityY = mesh.at(i).at(j).at(k).velocityY;
-                        float velocityZ = mesh.at(i).at(j).at(k).velocityZ;
-                        float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
-                        
-                        double val = (velocity / 200.0f) *300;
-                        double val2 = (velocity / 500.0f);
-                        double val3 = velocity * 180;
-                        
-                        Color velocityColor = {255, val2, val3, 255};
-                        
-                        DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, velocityColor);
-                        std::cout << velocity << " ";
-                    }
-                }
-                std::cout  << std::endl;
-            }
-        }
-                std::cout  << std::endl;
-                std::cout  << std::endl;
-                std::cout  << std::endl;
-
-        // for (int i=0; i < ny; i++) {
-        //     std::cout << mesh.at(1).at(0).at(i).velocityX << " boundary ";
-        // }
-        // std::cout << std::endl;
+        draw2DGrid();
         // BeginMode3D(camera);
-        //     // DrawModel(airplane, {0,0,0}, 1.0f, RED);
-        //     // DrawBoundingBox(boundingBoxPlane, ORANGE);
-        //     DrawPoint3D(boundingBoxPlaneMax, PINK);
-        //     DrawPoint3D(boundingBoxPlaneMin, BLACK);
-        //     // std::cout << boundingBoxPlaneMax.x << " "  << boundingBoxPlaneMax.y << " " << boundingBoxPlaneMax.z << std::endl;
         //     drawVelocityVectors();
         // EndMode3D();
     EndDrawing();
