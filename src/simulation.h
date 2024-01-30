@@ -70,7 +70,7 @@ private:
     void currentAirDensity();
 
     std::vector<float> plotXRange;
-    std::vector<float> plotYValues;
+    std::vector<float> plotYValues, vel;
     float timeElapsed;
 
 public:

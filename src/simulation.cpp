@@ -50,7 +50,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
 
     plane = Plane(fileName, 100);
     
-    plotXRange = linspace(0, 500, 501);
+    plotXRange = linspace(0, 100, 101);
     timeElapsed = 0;
     // Vector2 aeroConsts;
     // for (float x = 0; x < plotXRange.size(); x++)
@@ -215,7 +215,8 @@ void RunSimulation::run()
             {
                 timeElapsed = 0;
                 std::cout << plotYValues.size() << " size \n";
-                plotYValues.push_back(plane.speed);
+                plotYValues.push_back(plane.acceleration.y);
+                vel.push_back(plane.velocity.z);
             }
             else
             {
@@ -224,5 +225,7 @@ void RunSimulation::run()
         }
     }
     mat::plot(plotXRange, plotYValues, "-o");
+    mat::save("yaccel.pdf");
+    mat::plot(plotXRange, vel, "-o");
     mat::save("velocity.pdf");
 }

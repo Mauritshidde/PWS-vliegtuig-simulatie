@@ -39,7 +39,7 @@ public:
       Physics planePhysics;
 
       float currentEngineTrust = 0.0f; // in newton
-      float maxEngineTrust = -116000;   // in newton
+      float maxEngineTrust = -116000 * 20;   // in newton
       float engineOffset; //distance of the engine to the center of mass
       Vector2 consts;
       float cl;
@@ -53,7 +53,7 @@ public:
       Vector3 velocity, angularVelocity, acceleration, angularAcceleration;
       Vector3 leftMotorThrustDirection, leftMotorThrust,rightMotorThrust;
       Vector3 liftDirection, dragDirection;
-      physicsVector forceLeftMotor, forceRightMotor, forceDrag, fG;
+      physicsVector forceLeftMotor, forceRightMotor, forceDrag, forceLift, fG;
       std::vector<physicsVector> forces;
       
       Vector3 momentOfInertia;
