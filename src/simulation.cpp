@@ -215,7 +215,7 @@ void RunSimulation::run()
             {
                 timeElapsed = 0;
                 std::cout << plotYValues.size() << " size \n";
-                plotYValues.push_back(plane.angleYaw);
+                plotYValues.push_back(plane.speed);
             }
             else
             {
@@ -224,5 +224,5 @@ void RunSimulation::run()
         }
     }
     mat::plot(plotXRange, plotYValues, "-o");
-    mat::save("test.pdf");
+    mat::save("velocity.pdf");
 }

@@ -58,19 +58,19 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       leftMotorThrust = {0,0, -maxEngineTrust};
       rightMotorThrust = {0,0, -maxEngineTrust};
 
-      // physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), {centerOfMass.x + 10000, centerOfMass.y, centerOfMass.z});
-      // leftMotorThrustDirection = Vector3Transform(leftMotorThrust, MatrixRotateXYZ((Vector3){DEG2RAD * angleYaw, DEG2RAD * anglePitch, DEG2RAD * angleRoll}));
       // Vector3 engineStartPosition = {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z};
       // Vector3 engineDirectionVec = planePhysics.vectorAddition(engineStartPosition, {0, 0, maxEngineTrust});
-      // physicsVector forceRightMotor = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x + engineOffset, centerOfMass.y, centerOfMass.z});
-      physicsVector forceLeftMotor = physicsVector(leftMotorThrust , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
-      physicsVector forceRightMotor = physicsVector(rightMotorThrust , {centerOfMass.x + engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
+      // fG = physicsVector(planePhysics.calcForceGravity(mass), {centerOfMass.x + 10000, centerOfMass.y, centerOfMass.z});
+      forceDrag = physicsVector({0, 0, 0}, centerOfMass);
+      calcLift(rho);
+      forceLeftMotor = physicsVector(leftMotorThrust , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
+      forceRightMotor = physicsVector(rightMotorThrust , {centerOfMass.x + engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
       
       // leftMotorDirectionPoint = planePhysics.vectorAddition(forceLeftMotor.location, forceLeftMotor.components);
       // rightMotorDirectionPoint = planePhysics.vectorAddition(forceRightMotor.location, {Vector3Normalize(forceRightMotor.components)});
       forces.push_back(forceLeftMotor);
       forces.push_back(forceRightMotor);
-      // forces.push_back(forceRightMotor);
+      forces.push_back(forceDrag);
       // forces.push_back(fG);
 }
 
@@ -111,8 +111,8 @@ void Plane::calcLift(float rho)
       lift = cl * rho * pow(speed, 2) * 0.5;
       drag = cd * rho * pow(speed, 2) * 0.5;
       dragDirection = Vector3Negate(Vector3Normalize(velocity));
-      dragForce = Vector3Scale(dragDirection, drag);
-      std::cout << " xdrag " << dragForce.x << " ydrag " << dragForce.y << " zdrag " << dragForce.z << "\n";
+      forceDrag.components = Vector3Scale(dragDirection, drag);
+      std::cout << " xdrag " << forceDrag.components.x << " ydrag " << forceDrag.components.y << " zdrag " << forceDrag.components.z << "\n";
 }
 
 Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth)
@@ -161,15 +161,14 @@ void Plane::Update(float deltaTime, float rho)
       if (previousAnglePitch != anglePitch || previousAngleYaw != angleYaw || previousAngleRoll != angleRoll)
       {
             airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
-            rotatePoints();
       }
 
       previousAnglePitch = anglePitch;
       previousAngleYaw = angleYaw;
       previousAngleRoll = angleRoll;
 
+      forces = {forceLeftMotor, forceRightMotor, forceDrag};
       calcLift(rho);
-
       rotateVector();
       evaluateForces(forces);
       updateVel(deltaTime);
@@ -280,17 +279,17 @@ Vector3 Plane::reduceAngleDegrees(Vector3 angle) // 0 < Angle < 360
       return angle;
 }
 
-void Plane::rotatePoints()
-{
-      leftMotorDirectionPoint = Vector3Transform(leftMotorDirectionPoint, MatrixRotateXYZ((Vector3){DEG2RAD *anglePitch, DEG2RAD *angleYaw, DEG2RAD *angleRoll}));
-}
+// void Plane::rotatePoints()
+// {
+//       leftMotorDirectionPoint = Vector3Transform(leftMotorDirectionPoint, MatrixRotateXYZ((Vector3){DEG2RAD *anglePitch, DEG2RAD *angleYaw, DEG2RAD *angleRoll}));
+// }
 
 void Plane::rotateVector()
 {
       // leftMotorThrustDirection = Vector3Transform(leftMotorThrust, MatrixRotateXYZ((Vector3){DEG2RAD * angleYaw, DEG2RAD * anglePitch, DEG2RAD * angleRoll}));
       // rotatePoints();
-      forces.at(0).components = Vector3Transform(leftMotorThrust, MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll}));
-      forces.at(1).components = Vector3Transform(rightMotorThrust, MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll}));
+      forceLeftMotor.components = Vector3Transform(leftMotorThrust, MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll}));
+      forceRightMotor.components = Vector3Transform(rightMotorThrust, MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll}));
       // forces.at(0).components = planePhysics.vectorSubtraction(leftMotorDirectionPoint, forces.at(0).location);
       // std::cout << sqrt(pow(forces.at(0).components.x, 2) + pow(forces.at(0).components.y, 2) + pow(forces.at(0).components.z, 2)) << " hhhhh" << std::endl;
       // std::cout << forces.at(0).components.x << " " << forces.at(0).components.y << " " << forces.at(0).components.z << " hhhhh" << std::endl;

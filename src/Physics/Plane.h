@@ -33,7 +33,6 @@ public:
 
       void reduceAngleDegrees();
       Vector3 reduceAngleDegrees(Vector3 angle);
-      void rotatePoints();
       void rotateVector();
 
 
@@ -53,9 +52,9 @@ public:
       Vector3 externalPos, pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
       Vector3 velocity, angularVelocity, acceleration, angularAcceleration;
       Vector3 leftMotorThrustDirection, leftMotorThrust,rightMotorThrust;
-      Vector3 liftDirection, liftForce, dragDirection, dragForce;
+      Vector3 liftDirection, dragDirection;
+      physicsVector forceLeftMotor, forceRightMotor, forceDrag, fG;
       std::vector<physicsVector> forces;
-      std::vector<physicsVector*> internalForces, relativeForces;
       
       Vector3 momentOfInertia;
 

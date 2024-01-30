@@ -8,6 +8,7 @@ public:
       Vector3 components;
       Vector3 location;
       bool isAbsoluteForce;
+      physicsVector() = default;
       physicsVector(Vector3 setComponents, Vector3 setLocation);
       ~physicsVector();
 };
