@@ -50,6 +50,7 @@ public:
       Vector3 leftMotorDirectionPoint, rightMotorDirectionPoint;
       Vector3 externalPos, pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
       Vector3 velocity, angularVelocity, acceleration, angularAcceleration;
+      Vector3 leftMotorThrustDirection, leftMotorThrust,rightMotorThrust;
       std::vector<physicsVector> forces;
       std::vector<physicsVector*> internalForces, relativeForces;
       

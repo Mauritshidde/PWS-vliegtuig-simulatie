@@ -57,14 +57,21 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       // std::cout << " xangAccel " << angularAcceleration.x << " yangAccel " << angularAcceleration.y << " zangAccel " << angularAcceleration.z << "\n";
 
       engineOffset = 14;
+      leftMotorThrust = {0,0, -maxEngineTrust};
+      rightMotorThrust = {0,0, -maxEngineTrust};
 
       // physicsVector fG = physicsVector(planePhysics.calcForceGravity(mass), {centerOfMass.x + 10000, centerOfMass.y, centerOfMass.z});
-      physicsVector forceLeftMotor  = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
+      // leftMotorThrustDirection = Vector3Transform(leftMotorThrust, MatrixRotateXYZ((Vector3){DEG2RAD * angleYaw, DEG2RAD * anglePitch, DEG2RAD * angleRoll}));
+      // Vector3 engineStartPosition = {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z};
+      // Vector3 engineDirectionVec = planePhysics.vectorAddition(engineStartPosition, {0, 0, maxEngineTrust});
       // physicsVector forceRightMotor = physicsVector({0, 0, maxEngineTrust} , {centerOfMass.x + engineOffset, centerOfMass.y, centerOfMass.z});
+      physicsVector forceLeftMotor = physicsVector(leftMotorThrust , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
+      physicsVector forceRightMotor = physicsVector(rightMotorThrust , {centerOfMass.x + engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
       
-      leftMotorDirectionPoint = planePhysics.vectorAddition(forceLeftMotor.location, forceLeftMotor.components);
+      // leftMotorDirectionPoint = planePhysics.vectorAddition(forceLeftMotor.location, forceLeftMotor.components);
       // rightMotorDirectionPoint = planePhysics.vectorAddition(forceRightMotor.location, {Vector3Normalize(forceRightMotor.components)});
       forces.push_back(forceLeftMotor);
+      forces.push_back(forceRightMotor);
       // forces.push_back(forceRightMotor);
       // forces.push_back(fG);
 }
@@ -99,6 +106,8 @@ Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, floa
 void Plane::Draw()
 {
       // 2de vector geeft aan met welke factor hij met currentangle draait
+      std::cout << " ?? " << forces.at(0).components.x*100 << " " << forces.at(0).components.y*100 << " " << forces.at(0).components.z *100 << std::endl;
+      DrawLine3D({0,0,0}, {forces.at(0).components.x/pow(10, 3), forces.at(0).components.y/pow(10, 3), forces.at(0).components.z /pow(10, 3)}, RED);
       DrawModelEx(airplane, externalPos, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); 
 }
 
@@ -150,6 +159,9 @@ void Plane::Update(float deltaTime, float rho)
       updateAngularVel(deltaTime);
       updateRotation(deltaTime);
       externalPos = planePhysics.moveWithVelocity(externalPos, velocity, deltaTime); //TODO update pos in torque
+
+      // physicsVector forceLeftMotor = physicsVector(leftMotorThrustDirection , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
+
       //test prints
       // for (int i = 0; i < forces.size(); i++)
       // {
@@ -229,6 +241,11 @@ void Plane::rotatePoints()
 
 void Plane::rotateVector()
 {
-      rotatePoints();
-      forces.at(0).components = planePhysics.vectorSubtraction(leftMotorDirectionPoint, forces.at(0).location);
+      // leftMotorThrustDirection = Vector3Transform(leftMotorThrust, MatrixRotateXYZ((Vector3){DEG2RAD * angleYaw, DEG2RAD * anglePitch, DEG2RAD * angleRoll}));
+      // rotatePoints();
+      forces.at(0).components = Vector3Transform(leftMotorThrust, MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll}));
+      forces.at(1).components = Vector3Transform(rightMotorThrust, MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll}));
+      // forces.at(0).components = planePhysics.vectorSubtraction(leftMotorDirectionPoint, forces.at(0).location);
+      // std::cout << sqrt(pow(forces.at(0).components.x, 2) + pow(forces.at(0).components.y, 2) + pow(forces.at(0).components.z, 2)) << " hhhhh" << std::endl;
+      // std::cout << forces.at(0).components.x << " " << forces.at(0).components.y << " " << forces.at(0).components.z << " hhhhh" << std::endl;
 }
