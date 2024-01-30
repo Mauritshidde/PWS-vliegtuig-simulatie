@@ -32,20 +32,18 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
 
       speed = startVelocity; // m/s
       speed = 257;
-      planeFrontalArea = 10;
-
-      wingArea = planeData["Planes"][planeName]["wing area"].get<float>(); // surface area of the wing in m2
+      
+      // wingArea = planeData["Planes"][planeName]["wing area"].get<float>(); // surface area of the wing in m2
       mass = planeData["Planes"][planeName]["maximal mass"].get<float>();
       centerOfMass = {0, 0, 0};
 
       liftFileName = planeName;
 
       files = LiftFileReader(liftFileName);
-      Vector2 consts = getConsts(anglePitch, angleYaw, true, true);
+      consts = getConsts(anglePitch, angleYaw, true, true);
 
       cl = consts.x;
       cd = consts.y;
-      calcLift(rho); // set lift and drag
       velocity = {0, 0, 0};
       acceleration = {0, 0, 0};
       angularVelocity = {0, 0, 0};
@@ -93,8 +91,28 @@ Vector2 Plane::getConsts(float pitch, float yaw, bool useYaw, bool usePitch)
 
 void Plane::calcLift(float rho)
 {
-      lift = cl * rho * pow(speed, 2) * wingArea * 0.5;
-      drag = cd * rho * pow(speed, 2) * planeFrontalArea * 0.5;
+      speed = planePhysics.calcHypot(velocity);
+      if (speed)
+      {
+            std::cout << " xvel " << velocity.x << " yvel " << velocity.y << " zvel " << velocity.z << "\n";
+            float angleYZ = atan(velocity.y / velocity.z) * 360; // pitch
+            float angleXZ = atan(velocity.x / velocity.z) * 360; // yaw
+            // float angleYX = atan(velocity.y / velocity.x) * 360; // roll
+            std::cout << " YZ " << angleYZ << " xz " << angleXZ << " \n "; // << angleYX << "\n";
+            Vector3 angleOfAttack = {angleYZ - anglePitch, angleXZ - angleYaw, 0}; //, angleYX - angleRoll};
+            std::cout << " aoa.x " << angleOfAttack.x << " aoa.y " << angleOfAttack.y << " \n "; 
+            angleOfAttack = reduceAngleDegrees(angleOfAttack);
+            std::cout << " aoa.x " << angleOfAttack.x << " aoa.y " << angleOfAttack.y << " \n "; 
+            consts = getConsts(angleOfAttack.x, angleOfAttack.y, (angleOfAttack.x != 0 ), (angleOfAttack.y != 0));
+            cl = consts.x;
+            cd = consts.y;
+            std::cout << " cl" << cl << " cd " << cd << " \n";
+      }
+      lift = cl * rho * pow(speed, 2) * 0.5;
+      drag = cd * rho * pow(speed, 2) * 0.5;
+      dragDirection = Vector3Negate(Vector3Normalize(velocity));
+      dragForce = Vector3Scale(dragDirection, drag);
+      std::cout << " xdrag " << dragForce.x << " ydrag " << dragForce.y << " zdrag " << dragForce.z << "\n";
 }
 
 Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth)
@@ -144,7 +162,6 @@ void Plane::Update(float deltaTime, float rho)
       {
             airplane.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
             rotatePoints();
-            getConsts(anglePitch, angleYaw, false, true);
       }
 
       previousAnglePitch = anglePitch;
@@ -232,6 +249,35 @@ void Plane::reduceAngleDegrees() // 0 < Angle < 360
       {
             angleRoll += 360;
       }
+}
+
+Vector3 Plane::reduceAngleDegrees(Vector3 angle) // 0 < Angle < 360
+{
+      while (angle.x > 360)
+      {
+            angle.x -= 360;
+      }
+      while (angle.x < 0)
+      {
+            angle.x += 360;
+      }
+      while (angle.y > 360)
+      {
+            angle.y -= 360;
+      }
+      while (angle.y < 0)
+      {
+            angle.y += 360;
+      }
+      while (angle.z > 360)
+      {
+            angle.z -= 360;
+      }
+      while (angle.z < 0)
+      {
+            angle.z += 360;
+      }
+      return angle;
 }
 
 void Plane::rotatePoints()

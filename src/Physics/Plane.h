@@ -32,6 +32,7 @@ public:
       void updateRotation(float deltaTime);
 
       void reduceAngleDegrees();
+      Vector3 reduceAngleDegrees(Vector3 angle);
       void rotatePoints();
       void rotateVector();
 
@@ -41,6 +42,7 @@ public:
       float currentEngineTrust = 0.0f; // in newton
       float maxEngineTrust = -116000;   // in newton
       float engineOffset; //distance of the engine to the center of mass
+      Vector2 consts;
       float cl;
       float cd;
       float lift;
@@ -51,6 +53,7 @@ public:
       Vector3 externalPos, pos, centerOfMass, centerOfLiftWingR, centerOfLiftWingL;
       Vector3 velocity, angularVelocity, acceleration, angularAcceleration;
       Vector3 leftMotorThrustDirection, leftMotorThrust,rightMotorThrust;
+      Vector3 liftDirection, liftForce, dragDirection, dragForce;
       std::vector<physicsVector> forces;
       std::vector<physicsVector*> internalForces, relativeForces;
       
