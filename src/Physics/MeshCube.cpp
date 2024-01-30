@@ -8,7 +8,7 @@ MeshCube::MeshCube(double vx, double vy, double vz, double setPressure, bool bou
     pressure = setPressure;
     boundary = bound;
     velocityX = 1;
-    velocityY = 0;
+    velocityY = 2;
     velocityZ = 0;
     pressureChanged = false;
 }
