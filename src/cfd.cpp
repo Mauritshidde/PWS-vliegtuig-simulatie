@@ -183,7 +183,7 @@ void Cfd::solvePressure(int i, int j, int k)
             if (!mesh.at(indexes.x).at(indexes.y).at(indexes.z).pressureChanged) {
                 toCalc.push_back(indexes);
                 values.push_back(0);
-                previousValues.push_back(0);
+                previousValues.push_back(mesh.at(indexes.x).at(indexes.y).at(indexes.z).pressure);
             }
         }
 
@@ -303,40 +303,90 @@ void Cfd::resetMesh() {
 }
 
 void Cfd::velocityMovement(float dT) {
-    // for (int i=1; i < nz-1; i++) {
-            for (int j=1; j < nx-1; j++) {
-                for (int k=1; k < ny-1; k++) {
-                    double vHere = 0.25 * (mesh.at(1).at(j-1).at(k).velocityY + mesh.at(1).at(j-1).at(k+1).velocityY + mesh.at(1).at(j).at(k).velocityY + mesh.at(1).at(j).at(k+1).velocityY);
-                    float a = (nu * (mesh.at(1).at(j-1).at(k).velocityX - 2 * mesh.at(1).at(j).at(k).velocityX + mesh.at(1).at(j + 1).at(k).velocityX) * pow(dxi, 2));
-                    float b = nu * (mesh.at(1).at(j).at(k - 1).velocityX - 2 * mesh.at(1).at(j).at(k).velocityX + mesh.at(1).at(j).at(k + 1).velocityX * pow(dyi, 2));
-                    float c = -mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j +1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX) * 0.5 * dxi;
-                    float d = -vHere * (mesh.at(1).at(j).at(k+1).velocityX - mesh.at(1).at(j).at(k-1).velocityX) * 0.5 * dyi;
-                    mesh.at(1).at(j).at(k).newVelocityX = mesh.at(1).at(j).at(k).velocityX + dT * (a + b + c + d); // nieuwe s over tijd
-                }
+    // // for (int i=1; i < nz-1; i++) {
+    //         for (int j=1; j < nx-1; j++) {
+    //             for (int k=1; k < ny-1; k++) {
+    //                 double vHere = 0.25 * (mesh.at(1).at(j-1).at(k).velocityY + mesh.at(1).at(j-1).at(k+1).velocityY + mesh.at(1).at(j).at(k).velocityY + mesh.at(1).at(j).at(k+1).velocityY);
+    //                 float a = (nu * (mesh.at(1).at(j-1).at(k).velocityX - 2 * mesh.at(1).at(j).at(k).velocityX + mesh.at(1).at(j + 1).at(k).velocityX) * pow(dxi, 2));
+    //                 float b = nu * (mesh.at(1).at(j).at(k - 1).velocityX - 2 * mesh.at(1).at(j).at(k).velocityX + mesh.at(1).at(j).at(k + 1).velocityX * pow(dyi, 2));
+    //                 float c = -mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j +1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX) * 0.5 * dxi;
+    //                 float d = -vHere * (mesh.at(1).at(j).at(k+1).velocityX - mesh.at(1).at(j).at(k-1).velocityX) * 0.5 * dyi;
+    //                 // mesh.at(1).at(j).at(k).newVelocityX = mesh.at(1).at(j).at(k).velocityX + dT * (a + b + c + d); // nieuwe s over tijd
+    //                 mesh.at(1).at(j).at(k).newVelocityX = mesh.at(1).at(j).at(k).velocityX + (mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j+1).at(k).velocityX + mesh.at(1).at(j).at(k-1).velocityX+ mesh.at(1).at(j).at(k+1).velocityX)/4.0f;
+    //             }
+    //         }
+    //     // }
+    // // for (int i=1; i < nz-1; i++) {
+    //     for (int j=1; j < nx-1; j++) {
+    //         for (int k=1; k < ny-1; k++) {
+    //             float vHere = 0.25 * (mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j - 1).at(k+1).velocityX + mesh.at(1).at(j).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityX);
+    //             float a = (nu * (mesh.at(1).at(j-1).at(k).velocityY - 2 * mesh.at(1).at(j).at(k).velocityY + mesh.at(1).at(j+1).at(k).velocityY) * pow(dxi, 2));
+    //             float b = nu * (mesh.at(1).at(j).at(k-1).velocityY - 2 * mesh.at(1).at(j).at(k).velocityY + mesh.at(1).at(j).at(k+1).velocityY * pow(dyi, 2));
+    //             float c = -mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j + 1).at(k).velocityY - mesh.at(1).at(j -1).at(k).velocityY) * 0.5 * dxi;
+    //             float d = -vHere * (mesh.at(1).at(j).at(k + 1).velocityY - mesh.at(1).at(j).at(k-1).velocityY) * 0.5 * dyi;
+    //             // mesh.at(1).at(j).at(k).newVelocityY = mesh.at(1).at(j).at(k).velocityY + dT * (a + b + c + d); // nieuwe s over tijd
+    //             mesh.at(1).at(j).at(k).newVelocityY = mesh.at(1).at(j).at(k).velocityY + (mesh.at(1).at(j-1).at(k).velocityY + mesh.at(1).at(j+1).at(k).velocityY + mesh.at(1).at(j).at(k-1).velocityY + mesh.at(1).at(j).at(k+1).velocityY)/4.0f;
+    //         }
+    //     }
+    // // }
+
+    // // for (int i=1; i < nz-1; i++) {
+    //     for (int j=1; j < nx-1; j++) {
+    //         for (int k=1; k < ny-1; k++) {
+    //             mesh.at(1).at(j).at(k).velocityX = mesh.at(1).at(j).at(k).newVelocityX;
+    //             mesh.at(1).at(j).at(k).velocityY = mesh.at(1).at(j).at(k).newVelocityY;
+    //             // std::cout << "newe x" << mesh.at(1).at(j).at(k).newVelocityX << " y " << mesh.at(1).at(j).at(k).newVelocityY << std::endl;
+    //         }
+    //     }
+    // // }
+    
+    std::vector<std::vector<std::vector<Vector3>>> tempVelocity;
+    for (int i=0; i < nz; i++) {
+        std::vector<std::vector<Vector3>> helper;
+        for (int j=0; j < nx; j++) {
+            std::vector<Vector3> helperHelper;
+            for (int k=0; k < ny; k++) {
+                helperHelper.push_back({0,0,0});
             }
-        // }
-    // for (int i=1; i < nz-1; i++) {
-        for (int j=1; j < nx-1; j++) {
-            for (int k=1; k < ny-1; k++) {
-                float vHere = 0.25 * (mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j - 1).at(k+1).velocityX + mesh.at(1).at(j).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityX);
-                float a = (nu * (mesh.at(1).at(j-1).at(k).velocityY - 2 * mesh.at(1).at(j).at(k).velocityY + mesh.at(1).at(j+1).at(k).velocityY) * pow(dxi, 2));
-                float b = nu * (mesh.at(1).at(j).at(k-1).velocityY - 2 * mesh.at(1).at(j).at(k).velocityY + mesh.at(1).at(j).at(k+1).velocityY * pow(dyi, 2));
-                float c = -mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j + 1).at(k).velocityY - mesh.at(1).at(j -1).at(k).velocityY) * 0.5 * dxi;
-                float d = -vHere * (mesh.at(1).at(j).at(k + 1).velocityY - mesh.at(1).at(j).at(k-1).velocityY) * 0.5 * dyi;
-                mesh.at(1).at(j).at(k).newVelocityY = mesh.at(1).at(j).at(k).velocityY + dT * (a + b + c + d); // nieuwe s over tijd
-            }
+            helper.push_back(helperHelper);
         }
-    // }
+        tempVelocity.push_back(helper);
+    }
 
     // for (int i=1; i < nz-1; i++) {
         for (int j=1; j < nx-1; j++) {
             for (int k=1; k < ny-1; k++) {
-                mesh.at(1).at(j).at(k).velocityX = mesh.at(1).at(j).at(k).newVelocityX;
-                mesh.at(1).at(j).at(k).velocityY = mesh.at(1).at(j).at(k).newVelocityY;
-                // std::cout << "newe x" << mesh.at(1).at(j).at(k).newVelocityX << " y " << mesh.at(1).at(j).at(k).newVelocityY << std::endl;
+                // double duDt = 1(mesh.at())
+                double duDt = -(mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX) / dx +
+                        mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityX - mesh.at(1).at(j).at(k-1).velocityX) / dy + 0) /dx;
+                        // mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityX - mesh.at(2-1).at(j).at(k).velocityX) / dz) / dx;
+
+                double dvDt = -(mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j).at(k).velocityY - mesh.at(1).at(j-1).at(k).velocityY) / dx +
+                        mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityY - mesh.at(1).at(j).at(k-1).velocityY) / dy + 0) /dy;
+                        // mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityY - mesh.at(2-1).at(j).at(k).velocityY) / dz) / dy;
+
+                // double dwDt = -(mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(1).at(j-1).at(k).velocityZ) / dx +
+                //         mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(1).at(j).at(k-1).velocityZ) / dy +
+                //         mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(2-1).at(j).at(k).velocityZ) / dz) / dz;
+
+                // # Update the temporary velocity field in the x-direction
+                tempVelocity.at(1).at(j).at(k).x = mesh.at(1).at(j).at(k).velocityX + duDt * dT;
+                tempVelocity.at(1).at(j).at(k).y = mesh.at(1).at(j).at(k).velocityY + dvDt * dT;
+                // tempVelocity.at(1).at(j).at(k).z = mesh.at(1).at(j).at(k).velocityZ + dwDt * dT;
+            }
+        }
+    // } 
+
+    // for (int i=1; i < nz-1; i++) {
+        for (int j=1; j < nx-1; j++) {
+            for (int k=1; k < ny-1; k++) {
+                mesh.at(1).at(j).at(k).velocityX = tempVelocity.at(1).at(j).at(k).x;
+                mesh.at(1).at(j).at(k).velocityY = tempVelocity.at(1).at(j).at(k).y;
+                // mesh.at(1).at(j).at(k).velocityZ = tempU.at(1).at(j).at(k).z;
             }
         }
     // }
+
 }
 
 Vector2 Cfd::calc(double anglePitch, double angleYaw)
@@ -349,8 +399,8 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         
         // TODO the movement of the velocity and pressure NOTE density is constant
 
-        velocityMovement(0.1);
-        removeDivergence();
+        velocityMovement(0.01);
+        // removeDivergence();
 
 
         // for (int j = jMin + 1; j < jMax + 1; j++)
@@ -533,17 +583,6 @@ void Cfd::drawVelocityVectors() {
 }
 
 void Cfd::Draw() {
-    // Vector3 position;
-    // position.x = 0;
-    // position.y = 0;
-    // position.z = 0;
-    // Vector3 test = {0, 100, 0};
-    // Ray ray;
-    // ray.position = position;
-    // ray.direction = test;
-
-    // int collisions = plane.detectCollision(ray);
-
     moveCamera(GetFrameTime());
     BeginDrawing();
         ClearBackground(WHITE);
@@ -611,6 +650,11 @@ void Cfd::run(int steps) { //333
                 for (int j=1; j < ny-1; j++) {
                     mesh.at(1).at(nx/2).at(j).boundary = true;
                 }
+                    mesh.at(1).at(nx/2).at(ny/2-1).boundary = false;
+                    mesh.at(1).at(nx/2).at(ny/2-2).boundary = false;
+                    mesh.at(1).at(nx/2).at(ny/2+1).boundary = false;
+                    mesh.at(1).at(nx/2).at(ny/2+2).boundary = false;
+
             Vector2 consts = calc(i, j);
             cfdResultsHelper.push_back({consts.x, consts.y});
         }
