@@ -1,7 +1,6 @@
 #include "simulation.h"
 #include "ui/menu.h"
 #include "cfd.h"
-#include "liftFileCode/createFile.h"
 #include "ui/loadingScreen.h"
 
 #include <raylib.h>
