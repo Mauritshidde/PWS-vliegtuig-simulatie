@@ -13,10 +13,10 @@ private:
     nlohmann::json liftWithPitchData;
     
 public:
-    Vector2 getClCdWithYaw(double yawAngle);
-    Vector2 getClCdWithPitch(double pitchAngle);
-    Vector2 getClCdWithPitchAndYaw(double pitchAngle, double yawAngle);
-    Vector2 getConstFromLiftFile(double pitchAngle, double yawAngle, bool withYaw, bool withPitch);
+    Vector2 getClCdWithYaw(float yawAngle);
+    Vector2 getClCdWithPitch(float pitchAngle);
+    Vector2 getClCdWithPitchAndYaw(float pitchAngle, float yawAngle);
+    Vector2 getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch);
 
     LiftFileReader(std::string name = "Boeing737");
     ~LiftFileReader();

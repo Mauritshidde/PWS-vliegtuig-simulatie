@@ -1,7 +1,6 @@
 #include "simulation.h"
 #include "ui/menu.h"
 #include "cfd.h"
-#include "liftFileCode/createFile.h"
 #include "ui/loadingScreen.h"
 
 #include <raylib.h>
@@ -39,10 +38,10 @@ int main()
             else if (menu.buttonPressed == 1)
             {
                 Cfd cfd;
-                cfd.run(100);
+                cfd.run(30, 5, 5);
                 // cfd.Draw();
                 running = false;
-                // start cfd program for calculating cl and cd;
+                // start cdf program for calculating cl and cd;
             }
             else if (menu.buttonPressed == 2)
             {

@@ -7,6 +7,7 @@
 #include "Physics/ModelLoader.h"
 #include "extra/raymath2.h"
 #include "ui/loadingScreen.h"
+#include "liftFileCode/createFile.h"
 // #include "matrix.h"
 
 class Cfd
@@ -26,6 +27,9 @@ private:
     Model airplane;
     Texture airplaneTexture;
     bool drawing;
+    BoundingBox boundingBoxPlane;
+    Vector3 boundingBoxPlaneMin;
+    Vector3 boundingBoxPlaneMax;
 
     // multi threading
     int cores;
@@ -53,8 +57,8 @@ private:
     double dT; // time steps
 
     std::vector<std::vector<std::vector<MeshCube>>> mesh;
-    std::vector<std::vector<std::vector<double>>> divergenceVelocityField;
-    std::vector<std::vector<std::vector<Vector3>>> gradientPressureField;
+    std::vector<std::vector<std::vector<double>>> divergenceVelocityScalarField;
+    std::vector<std::vector<std::vector<Vector3>>> gradientPressureField, divergenceVelocityField, divergenceFreeField;
 
     // functions for the creation of the grid
     void Start();
@@ -64,24 +68,25 @@ private:
 
     // functions for setting the plane boundary
     void setPlaneBoundaryHelper(int startIndex, int endIndex);
+    bool getCollisionPlaneRay(Vector3 direction, Vector3 oppositeDirection, Ray ray, Ray ray2);
     void detectColission();
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions 
 
     // functions for calculating the movement of the fluid
-    void densityDispersion();
     void removeDivergence();
-    void solveDensity(int i, int j, int k);
-    void solveDensityFirst(int i, int j, int k);
+    void velocityMovement(float dT);
     void solvePressure(int i, int j, int k);
-    void solvePressureFirst(int i, int j, int k);
-    void calc(double anglePitch, double angleYaw);    
+    Vector3 getNetPressureOnPlane();
+    Vector2 calc(double anglePitch, double angleYaw);    
 
     // graphics functions (these are optionally when running the cfd) 
-    void moveCamera();
+    void moveCamera(float deltaTime);
+    void drawVelocityVectors();
+    void draw2DGrid();
     void Draw();
 public:
-    void run(int steps);
+    void run(int steps, double stepsizePitch, double stepsizeYaw);
 
-    Cfd(int setnx = 120, int setny = 80, int setnz = 80, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
+    Cfd(int setnx = 150, int setny = 150, int setnz = 150, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
     ~Cfd();
 };
