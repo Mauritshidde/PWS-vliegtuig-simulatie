@@ -47,7 +47,7 @@ void Cfd::setBoundaryConditions(double velocityXDirectionStart, double velocityY
         {
             mesh.at(i).at(0).at(k).boundary = true;
             mesh.at(i).at(0).at(k).velocityX = velocityXDirectionStart;
-            mesh.at(i).at(0).at(k).pressure = pow(velocityXDirectionStart,2) * (rho/2.0f);
+            // mesh.at(i).at(0).at(k).pressure = pow(velocityXDirectionStart,2) * (rho/2.0f);
 
             mesh.at(i).at(nx - 1).at(k).boundary = true;
             mesh.at(i).at(nx - 1).at(k).velocityX = velocityXDirectionEnd;
@@ -275,12 +275,14 @@ void Cfd::removeDivergence() {
                     divergenceFreeField.at(1).at(j).at(k).x = divergenceVelocityField.at(1).at(j).at(k).x - gradientPressureField.at(1).at(j).at(k).x;
                     divergenceFreeField.at(1).at(j).at(k).y = divergenceVelocityField.at(1).at(j).at(k).y - gradientPressureField.at(1).at(j).at(k).y;
                     divergenceFreeField.at(1).at(j).at(k).z = divergenceVelocityField.at(1).at(j).at(k).z - gradientPressureField.at(1).at(j).at(k).z;
+
+                    mesh.at(1).at(j).at(k).velocityX += (mesh.at(1).at(j).at(k).velocityX - divergenceFreeField.at(1).at(j).at(k).x)/dx *(dT/10);
+                    mesh.at(1).at(j).at(k).velocityY += (mesh.at(1).at(j).at(k).velocityY - divergenceFreeField.at(1).at(j).at(k).y)/dy *(dT/10);
+                    mesh.at(1).at(j).at(k).velocityZ += (mesh.at(1).at(j).at(k).velocityZ - divergenceFreeField.at(1).at(j).at(k).z)/dz *(dT/10);
                 } else {
                     divergenceFreeField.at(1).at(j).at(k) = {0,0,0};
                 }
-                mesh.at(1).at(j).at(k).velocityX = divergenceFreeField.at(1).at(j).at(k).x;
-                mesh.at(1).at(j).at(k).velocityY = divergenceFreeField.at(1).at(j).at(k).y;
-                mesh.at(1).at(j).at(k).velocityZ = divergenceFreeField.at(1).at(j).at(k).z;
+                // TODO solve velocity by calculating the divergence velocity back
             }
         }
     // } 
@@ -356,6 +358,39 @@ void Cfd::velocityMovement(float dT) {
 
 }
 
+Vector3 Cfd::getNetPressureOnPlane() {
+    Vector3 netPressure = {0,0,0};
+
+    for (int i=1; i < nz-1; i++) {
+        for (int j=1; j < nx-1; j++) {
+            for (int k=1; k < ny-1; k++) {
+                if (mesh.at(1).at(j).at(k).boundary) {
+                    if (!mesh.at(i).at(j+1).at(k).boundary) {
+                        netPressure.x += mesh.at(1).at(j+1).at(k).pressure * dy * dz;
+                    }
+                    if (!mesh.at(i).at(j-1).at(k).boundary) {
+                        netPressure.x -= mesh.at(1).at(j-1).at(k).pressure * dy * dz;
+                    }
+                    if (!mesh.at(i).at(j).at(k+1).boundary) {
+                        netPressure.y += mesh.at(1).at(j).at(k+1).pressure * dx * dz;
+                    }
+                    if (!mesh.at(i).at(j).at(k-1).boundary) {
+                        netPressure.y -= mesh.at(1).at(j).at(k-1).pressure * dx * dz;
+                    }
+                    if (!mesh.at(i+1).at(j).at(k).boundary) {
+                        netPressure.z += mesh.at(i+1).at(j).at(k).pressure * dx * dy;
+                    }
+                    if (!mesh.at(i-1).at(j).at(k).boundary) {
+                        netPressure.z -= mesh.at(i-1).at(j).at(k).pressure * dx * dy;
+                    }
+                }
+            }
+        }
+    }
+
+    return netPressure;
+}
+
 Vector2 Cfd::calc(double anglePitch, double angleYaw)
 {
     float cl, cd;
@@ -364,76 +399,26 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
     {
         tijd += dT;
         
-        // TODO the movement of the velocity and pressure NOTE density is constant
+        // TODO the movement of the pressure NOTE density is constant
 
         velocityMovement(dT);
-
-
-        // for (int j = jMin + 1; j < jMax + 1; j++)
-        // {
-        //     for (int i = iMin; i < iMax + 1; i++)
-        //     {
-        //         std::cout << "ja 2" << std::endl;
-        //         float uHere = 0.25 * (u.at(i).at(j - 1) + u.at(i).at(j) + u.at(i + 1).at(j - 1) + u.at(i + 1).at(j));
-        //         float a = (nu * (v.at(i - 1).at(j) - 2 * v.at(i).at(j) + v.at(i + 1).at(j)) * pow(dxi, 2));
-        //         float b = nu * (v.at(i).at(j - 1) - 2 * v.at(i).at(j) + v.at(i).at(j + 1) * pow(dyi, 2));
-        //         float c = -uHere * (v.at(i + 1).at(j) - v.at(i - 1).at(j)) * 0.5 * dyi;
-        //         float d = -v.at(i).at(j) * (v.at(1).at(j + 1) - v.at(i).at(j - 1)) * 0.5 * dxi;
-        //         vs.at(i).at(j) = v.at(i).at(j) + dT * (a + b + c + d);
-        //     }
-        // }
+        // removeDivergence();
 
         if (drawing) {
             Draw();
         }
         std::cout << tijd << " " << maxTime << std::endl;
     }
-        removeDivergence();
 
     // TODO correction fase
     // correction 
 
-    // // for (int i=1; i < nz-1; i++) {
-    //     for (int j = 1; j < nx - 1; j++)
-    //     {
-    //         for (int k = 1; k < ny - 1; k++)
-    //         {
-    //             divergenceVelocityScalarField.at(1).at(j).at(k) = (mesh.at(1).at(j+1).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX + mesh.at(1).at(j).at(k+1).velocityY - mesh.at(1).at(j).at(k-1).velocityY)/2;
-    //             // mesh.at(1).at(j).at(k).pressure = iterativeSolver(1, j, k);
-    //             if (j == 1) {
-    //                 solvePressureFirst(1, j, k);
-    //             } else {
-    //                 solvePressure(1, j, k);
-    //             }
-    //             // mesh.at(1).at(j).at(k).newPressure = ((mesh.at(1).at(j-1).at(k).pressure + mesh.at(1).at(j+1).at(k).newPressure + mesh.at(1).at(j).at(k-1).newPressure + mesh.at(1).at(j).at(k+1).newPressure) - divergenceVelocityScalarField.at(1).at(j).at(k)) / 4;
-    //             // mesh.medianSurroundingDensity = (mesh.at(1).at(j+1).at(k) + mesh.at(1).at(j-1).at(k) + mesh.at(1).at(j).at(k+1) + mesh.at(1).at(j).at(k-1) + 0 + 0)/4;
-    //         }
-    //     }
-    // // }
+    Vector3 forces = getNetPressureOnPlane();
+    // TODO the 100 is the starting velocity of the boudnary on the left
+    cl = forces.y / (rho * pow(100 ,2) * 0.5);
+    cd = forces.x / (rho * pow(100 ,2) * 0.5);
+    // float cz = forces.z / (rho * pow(100 ,2) * 0.5);
 
-    // // for (int i=1; i < nz-1; i++) {
-    //     for (int j = 1; j < nx - 1; j++)
-    //     {
-    //         for (int k = 1; k < ny - 1; k++)
-    //         {
-    //             mesh.at(1).at(j).at(k).pressure = mesh.at(1).at(j).at(k).newPressure;
-    //         }
-    //     }
-    // // }
-
-    // // for (int i=1; i < nz-1; i++) {
-    //     for (int j = 1; j < nx - 1; j++)
-    //     {
-    //         for (int k = 1; k < ny - 1; k++)
-    //         {
-    //             gradientPressureField.at(1).at(j).at(k).x = (mesh.at(1).at(j+1).at(k).pressure - mesh.at(1).at(j-1).at(k).pressure)/2;
-    //             gradientPressureField.at(1).at(j).at(k).y = (mesh.at(1).at(j).at(k+1).pressure - mesh.at(1).at(j).at(k-1).pressure)/2;
-    //             // gradientPressureField.at(1).at(j).at(k).z = (mesh.at(0+1).at(j).at(k).pressure - mesh.at(0-1).at(j).at(k).pressure)/2 
-    //         }
-    //     }
-    // // }
-
-    // TODO use pressure field to calculate lift and drag
     return {cl, cd};
 }
 
@@ -594,7 +579,7 @@ void Cfd::Draw() {
     EndDrawing();
 }
 
-void Cfd::run(int steps) { //333
+void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
     double stepsize = 360.0f/steps;
     std::vector<std::vector<Vector2>> cfdResults;
     for (double i=0; i < 360; i+=stepsize) { // pitch
@@ -615,6 +600,26 @@ void Cfd::run(int steps) { //333
             cfdResultsHelper.push_back({consts.x, consts.y});
         }
     }
+
+    std::vector<Vector2> cfdResultsPitch, cfdResultsYaw;
+    for (double i=0; i < 360; i+=stepsizePitch) { // pitch
+        airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * i, DEG2RAD * 0, DEG2RAD * 0});
+        resetMesh();
+        setPlaneBoundary();
+        Vector2 consts = calc(i, 0);
+        cfdResultsPitch.push_back({consts.x, consts.y});
+    }
+
+    for (double i=0; i < 360; i+=stepsizeYaw) {
+        airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * 0, DEG2RAD * i, DEG2RAD * 0});
+        resetMesh();
+        setPlaneBoundary();
+
+        Vector2 consts = calc(0, i);
+        cfdResultsYaw.push_back({consts.x, consts.y});
+    }
+
+    createLiftFiles(&cfdResults, &cfdResultsPitch, &cfdResultsYaw);
 }
 
 Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho, bool drawingEnabled)

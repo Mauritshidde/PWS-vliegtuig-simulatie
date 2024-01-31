@@ -1,12 +1,13 @@
 #include "createFile.h"
 
-void fileWithoutYaw(float stepSize) {
+void fileWithoutYaw(std::vector<Vector2> *consts) {
     nlohmann::json data;
+    double stepSize = 360 / consts->size();
 
     int index = 0;
-    for (float i=0; i <= 360; i+= stepSize) {
-        data["pitch"][std::to_string(index)]["cl"] = 0.445; // calc lift and cl here
-        data["pitch"][std::to_string(index)]["cd"] = 0.017;
+    for (double i=0; i <= 360; i+= stepSize) {
+        data["pitch"][std::to_string(index)]["cl"] = consts->at(i).x;
+        data["pitch"][std::to_string(index)]["cd"] = consts->at(i).y;
         index++;
     }
 
@@ -18,13 +19,14 @@ void fileWithoutYaw(float stepSize) {
     liftfile.close();
 }
 
-void fileWithoutPitch(float stepSize) {
+void fileWithoutPitch(std::vector<Vector2> *consts) {
     nlohmann::json data;
+    double stepSize = 360 / consts->size();
 
     int index = 0;
-    for (float i=0; i <= 360; i+= stepSize) {
-        data["yaw"][std::to_string(index)]["cl"] = 0.445;
-        data["yaw"][std::to_string(index)]["cd"] = 0.017;
+    for (double i=0; i <= 360; i+= stepSize) {
+        data["yaw"][std::to_string(index)]["cl"] = consts->at(i).x;
+        data["yaw"][std::to_string(index)]["cd"] = consts->at(i).y;
         index++;
     }
 
@@ -36,14 +38,15 @@ void fileWithoutPitch(float stepSize) {
     liftfile.close();
 }
 
-void fileWithBoth(int steps) {
+void fileWithBoth(std::vector<std::vector<Vector2>> *consts) {
     nlohmann::json data;
+    int steps = consts->size();
     float stepSize = 360.0f/(steps-1);
     
     for (int i=0; i < steps; i++) {
         for (int j=0; j < steps; j++) {
-            data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cl"] = 0.445;
-            data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cd"] = 0.017;
+            data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cl"] = consts->at(i).at(j).x;
+            data["pitch"][std::to_string(i)]["yaw"][std::to_string(j)]["cd"] = consts->at(i).at(j).y;
         }
     }
 
@@ -57,8 +60,8 @@ void fileWithBoth(int steps) {
 }
 
 
-void createLiftFiles(int steps, float stepSize) { // steps has to be greater than 2 but realisticly has to be higher than 200
-    fileWithoutYaw(stepSize); // for the best results x times stepsize should be 360
-    fileWithoutPitch(stepSize);
-    fileWithBoth(steps);
+void createLiftFiles(std::vector<std::vector<Vector2>> *constsBoth, std::vector<Vector2> *constsPitch, std::vector<Vector2> *constsYaw) { // steps has to be greater than 2 but realisticly has to be higher than 200
+    fileWithoutYaw(constsPitch); // for the best results x times stepsize should be 360
+    fileWithoutPitch(constsYaw);
+    fileWithBoth(constsBoth);
 }
