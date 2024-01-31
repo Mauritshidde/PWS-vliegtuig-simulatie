@@ -70,11 +70,11 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       
       // leftMotorDirectionPoint = planePhysics.vectorAddition(forceLeftMotor.location, forceLeftMotor.components);
       // rightMotorDirectionPoint = planePhysics.vectorAddition(forceRightMotor.location, {Vector3Normalize(forceRightMotor.components)});
-      forces.push_back(forceLift);
-      // forces.push_back(forceLeftMotor);
+      // forces.push_back(forceLift);
+      forces.push_back(forceLeftMotor);
       forces.push_back(forceRightMotor);
-      forces.push_back(forceDrag);
-      forces.push_back(fG);
+      // forces.push_back(forceDrag);
+      // forces.push_back(fG);
 }
 
 Plane::~Plane()
@@ -128,8 +128,11 @@ Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, floa
 
 void Plane::Draw()
 {
+      for (int i = 0; i < forces.size(); i++)
+      {
+            DrawLine3D(forces.at(i).location, {forces.at(0).components.x + forces.at(i).location.x, forces.at(0).components.y + forces.at(i).location.y, forces.at(0).components.z + forces.at(i).location.z}, RED);
+      }
       // 2de vector geeft aan met welke factor hij met currentangle draait
-      DrawLine3D({0,0,0}, {forces.at(0).components.x/pow(10, 3), forces.at(0).components.y/pow(10, 3), forces.at(0).components.z /pow(10, 3)}, RED);
       DrawModelEx(airplane, externalPos, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); 
 }
 
@@ -171,7 +174,7 @@ void Plane::Update(float deltaTime, float rho)
       previousAngleYaw = angleYaw;
       previousAngleRoll = angleRoll;
 
-      forces = {forceLift, forceDrag /* ,forceLeftMotor */, forceRightMotor, fG};
+      forces = {forceLift, forceDrag ,forceLeftMotor, forceRightMotor, fG};
       calcLift(rho);
       rotateVector();
       evaluateForces(forces);
@@ -183,11 +186,12 @@ void Plane::Update(float deltaTime, float rho)
       // physicsVector forceLeftMotor = physicsVector(leftMotorThrustDirection , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
 
       // test prints
-      for (int i = 0; i < forces.size(); i++)
-      {
-            std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
-            std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
-      }
+      // for (int i = 0; i < forces.size(); i++)
+      // {
+      //       DrawLine3D({0,0,0}, {forces.at(0).components.x/pow(10, 3), forces.at(0).components.y/pow(10, 3), forces.at(0).components.z /pow(10, 3)}, RED);
+      //       std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
+      //       std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
+      // }
       // std::cout << "speed: " << velocity << " lift: " << lift << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
 }
 

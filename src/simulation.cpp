@@ -46,7 +46,8 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     skyboxTexture = LoadTexture("models/texture/skyboxtexture.png");
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
 
-    decorations = skyDecoration();
+    decorations1 = skyDecoration({0, 0, 0});
+    decorations2 = skyDecoration({-700, 40, -700});
 
     plane = Plane(fileName, 100);
     
@@ -152,8 +153,9 @@ void RunSimulation::Update(float deltaTime)
     // after that value updates by gui or key inputs
     
     plane.Update(deltaTime, rho);
-    //move the environment decorations (birds) with the speed of the plane to create the illusion of plane movement
-    decorations.globalPosition = decorations.physics.moveWithVelocity(decorations.globalPosition, Vector3Negate(plane.velocity), deltaTime);
+    //move the environment decorations1 (birds) with the speed of the plane to create the illusion of plane movement
+    decorations1.globalPosition = decorations1.physics.moveWithVelocity(decorations1.globalPosition, Vector3Negate(plane.velocity), deltaTime);
+    decorations2.globalPosition = decorations2.physics.moveWithVelocity(decorations2.globalPosition, Vector3Negate(plane.velocity), deltaTime);
     //TODO add external plane position and move plane
     
     moveCamera(deltaTime);
@@ -169,7 +171,8 @@ void RunSimulation::Render()
 
         BeginMode3D(mainCamera);
             DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
-            decorations.draw();
+            decorations1.draw();
+            decorations2.draw();
             plane.Draw();
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
             DrawGrid(10, 10.0f);

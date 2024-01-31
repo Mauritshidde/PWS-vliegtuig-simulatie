@@ -3,10 +3,10 @@
 #define RAYMATH_IMPLEMENTATION
 #include "../include/modules/raymath.h"
 
-skyDecoration::skyDecoration()
+skyDecoration::skyDecoration(Vector3 position)
 {
       SetRandomSeed(GetTime());
-      globalPosition = {0, 0, 0};
+      globalPosition = position;
       birds = LoadModel("models/object/birds.obj");
       anglePitch = 0;
       angleYaw = 0;

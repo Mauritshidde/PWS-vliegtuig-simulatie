@@ -20,7 +20,8 @@ private:
 public:
       Physics physics = Physics();
       Vector3 globalPosition;
-      skyDecoration();
+      skyDecoration() = default;
+      skyDecoration(Vector3 position);
       ~skyDecoration();
       void draw();
       bool isOutOfBounds();
