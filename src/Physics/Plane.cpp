@@ -37,13 +37,14 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       mass = planeData["Planes"][planeName]["maximal mass"].get<float>();
       centerOfMass = {0, 0, 0};
 
-      liftFileName = planeName;
+      angularDrag = 0.01; 
 
+      liftFileName = planeName;
       files = LiftFileReader(liftFileName);
       consts = getConsts(anglePitch, angleYaw, true, true);
-
       cl = consts.x;
       cd = consts.y;
+
       velocity = {0, 0, speed};
       acceleration = {0, 0, 0};
       angularVelocity = {0, 0, 0};
@@ -70,7 +71,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       // leftMotorDirectionPoint = planePhysics.vectorAddition(forceLeftMotor.location, forceLeftMotor.components);
       // rightMotorDirectionPoint = planePhysics.vectorAddition(forceRightMotor.location, {Vector3Normalize(forceRightMotor.components)});
       forces.push_back(forceLift);
-      forces.push_back(forceLeftMotor);
+      // forces.push_back(forceLeftMotor);
       forces.push_back(forceRightMotor);
       forces.push_back(forceDrag);
       forces.push_back(fG);
@@ -128,7 +129,6 @@ Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, floa
 void Plane::Draw()
 {
       // 2de vector geeft aan met welke factor hij met currentangle draait
-      std::cout << " ?? " << forces.at(0).components.x*100 << " " << forces.at(0).components.y*100 << " " << forces.at(0).components.z *100 << std::endl;
       DrawLine3D({0,0,0}, {forces.at(0).components.x/pow(10, 3), forces.at(0).components.y/pow(10, 3), forces.at(0).components.z /pow(10, 3)}, RED);
       DrawModelEx(airplane, externalPos, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE); 
 }
@@ -171,15 +171,14 @@ void Plane::Update(float deltaTime, float rho)
       previousAngleYaw = angleYaw;
       previousAngleRoll = angleRoll;
 
-      forces = {forceLift, forceDrag ,forceLeftMotor, forceRightMotor, fG};
+      forces = {forceLift, forceDrag /* ,forceLeftMotor */, forceRightMotor, fG};
       calcLift(rho);
       rotateVector();
       evaluateForces(forces);
       updateVel(deltaTime);
       updateAngularVel(deltaTime);
       updateRotation(deltaTime);
-      externalPos = planePhysics.moveWithVelocity(externalPos, velocity, deltaTime);
-      externalPos = Vector3Scale(externalPos, 0.01);
+      pos = planePhysics.moveWithVelocity(externalPos, velocity, deltaTime);
 
       // physicsVector forceLeftMotor = physicsVector(leftMotorThrustDirection , {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z}); //TODO add variable engine thrust
 
@@ -195,8 +194,14 @@ void Plane::Update(float deltaTime, float rho)
 void Plane::evaluateForces(std::vector<physicsVector> forces)
 {
       angularAcceleration = planePhysics.calcAngularAcceleration(forces, mass, centerOfMass, momentOfInertia, (Vector3){anglePitch, angleYaw, angleRoll});
-      acceleration = planePhysics.calcAcceleration(forces, mass);
-      // std::cout << " xAccel " << acceleration.x << " yAccel " << acceleration.y << " zAccel " << acceleration.z << "\n";
+      acceleration = planePhysics.calcAcceleration(forces, mass);      
+
+      // if (abs(angularAcceleration.x) > 0.1 || abs(angularAcceleration.y) > 0.1 || abs(angularAcceleration.z) > 0.1) //apply drag force
+      // {
+      //       angularAcceleration.x -= angularDrag * pow(angularVelocity.x, 2);
+      //       angularAcceleration.y -= angularDrag * pow(angularVelocity.y, 2);
+      //       angularAcceleration.z -= angularDrag * pow(angularVelocity.z, 2);
+      // }
 }
 
 void Plane::updateVel(float deltaTime)

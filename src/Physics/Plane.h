@@ -39,13 +39,14 @@ public:
       Physics planePhysics;
 
       float currentEngineTrust = 0.0f; // in newton
-      float maxEngineTrust = -116000 * 20;   // in newton
+      float maxEngineTrust = -116000;   // in newton
       float engineOffset; //distance of the engine to the center of mass
       Vector2 consts;
       float cl;
       float cd;
       float lift;
       float drag;
+      float angularDrag;
       float leftMotorForce;
       float rightMotorForce;
       Vector3 leftMotorDirectionPoint, rightMotorDirectionPoint;
