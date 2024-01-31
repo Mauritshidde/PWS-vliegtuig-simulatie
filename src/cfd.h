@@ -87,6 +87,6 @@ private:
 public:
     void run(int steps, double stepsizePitch, double stepsizeYaw);
 
-    Cfd(int setnx = 150, int setny = 150, int setnz = 150, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
+    Cfd(int setnx = 5, int setny = 5, int setnz = 5, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
     ~Cfd();
 };

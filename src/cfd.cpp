@@ -110,25 +110,27 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
                         // if (collisions % 2 != 0 && collisions > 0) {
                         //     mesh.at(i).at(j).at(k).boundary = true;
                         // }
-                        Ray ray;
-                        Ray ray2;
-                        
-                        ray.position = position;
-                        ray2.position = position;
-                        
-                        // check if the cube is inside the plane
-                        if (getCollisionPlaneRay({1,0,0}, {1,0,0}, ray, ray2)) { 
-                            if (getCollisionPlaneRay({0,1,0}, {0,1,0}, ray, ray2)) {
-                                if (getCollisionPlaneRay({0,0,1}, {0,0,1}, ray, ray2)) {
-                                    mesh.at(i).at(j).at(k).boundary = true;
-                                }
+                    Ray ray;
+                    Ray ray2;
+                    
+                    ray.position = position;
+                    ray2.position = position;
+                    
+                    // check if the cube is inside the plane
+                    if (getCollisionPlaneRay({1,0,0}, {1,0,0}, ray, ray2)) { 
+                        if (getCollisionPlaneRay({0,1,0}, {0,1,0}, ray, ray2)) {
+                            if (getCollisionPlaneRay({0,0,1}, {0,0,1}, ray, ray2)) {
+                                mesh.at(i).at(j).at(k).boundary = true;
                             }
                         }
+                    }
                 }
             }
         }
         std::cout << "ja" << std::endl;
     }
+    std::cout << "nee" << std::endl;
+
     settingPlaneBOundarys = false;
 
 }
@@ -395,7 +397,7 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
 {
     float cl, cd;
     double tijd = 0;
-    while (tijd < maxTime)
+    while (tijd < 1)
     {
         tijd += dT;
         
@@ -508,7 +510,7 @@ void Cfd::drawVelocityVectors() {
                     double val2 = (velocity / 500.0f);
                     double val3 = velocity * 180;
                     
-                    Color velocityColor = {255, val2, val3, 255};
+                    Color velocityColor = {val, val2, val3, 255};
                     
                     Vector3 velocityDirection = {velocityX,velocityY,velocityZ};
                     velocityDirection = Vector3Normalize2(velocityDirection);
@@ -518,7 +520,7 @@ void Cfd::drawVelocityVectors() {
                     // std::cout << point.x << "  x " << velocityDirection.x << std::endl;
                     // std::cout << point.y << " y " << velocityDirection.y << std::endl;
                     // std::cout << point.z << " z " << velocityDirection.z << std::endl;
-                    DrawLine3D(point, velocityDirection, velocityColor); //111
+                    // DrawLine3D(point, velocityDirection, velocityColor); //111
                     // DrawLine3D(point, {point.x, point.y, point.z+dz}, BLUE);
                     // DrawCubeWires(point, dx, dy, dz, RED);
                     // std::cout << velocity << " ";
@@ -572,54 +574,60 @@ void Cfd::Draw() {
     moveCamera(GetFrameTime());
     BeginDrawing();
         ClearBackground(WHITE);
-        draw2DGrid();
-        // BeginMode3D(camera);
-        //     drawVelocityVectors();
-        // EndMode3D();
+        // draw2DGrid();
+        BeginMode3D(camera);
+            drawVelocityVectors();
+        EndMode3D();
     EndDrawing();
 }
 
 void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
     double stepsize = 360.0f/steps;
     std::vector<std::vector<Vector2>> cfdResults;
-    for (double i=0; i < 360; i+=stepsize) { // pitch
+    for (double i=0; i <= 360; i+=stepsize) { // pitch
         std::vector<Vector2> cfdResultsHelper;
-        for (double j=0; j < 360; j+=stepsize) { // yaw
+        for (double j=0; j <= 360; j+=stepsize) { // yaw
             airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * i, DEG2RAD * j, DEG2RAD * 0});
             resetMesh();
             // setPlaneBoundary();
-                for (int j=1; j < ny-1; j++) {
-                    mesh.at(1).at(nx/2).at(j).boundary = true;
-                }
-                    mesh.at(1).at(nx/2).at(ny/2-1).boundary = false;
-                    mesh.at(1).at(nx/2).at(ny/2-2).boundary = false;
-                    mesh.at(1).at(nx/2).at(ny/2+1).boundary = false;
-                    mesh.at(1).at(nx/2).at(ny/2+2).boundary = false;
+                // for (int j=1; j < ny-1; j++) {
+                //     mesh.at(1).at(nx/2).at(j).boundary = true;
+                // }
+                //     mesh.at(1).at(nx/2).at(ny/2-1).boundary = false;
+                //     mesh.at(1).at(nx/2).at(ny/2-2).boundary = false;
+                //     mesh.at(1).at(nx/2).at(ny/2+1).boundary = false;
+                //     mesh.at(1).at(nx/2).at(ny/2+2).boundary = false;
 
             Vector2 consts = calc(i, j);
-            cfdResultsHelper.push_back({consts.x, consts.y});
+            cfdResultsHelper.push_back(consts);
         }
     }
-
+    std::cout << "done" << std::endl;
     std::vector<Vector2> cfdResultsPitch, cfdResultsYaw;
-    for (double i=0; i < 360; i+=stepsizePitch) { // pitch
+    for (double i=0; i <= 360; i+=stepsizePitch) { // pitch
         airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * i, DEG2RAD * 0, DEG2RAD * 0});
         resetMesh();
-        setPlaneBoundary();
+        // setPlaneBoundary();
         Vector2 consts = calc(i, 0);
         cfdResultsPitch.push_back({consts.x, consts.y});
     }
+    std::cout << "done2" << std::endl;
 
-    for (double i=0; i < 360; i+=stepsizeYaw) {
+    for (double i=0; i <= 360; i+=stepsizeYaw) {
         airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * 0, DEG2RAD * i, DEG2RAD * 0});
         resetMesh();
-        setPlaneBoundary();
+        // setPlaneBoundary();
 
         Vector2 consts = calc(0, i);
         cfdResultsYaw.push_back({consts.x, consts.y});
     }
+    std::cout << "done3" << std::endl;
 
     createLiftFiles(&cfdResults, &cfdResultsPitch, &cfdResultsYaw);
+    if (drawing) {
+        CloseWindow();
+    }
+    std::cout << "cfd-program completed calculating cl and cd over pitch and yaw and exited succesfully";
 }
 
 Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho, bool drawingEnabled)

@@ -2,14 +2,16 @@
 
 void fileWithoutYaw(std::vector<Vector2> *consts) {
     nlohmann::json data;
-    double stepSize = 360 / consts->size();
+    double stepSize = 360 / (consts->size()-1);
 
     int index = 0;
     for (double i=0; i <= 360; i+= stepSize) {
-        data["pitch"][std::to_string(index)]["cl"] = consts->at(i).x;
-        data["pitch"][std::to_string(index)]["cd"] = consts->at(i).y;
+        data["pitch"][std::to_string(index)]["cl"] = consts->at(index).x;
+        data["pitch"][std::to_string(index)]["cd"] = consts->at(index).y;
         index++;
+        std::cout << i << " " << index << " " <<  consts->size() << std::endl;
     }
+    std::cout << "ja" << std::endl;
 
     data["stepSize"] = stepSize;
 
@@ -21,12 +23,12 @@ void fileWithoutYaw(std::vector<Vector2> *consts) {
 
 void fileWithoutPitch(std::vector<Vector2> *consts) {
     nlohmann::json data;
-    double stepSize = 360 / consts->size();
+    double stepSize = 360 / (consts->size() - 1);
 
     int index = 0;
     for (double i=0; i <= 360; i+= stepSize) {
-        data["yaw"][std::to_string(index)]["cl"] = consts->at(i).x;
-        data["yaw"][std::to_string(index)]["cd"] = consts->at(i).y;
+        data["yaw"][std::to_string(index)]["cl"] = consts->at(index).x;
+        data["yaw"][std::to_string(index)]["cd"] = consts->at(index).y;
         index++;
     }
 
@@ -62,6 +64,9 @@ void fileWithBoth(std::vector<std::vector<Vector2>> *consts) {
 
 void createLiftFiles(std::vector<std::vector<Vector2>> *constsBoth, std::vector<Vector2> *constsPitch, std::vector<Vector2> *constsYaw) { // steps has to be greater than 2 but realisticly has to be higher than 200
     fileWithoutYaw(constsPitch); // for the best results x times stepsize should be 360
+    std::cout << "done << " << std::endl;
     fileWithoutPitch(constsYaw);
+    std::cout << "done << " << std::endl;
     fileWithBoth(constsBoth);
+    std::cout << "done << " << std::endl;
 }

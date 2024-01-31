@@ -2,6 +2,7 @@
 #include "ui/menu.h"
 #include "cfd.h"
 #include "ui/loadingScreen.h"
+// #include "ui/cfdOptionsMenu.h"
 
 #include <raylib.h>
 #include <iostream>
@@ -37,8 +38,10 @@ int main()
             }
             else if (menu.buttonPressed == 1)
             {
-                Cfd cfd;
-                cfd.run(30, 5, 5);
+                // CfdMenu cfdMenu = CfdMenu(screenWidth, screenHeight);
+                // cfdMenu.Draw(screenWidth, screenHeight);
+                Cfd cfd(80, 60, 90, 0.1, 300, 1.293, false);
+                cfd.run(4, 20, 23);
                 // cfd.Draw();
                 running = false;
                 // start cdf program for calculating cl and cd;

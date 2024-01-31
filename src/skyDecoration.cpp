@@ -7,8 +7,8 @@ skyDecoration::skyDecoration()
 {
       SetRandomSeed(GetTime());
       globalPosition = {0, 0, 0};
-      birds = LoadModel("../models/object/birds.obj");
-      anglePitch = 90;
+      birds = LoadModel("models/object/birds.obj");
+      anglePitch = 0;
       angleYaw = 0;
       angleRoll = 0;
       birds.transform = MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll});
