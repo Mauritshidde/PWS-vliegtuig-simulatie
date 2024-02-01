@@ -114,7 +114,7 @@ void Plane::calcLift(float rho)
       drag = cd * rho * pow(speed, 2) * 0.5;
       dragDirection = Vector3Negate(Vector3Normalize(velocity));
       forceDrag.components = Vector3Scale(dragDirection, drag);
-      liftDirection = Vector3Transform({0, 1, 0}, MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll})); //point the lift up
+      liftDirection = {0, 1, 0}; //point the lift up
       forceLift.components = Vector3Scale(liftDirection, lift);
       //std::cout << " xlift " << forceLift.components.x << " ylift " << forceLift.components.y << " zlift " << forceLift.components.z << "\n";
       //std::cout << " xdrag " << forceDrag.components.x << " ydrag " << forceDrag.components.y << " zdrag " << forceDrag.components.z << "\n";
