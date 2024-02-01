@@ -349,6 +349,7 @@ void Cfd::velocityMovement(float dT) {
 
                     tempVelocity.at(1).at(j).at(k).x = mesh.at(1).at(j).at(k).velocityX + duDt * dT;
                     tempVelocity.at(1).at(j).at(k).y = mesh.at(1).at(j).at(k).velocityY + dvDt * dT;
+                    mesh.at(1).at(j).at(k).pressure = (duDt / dT) * rho; 
                     // tempVelocity.at(1).at(j).at(k).z = mesh.at(1).at(j).at(k).velocityZ + dwDt * dT;
                 }
             }
@@ -366,7 +367,6 @@ void Cfd::velocityMovement(float dT) {
             }
         }
     // }
-
 }
 
 Vector3 Cfd::getNetPressureOnPlane() {
@@ -475,7 +475,7 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
 
         velocityMovement(dT);
         // solvePressure2();
-        removeDivergence();
+        // removeDivergence();
         // for (int i=1; i < 2; i++) {
         //     for (int j=1; j < nx-1; j++) {
         //         for (int k=1; k < ny-1; k++) {
@@ -606,7 +606,7 @@ void Cfd::drawVelocityVectors() {
                     // std::cout << point.x << "  x " << velocityDirection.x << std::endl;
                     // std::cout << point.y << " y " << velocityDirection.y << std::endl;
                     // std::cout << point.z << " z " << velocityDirection.z << std::endl;
-                    // DrawLine3D(point, velocityDirection, velocityColor); //111
+                    DrawLine3D(point, velocityDirection, velocityColor); //111
                     // DrawLine3D(point, {point.x, point.y, point.z+dz}, BLUE);
                     // DrawCubeWires(point, dx, dy, dz, RED);
                     // std::cout << velocity << " ";
@@ -622,35 +622,33 @@ void Cfd::drawVelocityVectors() {
 }
 
 void Cfd::draw2DGrid() {
-    for (int i=1; i < 2; i++) {
-        for (int j=0; j < nx-1; j++) {
-            for (int k=1; k < ny-1; k++) {
-                Vector3 point;
-                point.x = j * dx - 0.5 * dx;
-                point.y = k * dy - 0.5 * dy;
-                point.z = startingPoint.z + i * dz - 0.5 * dz;
+    for (int j=0; j < nx-1; j++) {
+        for (int k=1; k < ny-1; k++) {
+            Vector3 point;
+            point.x = j * dx - 0.5 * dx;
+            point.y = k * dy - 0.5 * dy;
+            point.z = startingPoint.z + dz - 0.5 * dz;
 
-                if (mesh.at(i).at(j).at(k).boundary) {
-                    DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, BLACK);
+            if (mesh.at(1).at(j).at(k).boundary) {
+                DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, BLACK);
 
-                } else {
-                    float velocityX = mesh.at(i).at(j).at(k).velocityX;
-                    float velocityY = mesh.at(i).at(j).at(k).velocityY;
-                    float velocityZ = mesh.at(i).at(j).at(k).velocityZ;
-                    float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
-                    
-                    double val = (velocity / 200.0f) *300;
-                    double val2 = (velocity / 500.0f);
-                    double val3 = velocity * 180;
-                    
-                    Color velocityColor = {255, val2, val3, 255};
-                    DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, velocityColor);
-                    std::cout << mesh.at(i).at(j).at(k).pressure << " ";
-                    // std::cout << velocity << " ";
-                }
+            } else {
+                float velocityX = mesh.at(1).at(j).at(k).velocityX;
+                float velocityY = mesh.at(1).at(j).at(k).velocityY;
+                float velocityZ = mesh.at(1).at(j).at(k).velocityZ;
+                float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
+                
+                double val = (velocity / 200.0f) *300;
+                double val2 = (velocity / 500.0f);
+                double val3 = velocity * 180;
+                
+                Color velocityColor = {255, val2, val3, 255};
+                DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, velocityColor);
+                std::cout << mesh.at(1).at(j).at(k).pressure << " ";
+                // std::cout << velocity << " ";
             }
-            std::cout  << std::endl;
         }
+        std::cout  << std::endl;
     }
     std::cout  << std::endl;
     std::cout  << std::endl;
