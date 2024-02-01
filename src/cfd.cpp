@@ -36,7 +36,7 @@ void Cfd::createMesh()
         gradientPressureField.push_back(helper3);
         divergenceVelocityField.push_back(helper3);
         divergenceFreeField.push_back(helper3);
-        advectV.push_back(helper3);
+        tempVelocity.push_back(helper3);
     }
 }
 
@@ -132,7 +132,6 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
 void Cfd::setPlaneBoundary() //222
 {
     std::vector<std::thread> threads;
-    cores = 10;
     int newNz = nz - 2;
     
     for (int i=0; i < cores; i++) {
@@ -315,56 +314,31 @@ void Cfd::resetMesh() {
     }
 }
 
-void Cfd::velocityMovement(float dT) {
-    std::vector<std::vector<std::vector<Vector3>>> tempVelocity;
-    for (int i=0; i < nz; i++) {
-        std::vector<std::vector<Vector3>> helper;
-        for (int j=0; j < nx; j++) {
-            std::vector<Vector3> helperHelper;
-            for (int k=0; k < ny; k++) {
-                helperHelper.push_back({0,0,0});
-            }
-            helper.push_back(helperHelper);
-        }
-        tempVelocity.push_back(helper);
-    }
-
-    for (int i=1; i < nz-1; i++) {
+void Cfd::velocityMovement(float dT, int startIndex, int endIndex) {
+    for (int i=startIndex; i < endIndex; i++) {
         for (int j=1; j < nx-1; j++) {
             for (int k=1; k < ny-1; k++) {
-                if (!mesh.at(1).at(j).at(k).boundary) {
-                    double duDt = -(mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX) / dx +
-                            mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityX - mesh.at(1).at(j).at(k-1).velocityX) / dy + 
-                            mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityX - mesh.at(2-1).at(j).at(k).velocityX) / dz) / dx;
+                if (!mesh.at(i).at(j).at(k).boundary) {
+                    double duDt = -(mesh.at(i).at(j).at(k).velocityX * (mesh.at(i).at(j).at(k).velocityX - mesh.at(i).at(j-1).at(k).velocityX) / dx +
+                            mesh.at(i).at(j).at(k).velocityY * (mesh.at(i).at(j).at(k).velocityX - mesh.at(i).at(j).at(k-1).velocityX) / dy + 
+                            mesh.at(i).at(j).at(k).velocityZ * (mesh.at(i).at(j).at(k).velocityX - mesh.at(i-1).at(j).at(k).velocityX) / dz) / dx;
 
-                    double dvDt = -(mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j).at(k).velocityY - mesh.at(1).at(j-1).at(k).velocityY) / dx +
-                            mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityY - mesh.at(1).at(j).at(k-1).velocityY) / dy + 
-                            mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityY - mesh.at(2-1).at(j).at(k).velocityY) / dz) / dy;
+                    double dvDt = -(mesh.at(i).at(j).at(k).velocityX * (mesh.at(i).at(j).at(k).velocityY - mesh.at(i).at(j-1).at(k).velocityY) / dx +
+                            mesh.at(i).at(j).at(k).velocityY * (mesh.at(i).at(j).at(k).velocityY - mesh.at(i).at(j).at(k-1).velocityY) / dy + 
+                            mesh.at(i).at(j).at(k).velocityZ * (mesh.at(i).at(j).at(k).velocityY - mesh.at(i-1).at(j).at(k).velocityY) / dz) / dy;
 
-                    double dwDt = -(mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(1).at(j-1).at(k).velocityZ) / dx +
-                            mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(1).at(j).at(k-1).velocityZ) / dy +
-                            mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(2-1).at(j).at(k).velocityZ) / dz) / dz;
+                    double dwDt = -(mesh.at(i).at(j).at(k).velocityX * (mesh.at(i).at(j).at(k).velocityZ - mesh.at(i).at(j-1).at(k).velocityZ) / dx +
+                            mesh.at(i).at(j).at(k).velocityY * (mesh.at(i).at(j).at(k).velocityZ - mesh.at(i).at(j).at(k-1).velocityZ) / dy +
+                            mesh.at(i).at(j).at(k).velocityZ * (mesh.at(i).at(j).at(k).velocityZ - mesh.at(i-1).at(j).at(k).velocityZ) / dz) / dz;
 
-                    tempVelocity.at(1).at(j).at(k).x = mesh.at(1).at(j).at(k).velocityX + duDt * dT;
-                    tempVelocity.at(1).at(j).at(k).y = mesh.at(1).at(j).at(k).velocityY + dvDt * dT;
-                    tempVelocity.at(1).at(j).at(k).z = mesh.at(1).at(j).at(k).velocityZ + dwDt * dT;
-                    mesh.at(1).at(j).at(k).pressure = (duDt / dT + dvDt / dT + dwDt / dT) * rho; 
+                    tempVelocity.at(i).at(j).at(k).x = mesh.at(i).at(j).at(k).velocityX + duDt * dT;
+                    tempVelocity.at(i).at(j).at(k).y = mesh.at(i).at(j).at(k).velocityY + dvDt * dT;
+                    tempVelocity.at(i).at(j).at(k).z = mesh.at(i).at(j).at(k).velocityZ + dwDt * dT;
+                    mesh.at(i).at(j).at(k).pressure = (duDt / dT + dvDt / dT + dwDt / dT) * rho; 
                 }
             }
         }
     } 
-
-    for (int i=1; i < nz-1; i++) {
-        for (int j=1; j < nx-1; j++) {
-            for (int k=1; k < ny-1; k++) {
-                if (!mesh.at(1).at(j).at(k).boundary) {
-                    mesh.at(1).at(j).at(k).velocityX = tempVelocity.at(1).at(j).at(k).x;
-                    mesh.at(1).at(j).at(k).velocityY = tempVelocity.at(1).at(j).at(k).y;
-                    mesh.at(1).at(j).at(k).velocityZ = tempVelocity.at(1).at(j).at(k).z;
-                }
-            }
-        }
-    }
 }
 
 Vector3 Cfd::getNetPressureOnPlane() {
@@ -471,7 +445,30 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         
         // TODO the movement of the pressure NOTE density is constant
 
-        velocityMovement(dT);
+        std::vector<std::thread> threads;
+        int newNz = nz - 2;
+
+        for (int i=0; i < cores; i++) {
+            int part = 1 + (i * newNz)/cores;
+            int part2 = 1 + ((i+1) * newNz)/cores;
+            threads.emplace_back(&Cfd::velocityMovement, this, dT, part, part2);
+        }
+
+        for (int i=0; i < cores; i++) {
+            threads.at(i).join();
+        }
+
+        for (int i=1; i < nz-1; i++) {
+            for (int j=1; j < nx-1; j++) {
+                for (int k=1; k < ny-1; k++) {
+                    if (!mesh.at(i).at(j).at(k).boundary) {
+                        mesh.at(i).at(j).at(k).velocityX = tempVelocity.at(i).at(j).at(k).x;
+                        mesh.at(i).at(j).at(k).velocityY = tempVelocity.at(i).at(j).at(k).y;
+                        mesh.at(i).at(j).at(k).velocityZ = tempVelocity.at(i).at(j).at(k).z;
+                    }
+                }
+            }
+        }
         // solvePressure2();
         // removeDivergence();
         // for (int i=1; i < 2; i++) {
@@ -482,13 +479,13 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         //     }
         // }
 
-        for (int i=1; i < 2; i++) {
-            for (int j=1; j < nx-1; j++) {
-                for (int k=1; k < ny-1; k++) {
-                    mesh.at(i).at(j).at(k).pressureChanged = false;
-                }
-            }
-        }
+        // for (int i=1; i < 2; i++) {
+        //     for (int j=1; j < nx-1; j++) {
+        //         for (int k=1; k < ny-1; k++) {
+        //             mesh.at(i).at(j).at(k).pressureChanged = false;
+        //         }
+        //     }
+        // }
 
         if (drawing) {
             Draw();
@@ -758,8 +755,8 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
     dT = deltaTime;
     maxTime = setMaxTime;
     rho = setRho;
-    dx = 1.5;
-    dy = 1;
+    dx = 2;
+    dy = 2;
     dz = 5;
     startingPoint.x = -(nx*dx)/2;
     startingPoint.y = -(ny*dy)/2 + 10;

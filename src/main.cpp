@@ -40,8 +40,8 @@ int main()
             {
                 // CfdMenu cfdMenu = CfdMenu(screenWidth, screenHeight);
                 // cfdMenu.Draw(screenWidth, screenHeight);
-                Cfd cfd(100, 70, 100, 0.1, 300, 1.293, false, false);
-                cfd.run(100, 0.1, 0.5);
+                Cfd cfd(90, 50, 100, 0.1, 300, 1.293, false, false);
+                cfd.run(20, 1, 3);
                 // cfd.Draw();
                 running = false;
                 // start cdf program for calculating cl and cd;

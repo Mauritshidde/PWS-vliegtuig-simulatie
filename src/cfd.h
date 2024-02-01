@@ -59,7 +59,7 @@ private:
     std::vector<std::vector<std::vector<MeshCube>>> mesh;
     std::vector<std::vector<std::vector<double>>> divergenceVelocityScalarField;
     std::vector<std::vector<std::vector<Vector3>>> gradientPressureField, divergenceVelocityField, divergenceFreeField;
-    std::vector<std::vector<std::vector<Vector3>>> advectV;
+    std::vector<std::vector<std::vector<Vector3>>> tempVelocity;
 
     // functions for the creation of the grid
     void Start();
@@ -75,7 +75,7 @@ private:
 
     // functions for calculating the movement of the fluid
     void removeDivergence();
-    void velocityMovement(float dT);
+    void velocityMovement(float dT, int startIndex, int endIndex);
     void solvePressure(int i, int j, int k);
     Vector3 getNetPressureOnPlane();
     void calcVelocityField();
