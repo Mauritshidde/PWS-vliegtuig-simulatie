@@ -121,9 +121,9 @@ void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
                 }
             }
         }
-        std::cout << "ja" << std::endl;
+        // std::cout << "ja" << std::endl;
     }
-    std::cout << "nee" << std::endl;
+    // std::cout << "nee" << std::endl;
 
     settingPlaneBOundarys = false;
 
@@ -329,44 +329,42 @@ void Cfd::velocityMovement(float dT) {
         tempVelocity.push_back(helper);
     }
 
-    // for (int i=1; i < nz-1; i++) {
+    for (int i=1; i < nz-1; i++) {
         for (int j=1; j < nx-1; j++) {
             for (int k=1; k < ny-1; k++) {
                 if (!mesh.at(1).at(j).at(k).boundary) {
-                    // double duDt = 1(mesh.at())
                     double duDt = -(mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j).at(k).velocityX - mesh.at(1).at(j-1).at(k).velocityX) / dx +
-                            mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityX - mesh.at(1).at(j).at(k-1).velocityX) / dy + 0) /dx;
-                            // mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityX - mesh.at(2-1).at(j).at(k).velocityX) / dz) / dx;
+                            mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityX - mesh.at(1).at(j).at(k-1).velocityX) / dy + 
+                            mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityX - mesh.at(2-1).at(j).at(k).velocityX) / dz) / dx;
 
                     double dvDt = -(mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j).at(k).velocityY - mesh.at(1).at(j-1).at(k).velocityY) / dx +
-                            mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityY - mesh.at(1).at(j).at(k-1).velocityY) / dy + 0) /dy;
-                            // mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityY - mesh.at(2-1).at(j).at(k).velocityY) / dz) / dy;
+                            mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityY - mesh.at(1).at(j).at(k-1).velocityY) / dy + 
+                            mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityY - mesh.at(2-1).at(j).at(k).velocityY) / dz) / dy;
 
-                    // double dwDt = -(mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(1).at(j-1).at(k).velocityZ) / dx +
-                    //         mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(1).at(j).at(k-1).velocityZ) / dy +
-                    //         mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(2-1).at(j).at(k).velocityZ) / dz) / dz;
-
+                    double dwDt = -(mesh.at(1).at(j).at(k).velocityX * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(1).at(j-1).at(k).velocityZ) / dx +
+                            mesh.at(1).at(j).at(k).velocityY * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(1).at(j).at(k-1).velocityZ) / dy +
+                            mesh.at(1).at(j).at(k).velocityZ * (mesh.at(1).at(j).at(k).velocityZ - mesh.at(2-1).at(j).at(k).velocityZ) / dz) / dz;
 
                     tempVelocity.at(1).at(j).at(k).x = mesh.at(1).at(j).at(k).velocityX + duDt * dT;
                     tempVelocity.at(1).at(j).at(k).y = mesh.at(1).at(j).at(k).velocityY + dvDt * dT;
-                    mesh.at(1).at(j).at(k).pressure = (duDt / dT) * rho; 
-                    // tempVelocity.at(1).at(j).at(k).z = mesh.at(1).at(j).at(k).velocityZ + dwDt * dT;
+                    tempVelocity.at(1).at(j).at(k).z = mesh.at(1).at(j).at(k).velocityZ + dwDt * dT;
+                    mesh.at(1).at(j).at(k).pressure = (duDt / dT + dvDt / dT + dwDt / dT) * rho; 
                 }
             }
         }
-    // } 
+    } 
 
-    // for (int i=1; i < nz-1; i++) {
+    for (int i=1; i < nz-1; i++) {
         for (int j=1; j < nx-1; j++) {
             for (int k=1; k < ny-1; k++) {
                 if (!mesh.at(1).at(j).at(k).boundary) {
                     mesh.at(1).at(j).at(k).velocityX = tempVelocity.at(1).at(j).at(k).x;
                     mesh.at(1).at(j).at(k).velocityY = tempVelocity.at(1).at(j).at(k).y;
-                    // mesh.at(1).at(j).at(k).velocityZ = tempU.at(1).at(j).at(k).z;
+                    mesh.at(1).at(j).at(k).velocityZ = tempVelocity.at(1).at(j).at(k).z;
                 }
             }
         }
-    // }
+    }
 }
 
 Vector3 Cfd::getNetPressureOnPlane() {
@@ -436,7 +434,7 @@ void Cfd::calcVelocityField() {
 void Cfd::solvePressure2() {
     int steps = 0;
     bool door = true;
-        calcVelocityField();
+    calcVelocityField();
     // while (steps < 10 && door) {
     //     steps++;
     // }
@@ -495,16 +493,16 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         if (drawing) {
             Draw();
         }
-        std::cout << tijd << " " << maxTime << std::endl;
     }
+    std::cout << "done with loop getting pressure and velocity" << maxTime << std::endl;
 
     // TODO correction fase
     // correction 
 
     Vector3 forces = getNetPressureOnPlane();
     // TODO the 100 is the starting velocity of the boudnary on the left
-    cl = forces.y / (rho * pow(100 ,2) * 0.5);
-    cd = forces.x / (rho * pow(100 ,2) * 0.5);
+    cl = forces.y / (rho * pow(10 ,2) * 0.5);
+    cd = forces.x / (rho * pow(10 ,2) * 0.5);
     // float cz = forces.z / (rho * pow(100 ,2) * 0.5);
 
     return {cl, cd};
@@ -644,15 +642,15 @@ void Cfd::draw2DGrid() {
                 
                 Color velocityColor = {255, val2, val3, 255};
                 DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, velocityColor);
-                std::cout << mesh.at(1).at(j).at(k).pressure << " ";
+                // std::cout << mesh.at(1).at(j).at(k).pressure << " ";
                 // std::cout << velocity << " ";
             }
         }
-        std::cout  << std::endl;
+        // std::cout  << std::endl;
     }
-    std::cout  << std::endl;
-    std::cout  << std::endl;
-    std::cout  << std::endl;
+    // std::cout  << std::endl;
+    // std::cout  << std::endl;
+    // std::cout  << std::endl;
 }
 
 void Cfd::Draw() {
@@ -677,7 +675,7 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
         for (double j=0; j <= 360; j+=stepsize) { // yaw
             airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * i, DEG2RAD * j, DEG2RAD * 0});
             resetMesh();
-            // setPlaneBoundary();
+            setPlaneBoundary();
                 // for (int j=1; j < ny-1; j++) {
                 //     mesh.at(1).at(nx/2).at(j).boundary = true;
                 // }
@@ -724,7 +722,7 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
     nu = 1 / Re;
 
     // set multithreading variables
-    cores = 6;
+    cores = 12;
     settingPlaneBOundarys = false;
 
     // set camera variables
