@@ -67,11 +67,14 @@ Vector3 Physics::calcTorque(std::vector<physicsVector> forces, Vector3 centerOfM
         torquePitch = distance.z * currentForce.y + distance.y * currentForce.z;
         torqueYaw = distance.z * currentForce.x + distance.x * currentForce.z;
         torqueRoll = distance.y * currentForce.x + distance.x * currentForce.y;
-
         torqueTotal.x += torquePitch;
         torqueTotal.y += torqueYaw;
         torqueTotal.z += torqueRoll;
+        std::cout << "new yaw t   " <<  distance.z * currentForce.x << " " << distance.x * currentForce.z << std::endl;
+        std::cout << "forces    " <<  currentForce.x << " " << currentForce.z << std::endl;
+        std::cout << "distances  " <<  distance.z << " " << distance.x << std::endl;
     }
+        std::cout << "new torque  " <<  torqueTotal.y << std::endl;
     return torqueTotal;
 }
 
@@ -79,11 +82,14 @@ Vector3 Physics::calcAngularAcceleration(std::vector<physicsVector> forces, floa
 {
     Vector3 angularAcceleration, torque;
     torque = calcTorque(forces, centerOfMass, rotation);
-    std::cout << "torque xyz" << torque.x << " " << torque.y << " " << torque.z << " \n";
-    std::cout << "moment xyz" << momentOfInertia.x << " " << momentOfInertia.y << " " << momentOfInertia.z << " \n";
+    // //std::cout << "torque xyz" << torque.x << " " << torque.y << " " << torque.z << " \n";
+    // //std::cout << "moment xyz" << momentOfInertia.x << " " << momentOfInertia.y << " " << momentOfInertia.z << " \n";
     angularAcceleration.x = torque.x / momentOfInertia.x;
     angularAcceleration.y = torque.y / momentOfInertia.y;
     angularAcceleration.z = torque.z / momentOfInertia.z;
+    // //std::cout << "new moment  " <<  momentOfInertia.y << std::endl;
+    // //std::cout << "new aaa   " <<  angularAcceleration.y << std::endl;
+    // //std::cout << "new torque  " <<  torque.y << std::endl;
     return angularAcceleration;
 }
 

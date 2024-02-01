@@ -36,6 +36,7 @@ void Cfd::createMesh()
         gradientPressureField.push_back(helper3);
         divergenceVelocityField.push_back(helper3);
         divergenceFreeField.push_back(helper3);
+        advectV.push_back(helper3);
     }
 }
 
@@ -184,7 +185,12 @@ void Cfd::solvePressure(int i, int j, int k)
             indexes = toUse.at(l);
             if (!mesh.at(indexes.x).at(indexes.y).at(indexes.z).pressureChanged) {
                 toCalc.push_back(indexes);
-                values.push_back(0);
+                double value = mesh.at(indexes.x).at(indexes.y).at(indexes.z).pressure;
+                if (value) {
+                    values.push_back(value);
+                } else {
+                    values.push_back(1);
+                }
                 previousValues.push_back(mesh.at(indexes.x).at(indexes.y).at(indexes.z).pressure);
             }
         }
@@ -256,9 +262,9 @@ void Cfd::removeDivergence() {
             {
                 mesh.at(1).at(j).at(k).pressureChanged = false;
                 if (!mesh.at(1).at(j).at(k).boundary) {
-                    gradientPressureField.at(1).at(j).at(k).x = (mesh.at(1).at(j+1).at(k).pressure - mesh.at(1).at(j-1).at(k).pressure)/2;
-                    gradientPressureField.at(1).at(j).at(k).y = (mesh.at(1).at(j).at(k+1).pressure - mesh.at(1).at(j).at(k-1).pressure)/2;
-                    gradientPressureField.at(1).at(j).at(k).z = (mesh.at(0+1).at(j).at(k).pressure - mesh.at(2-1).at(j).at(k).pressure)/2; 
+                    gradientPressureField.at(1).at(j).at(k).x += 0.001 * (mesh.at(1).at(j+1).at(k).pressure - mesh.at(1).at(j-1).at(k).pressure)/dx;
+                    gradientPressureField.at(1).at(j).at(k).y += 0.001 * (mesh.at(1).at(j).at(k+1).pressure - mesh.at(1).at(j).at(k-1).pressure)/dy;
+                    gradientPressureField.at(1).at(j).at(k).z += 0.001 * (mesh.at(0+1).at(j).at(k).pressure - mesh.at(2-1).at(j).at(k).pressure)/dz; 
                 } else {
                     gradientPressureField.at(1).at(j).at(k) = {0,0,0};
                 }
@@ -278,9 +284,9 @@ void Cfd::removeDivergence() {
                     divergenceFreeField.at(1).at(j).at(k).y = divergenceVelocityField.at(1).at(j).at(k).y - gradientPressureField.at(1).at(j).at(k).y;
                     divergenceFreeField.at(1).at(j).at(k).z = divergenceVelocityField.at(1).at(j).at(k).z - gradientPressureField.at(1).at(j).at(k).z;
 
-                    mesh.at(1).at(j).at(k).velocityX += (mesh.at(1).at(j).at(k).velocityX - divergenceFreeField.at(1).at(j).at(k).x)/dx *(dT/10);
-                    mesh.at(1).at(j).at(k).velocityY += (mesh.at(1).at(j).at(k).velocityY - divergenceFreeField.at(1).at(j).at(k).y)/dy *(dT/10);
-                    mesh.at(1).at(j).at(k).velocityZ += (mesh.at(1).at(j).at(k).velocityZ - divergenceFreeField.at(1).at(j).at(k).z)/dz *(dT/10);
+                    mesh.at(1).at(j).at(k).velocityX += (mesh.at(1).at(j).at(k).velocityX - divergenceFreeField.at(1).at(j).at(k).x)/dx *(dT);
+                    mesh.at(1).at(j).at(k).velocityY += (mesh.at(1).at(j).at(k).velocityY - divergenceFreeField.at(1).at(j).at(k).y)/dy *(dT);
+                    mesh.at(1).at(j).at(k).velocityZ += (mesh.at(1).at(j).at(k).velocityZ - divergenceFreeField.at(1).at(j).at(k).z)/dz *(dT);
                 } else {
                     divergenceFreeField.at(1).at(j).at(k) = {0,0,0};
                 }
@@ -392,19 +398,96 @@ Vector3 Cfd::getNetPressureOnPlane() {
 
     return netPressure;
 }
+// void Cfd::calcVelocityFieldX() { 
+
+// }
+
+void Cfd::calcVelocityField() {
+    // calcAdvaction();
+    // diffuseV = calcDiffusion();
+    for (int i=1; i < 2; i++) {
+        for (int j=1; j < nx-1; j++) {
+            for (int k=1; k < ny-1; k++) {
+                double advectX = mesh.at(i).at(j).at(k).velocityX * (mesh.at(i).at(j).at(k).velocityX - mesh.at(i).at(j-1).at(k).velocityX) / dx;
+                double advectY = mesh.at(i).at(j).at(k).velocityY * (mesh.at(i).at(j).at(k).velocityY - mesh.at(i).at(j).at(k-1).velocityY) / dy;
+                double advectZ = mesh.at(i).at(j).at(k).velocityZ * (mesh.at(i).at(j).at(k).velocityZ - mesh.at(i-1).at(j).at(k).velocityZ) / dz;
+                double advect = advectX + advectY + advectZ;
+
+
+                double diffX = nu * ((mesh.at(i).at(j+1).at(k).velocityX - 2 * mesh.at(i).at(j).at(k).velocityX + mesh.at(i).at(j-1).at(k).velocityX) / pow(dx, 2));
+                double diffY = nu * ((mesh.at(i).at(j).at(k+1).velocityY - 2 * mesh.at(i).at(j).at(k).velocityY + mesh.at(i).at(j).at(k-1).velocityY) / pow(dy, 2));
+                double diffZ = nu * ((mesh.at(i+1).at(j).at(k).velocityZ - 2 * mesh.at(i).at(j).at(k).velocityZ + mesh.at(i-1).at(j).at(k).velocityZ) / pow(dz, 2));
+
+                double diffuse = diffX + diffY + diffZ;
+
+                mesh.at(i).at(j).at(k).newVelocityX = mesh.at(i).at(j).at(k).velocityX + dT * (advect + diffuse);
+                mesh.at(i).at(j).at(k).newVelocityY = mesh.at(i).at(j).at(k).velocityY + dT * (advect + diffuse);
+                mesh.at(i).at(j).at(k).newVelocityZ = mesh.at(i).at(j).at(k).velocityZ + dT * (advect + diffuse);
+
+                solvePressure(1,j,k);
+            } 
+        }
+    }
+}
+
+void Cfd::solvePressure2() {
+    int steps = 0;
+    bool door = true;
+        calcVelocityField();
+    // while (steps < 10 && door) {
+    //     steps++;
+    // }
+    
+    for (int i=1; i < 2; i++) {
+        for (int j=1; j < nx-1; j++) {
+            for (int k=1; k < ny-1; k++) {
+                mesh.at(i).at(j).at(k).pressure = 0.1 * 0;
+                
+            }
+        }
+    }
+
+    for (int i=1; i < 2; i++) {
+        for (int j=1; j < nx-1; j++) {
+            for (int k=1; k < ny-1; k++) {
+                double pressureDifference = mesh.at(i).at(j+1).at(k).pressure - mesh.at(i).at(j).at(k).pressure;
+                mesh.at(i).at(j).at(k).velocityX = mesh.at(i).at(j).at(k).newVelocityX - dT * (pressureDifference / dx) / rho;
+                mesh.at(i).at(j).at(k).velocityY = mesh.at(i).at(j).at(k).newVelocityY - dT * (pressureDifference / dy) / rho;
+                mesh.at(i).at(j).at(k).velocityZ = mesh.at(i).at(j).at(k).newVelocityZ - dT * (pressureDifference / dz) / rho;
+            }
+        }
+    }
+}
 
 Vector2 Cfd::calc(double anglePitch, double angleYaw)
 {
     float cl, cd;
     double tijd = 0;
-    while (tijd < 1)
+    std::vector<std::vector<std::vector<double>>> *diffuseV;
+    while (tijd < maxTime)
     {
         tijd += dT;
         
         // TODO the movement of the pressure NOTE density is constant
 
         velocityMovement(dT);
+        solvePressure2();
         // removeDivergence();
+        // for (int i=1; i < 2; i++) {
+        //     for (int j=1; j < nx-1; j++) {
+        //         for (int k=1; k < ny-1; k++) {
+        //             solvePressure(i,j,k);
+        //         }
+        //     }
+        // }
+
+        // for (int i=1; i < 2; i++) {
+        //     for (int j=1; j < nx-1; j++) {
+        //         for (int k=1; k < ny-1; k++) {
+        //             mesh.at(i).at(j).at(k).pressureChanged = false;
+        //         }
+        //     }
+        // }
 
         if (drawing) {
             Draw();
@@ -559,7 +642,8 @@ void Cfd::draw2DGrid() {
                     
                     Color velocityColor = {255, val2, val3, 255};
                     DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, velocityColor);
-                    std::cout << velocity << " ";
+                    std::cout << mesh.at(i).at(j).at(k).pressure << " ";
+                    // std::cout << velocity << " ";
                 }
             }
             std::cout  << std::endl;
@@ -574,10 +658,13 @@ void Cfd::Draw() {
     moveCamera(GetFrameTime());
     BeginDrawing();
         ClearBackground(WHITE);
-        // draw2DGrid();
-        BeginMode3D(camera);
-            drawVelocityVectors();
-        EndMode3D();
+        if (drawing3D) {
+            BeginMode3D(camera);
+                drawVelocityVectors();
+            EndMode3D();
+        } else {
+            draw2DGrid();
+        }
     EndDrawing();
 }
 
@@ -607,7 +694,7 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
     for (double i=0; i <= 360; i+=stepsizePitch) { // pitch
         airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * i, DEG2RAD * 0, DEG2RAD * 0});
         resetMesh();
-        // setPlaneBoundary();
+        setPlaneBoundary();
         Vector2 consts = calc(i, 0);
         cfdResultsPitch.push_back({consts.x, consts.y});
     }
@@ -616,7 +703,7 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
     for (double i=0; i <= 360; i+=stepsizeYaw) {
         airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * 0, DEG2RAD * i, DEG2RAD * 0});
         resetMesh();
-        // setPlaneBoundary();
+        setPlaneBoundary();
 
         Vector2 consts = calc(0, i);
         cfdResultsYaw.push_back({consts.x, consts.y});
@@ -630,7 +717,7 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
     std::cout << "cfd-program completed calculating cl and cd over pitch and yaw and exited succesfully";
 }
 
-Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho, bool drawingEnabled)
+Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho, bool drawingEnabled, bool draw3D)
 {   
     Re = 100;
     nu = 1 / Re;
@@ -678,7 +765,8 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
     startingPoint.x = -(nx*dx)/2;
     startingPoint.y = -(ny*dy)/2 + 10;
     startingPoint.z = -(nz*dz)/2;
-
+    
+    drawing3D = draw3D;
     drawing = drawingEnabled;
     if (!drawingEnabled) {
         CloseWindow();

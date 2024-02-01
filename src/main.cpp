@@ -40,7 +40,7 @@ int main()
             {
                 // CfdMenu cfdMenu = CfdMenu(screenWidth, screenHeight);
                 // cfdMenu.Draw(screenWidth, screenHeight);
-                Cfd cfd(80, 60, 90, 0.1, 300, 1.293, false);
+                Cfd cfd(80, 60, 90, 0.1, 300, 1.293, true, false);
                 cfd.run(4, 20, 23);
                 // cfd.Draw();
                 running = false;

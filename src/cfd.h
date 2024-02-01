@@ -26,7 +26,7 @@ private:
     // drawing variables
     Model airplane;
     Texture airplaneTexture;
-    bool drawing;
+    bool drawing, drawing3D;
     BoundingBox boundingBoxPlane;
     Vector3 boundingBoxPlaneMin;
     Vector3 boundingBoxPlaneMax;
@@ -59,6 +59,7 @@ private:
     std::vector<std::vector<std::vector<MeshCube>>> mesh;
     std::vector<std::vector<std::vector<double>>> divergenceVelocityScalarField;
     std::vector<std::vector<std::vector<Vector3>>> gradientPressureField, divergenceVelocityField, divergenceFreeField;
+    std::vector<std::vector<std::vector<Vector3>>> advectV;
 
     // functions for the creation of the grid
     void Start();
@@ -77,6 +78,8 @@ private:
     void velocityMovement(float dT);
     void solvePressure(int i, int j, int k);
     Vector3 getNetPressureOnPlane();
+    void calcVelocityField();
+    void solvePressure2(); 
     Vector2 calc(double anglePitch, double angleYaw);    
 
     // graphics functions (these are optionally when running the cfd) 
@@ -87,6 +90,6 @@ private:
 public:
     void run(int steps, double stepsizePitch, double stepsizeYaw);
 
-    Cfd(int setnx = 5, int setny = 5, int setnz = 5, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true);
+    Cfd(int setnx = 5, int setny = 5, int setnz = 5, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true, bool draw3D = true);
     ~Cfd();
 };
