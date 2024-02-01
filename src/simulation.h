@@ -62,6 +62,8 @@ private:
     const char *minText = "0";
     const char *maxText = "360";
 
+    const char *engineText = "116000";
+
     bool notOnGUI(Vector2 mousePosition);
     void moveCamera(float deltaTime);
     void Start(int screenHeight, int screenWidth);

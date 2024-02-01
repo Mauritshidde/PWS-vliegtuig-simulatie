@@ -35,11 +35,12 @@ public:
       Vector3 reduceAngleDegrees(Vector3 angle);
       void rotateVector();
 
+      void updateThrust();
 
       Physics planePhysics;
 
-      float currentEngineTrust = 0.0f; // in newton
-      float maxEngineTrust = -116000;   // in newton
+      float leftEngineVariable, rightEngineVariable; // in newton
+      float maxEngineTrust = 116000;   // in newton
       float engineOffset; //distance of the engine to the center of mass
       Vector2 consts;
       float cl;

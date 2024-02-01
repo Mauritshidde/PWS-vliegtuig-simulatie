@@ -55,9 +55,10 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       // //std::cout << " xangvel " << angularAcceleration.x << " yangvel " << angularAcceleration.y << " zangvel " << angularAcceleration.z << "\n";
       // //std::cout << " xangAccel " << angularAcceleration.x << " yangAccel " << angularAcceleration.y << " zangAccel " << angularAcceleration.z << "\n";
 
+      leftEngineVariable = rightEngineVariable = maxEngineTrust / 2;
       engineOffset = 14;
-      leftMotorThrust = {0,0, -maxEngineTrust};
-      rightMotorThrust = {0,0, -maxEngineTrust};
+      leftMotorThrust = {0,0, -leftEngineVariable};
+      rightMotorThrust = {0,0, -rightEngineVariable};
 
       // Vector3 engineStartPosition = {centerOfMass.x - engineOffset, centerOfMass.y, centerOfMass.z};
       // Vector3 engineDirectionVec = planePhysics.vectorAddition(engineStartPosition, {0, 0, maxEngineTrust});
@@ -70,7 +71,7 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       
       // leftMotorDirectionPoint = planePhysics.vectorAddition(forceLeftMotor.location, forceLeftMotor.components);
       // rightMotorDirectionPoint = planePhysics.vectorAddition(forceRightMotor.location, {Vector3Normalize(forceRightMotor.components)});
-      // forces.push_back(forceLift);
+      forces.push_back(forceLift);
       forces.push_back(forceLeftMotor);
       forces.push_back(forceRightMotor);
       // forces.push_back(forceDrag);
@@ -114,7 +115,7 @@ void Plane::calcLift(float rho)
       drag = cd * rho * pow(speed, 2) * 0.5;
       dragDirection = Vector3Negate(Vector3Normalize(velocity));
       forceDrag.components = Vector3Scale(dragDirection, drag);
-      liftDirection = {0, 1, 0}; //point the lift up
+      liftDirection = Vector3Transform({0, 1, 0}, MatrixRotateXYZ((Vector3){0, 0, DEG2RAD * angleRoll})); //lift points up, except when plane has roll
       forceLift.components = Vector3Scale(liftDirection, lift);
       //std::cout << " xlift " << forceLift.components.x << " ylift " << forceLift.components.y << " zlift " << forceLift.components.z << "\n";
       //std::cout << " xdrag " << forceDrag.components.x << " ydrag " << forceDrag.components.y << " zdrag " << forceDrag.components.z << "\n";
@@ -184,7 +185,8 @@ void Plane::Update(float deltaTime, float rho)
       previousAngleYaw = angleYaw;
       previousAngleRoll = angleRoll;
 
-      forces = {forceLift /* ,forceLeftMotor */, forceRightMotor, fG};
+      forces = {forceLift, forceDrag ,forceLeftMotor, forceRightMotor, fG};
+      updateThrust();
       calcLift(rho);
       rotateVector();
       evaluateForces(forces);
@@ -210,12 +212,12 @@ void Plane::evaluateForces(std::vector<physicsVector> forces)
       angularAcceleration = planePhysics.calcAngularAcceleration(forces, mass, centerOfMass, momentOfInertia, (Vector3){anglePitch, angleYaw, angleRoll});
       acceleration = planePhysics.calcAcceleration(forces, mass);      
 
-      // if (abs(angularAcceleration.x) > 0.1 || abs(angularAcceleration.y) > 0.1 || abs(angularAcceleration.z) > 0.1) //apply drag force
-      // {
-      //       angularAcceleration.x -= angularDrag * pow(angularVelocity.x, 2);
-      //       angularAcceleration.y -= angularDrag * pow(angularVelocity.y, 2);
-      //       angularAcceleration.z -= angularDrag * pow(angularVelocity.z, 2);
-      // }
+      if (abs(angularAcceleration.x) > 0.1 || abs(angularAcceleration.y) > 0.1 || abs(angularAcceleration.z) > 0.1) //apply drag force
+      {
+            angularAcceleration.x -= angularDrag;
+            angularAcceleration.y -= angularDrag; 
+            angularAcceleration.z -= angularDrag;
+      }
 }
 
 void Plane::updateVel(float deltaTime)
@@ -329,4 +331,18 @@ void Plane::rotateVector()
       // forces.at(0).components = planePhysics.vectorSubtraction(leftMotorDirectionPoint, forces.at(0).location);
       // std::cout << sqrt(pow(forces.at(0).components.x, 2) + pow(forces.at(0).components.y, 2) + pow(forces.at(0).components.z, 2)) << " hhhhh" << std::endl;
       // std::cout << forces.at(0).components.x << " " << forces.at(0).components.y << " " << forces.at(0).components.z << " hhhhh" << std::endl;
+}
+
+void Plane::updateThrust()
+{
+      if (leftEngineVariable < -maxEngineTrust)
+      {
+            leftEngineVariable = -maxEngineTrust;
+      }
+      if (rightEngineVariable < -maxEngineTrust)
+      {
+            rightEngineVariable = -maxEngineTrust;
+      }
+      leftMotorThrust = {0, 0, -leftEngineVariable};
+      rightMotorThrust = {0, 0, -rightEngineVariable};
 }
