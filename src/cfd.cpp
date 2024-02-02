@@ -347,7 +347,9 @@ Vector3 Cfd::getNetPressureOnPlane() {
     for (int i=1; i < nz-1; i++) {
         for (int j=1; j < nx-1; j++) {
             for (int k=1; k < ny-1; k++) {
-                if (mesh.at(1).at(j).at(k).boundary) {
+                if (mesh.at(i).at(j).at(k).boundary) {
+                    // std::cout << mesh.at(1).at(j+1).at(k).pressure * dy * dz << " pressure " << mesh.at(1).at(j+1).at(k).pressure << std::endl;
+                    // std::cout << mesh.at(1).at(j-1).at(k).pressure * dy * dz << " pressure2 " << mesh.at(1).at(j-1).at(k).pressure << std::endl;
                     if (!mesh.at(i).at(j+1).at(k).boundary) {
                         netPressure.x += mesh.at(1).at(j+1).at(k).pressure * dy * dz;
                     }
@@ -370,7 +372,7 @@ Vector3 Cfd::getNetPressureOnPlane() {
             }
         }
     }
-
+    // std::cout << netPressure.x << " e " << netPressure.y << " " << netPressure.z << std::endl;
     return netPressure;
 }
 // void Cfd::calcVelocityFieldX() { 
@@ -436,7 +438,6 @@ void Cfd::solvePressure2() {
 
 Vector2 Cfd::calc(double anglePitch, double angleYaw)
 {
-    float cl, cd;
     double tijd = 0;
     std::vector<std::vector<std::vector<double>>> *diffuseV;
     while (tijd < maxTime)
@@ -496,10 +497,14 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
     // TODO correction fase
     // correction 
 
-    Vector3 forces = getNetPressureOnPlane();
-    // TODO the 100 is the starting velocity of the boudnary on the left
+    Vector3 forces;
+    forces = getNetPressureOnPlane();
+    
+    double cl, cd;
     cl = forces.y / (rho * pow(10 ,2) * 0.5);
-    cd = forces.x / (rho * pow(10 ,2) * 0.5);
+    cd = forces.z / (rho * pow(10 ,2) * 0.5);
+    // std::cout << forces.x << " forces " << forces.y << forces.z << std::endl;
+    // std::cout << cl << " cl " << cd << std::endl;
     // float cz = forces.z / (rho * pow(100 ,2) * 0.5);
 
     return {cl, cd};
@@ -639,15 +644,15 @@ void Cfd::draw2DGrid() {
                 
                 Color velocityColor = {255, val2, val3, 255};
                 DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, velocityColor);
-                // std::cout << mesh.at(1).at(j).at(k).pressure << " ";
+                std::cout << mesh.at(1).at(j).at(k).pressure << " ";
                 // std::cout << velocity << " ";
             }
         }
-        // std::cout  << std::endl;
+        std::cout  << std::endl;
     }
-    // std::cout  << std::endl;
-    // std::cout  << std::endl;
-    // std::cout  << std::endl;
+    std::cout  << std::endl;
+    std::cout  << std::endl;
+    std::cout  << std::endl;
 }
 
 void Cfd::Draw() {
@@ -666,6 +671,7 @@ void Cfd::Draw() {
 
 void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
     double stepsize = 360.0f/steps;
+    // std::cout << stepsize << std::endl;
     std::vector<std::vector<Vector2>> cfdResults;
     for (double i=0; i <= 360; i+=stepsize) { // pitch
         std::vector<Vector2> cfdResultsHelper;
@@ -691,6 +697,7 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
         airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * i, DEG2RAD * 0, DEG2RAD * 0});
         resetMesh();
         setPlaneBoundary();
+
         Vector2 consts = calc(i, 0);
         cfdResultsPitch.push_back({consts.x, consts.y});
     }
