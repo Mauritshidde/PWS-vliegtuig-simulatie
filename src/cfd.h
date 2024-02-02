@@ -74,12 +74,8 @@ private:
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions 
 
     // functions for calculating the movement of the fluid
-    void removeDivergence();
     void velocityMovement(float dT, int startIndex, int endIndex);
-    void solvePressure(int i, int j, int k);
     Vector3 getNetPressureOnPlane();
-    void calcVelocityField();
-    void solvePressure2(); 
     Vector2 calc(double anglePitch, double angleYaw);    
 
     // graphics functions (these are optionally when running the cfd) 
