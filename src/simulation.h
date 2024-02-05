@@ -71,7 +71,7 @@ private:
     void Render();
     void currentAirDensity();
 
-    std::vector<float> plotXRange;
+    std::vector<float> plotXRange, lift;
     std::vector<float> plotYValues, vel;
     float timeElapsed;
 

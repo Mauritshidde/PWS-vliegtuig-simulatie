@@ -51,7 +51,8 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
 
     plane = Plane(fileName, 100);
     
-    plotXRange = linspace(0, 100, 101);
+    plotXRange = linspace(0, 100, 101); //time
+    
     timeElapsed = 0;
     // Vector2 aeroConsts;
     // for (float x = 0; x < plotXRange.size(); x++)
@@ -189,8 +190,8 @@ void RunSimulation::Render()
             GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 3.6, guiTriangleWidth, renderHeight / 54}, minText, maxText, &plane.anglePitch, 0, maxAngle);
             GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 5, guiTriangleWidth, renderHeight / 50}, minText, maxText, &plane.angleYaw, 0, maxAngle);
             GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 6.4, guiTriangleWidth, renderHeight / 46}, minText, maxText, &plane.angleRoll, 0, maxAngle);
-            GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 2.4, guiTriangleWidth, renderHeight / 42}, minText, engineText, &plane.leftEngineVariable, 0, plane.maxEngineTrust);
-            GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 1.0, guiTriangleWidth, renderHeight / 38}, minText,  engineText, &plane.rightEngineVariable, 0, plane.maxEngineTrust);
+            // GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 2.4, guiTriangleWidth, renderHeight / 42}, minText, engineText, &plane.leftEngineVariable, 0, plane.maxEngineTrust);
+            // GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight, guiTriangleWidth, renderHeight / 38}, minText,  engineText, &plane.rightEngineVariable, 0, plane.maxEngineTrust);
             // GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 0.5, guiTriangleWidth, renderHeight / 38}, minText,  engineText, &plane.currentEngineTrust, 0, plane.maxEngineTrust);
         EndScissorMode();
         // GuiSlider(Rectangle bounds, const char *textLeft, const char *textRight, float *value, float minValue, float maxValue);
@@ -223,7 +224,8 @@ void RunSimulation::run()
                 timeElapsed = 0;
                 std::cout << plotYValues.size() << " size \n";
                 plotYValues.push_back(plane.acceleration.y);
-                vel.push_back(plane.velocity.z);
+                vel.push_back(plane.pos.z);
+                lift.push_back((plane.pos.y));
             }
             else
             {
@@ -233,6 +235,8 @@ void RunSimulation::run()
     }
     mat::plot(plotXRange, plotYValues, "-o");
     mat::save("yaccel.pdf");
-    mat::plot(plotXRange, vel, "-o");
+    vel.pop_back();
+    lift.pop_back();
+    mat::plot(vel, lift, "-o");
     mat::save("velocity.pdf");
 }
