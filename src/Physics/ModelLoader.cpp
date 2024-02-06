@@ -38,14 +38,16 @@ void FluidDynamicsModel::readObjectModelFile(std::string *as, std::string *bs, s
     }
 }
 
-int FluidDynamicsModel::detectCollision(Ray ray) {
+int FluidDynamicsModel::detectCollision(Ray ray)
+{
     int hits = 0;
     if (objectTrianglePoints.size() >= 1)
     {
         for (int i = 0; i < objectTrianglePoints.size(); i++)
         {
             RayCollision info = GetRayCollisionTriangle(ray, objectTrianglePoints.at(i).at(0), objectTrianglePoints.at(i).at(1), objectTrianglePoints.at(i).at(2));
-            if (info.hit) {
+            if (info.hit)
+            {
                 hits++;
             }
         }
