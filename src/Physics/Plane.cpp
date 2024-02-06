@@ -121,12 +121,6 @@ void Plane::calcLift(float rho)
       //std::cout << " xdrag " << forceDrag.components.x << " ydrag " << forceDrag.components.y << " zdrag " << forceDrag.components.z << "\n";
 }
 
-Vector3 Plane::calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth)
-{
-      // TODO lift formula
-      return {0, 0, 0};
-}
-
 void Plane::Draw()
 {
       for (int i = 0; i < forces.size(); i++)
@@ -176,17 +170,33 @@ void Plane::Update(float deltaTime, float rho)
             angleRoll -= rotationMultiplier * deltaTime;
       }
 
+      double engineAccelaration = maxEngineTrust/30;
+
       if (IsKeyDown(KEY_LEFT_SHIFT)) 
       {
-            leftEngineVariable += 100 * deltaTime;
-            rightEngineVariable += 100 * deltaTime;
+            leftEngineVariable += engineAccelaration * deltaTime;
+            rightEngineVariable += engineAccelaration * deltaTime;
       } 
       else if (IsKeyDown(KEY_RIGHT_SHIFT))
       {
-            leftEngineVariable -= 100 * deltaTime;
-            rightEngineVariable -= 100 * deltaTime; 
+            leftEngineVariable -= engineAccelaration * deltaTime;
+            rightEngineVariable -= engineAccelaration * deltaTime; 
       }
 
+      if (IsKeyDown(KEY_G))
+      {
+            leftEngineVariable += engineAccelaration * deltaTime;
+      }
+      else if (IsKeyDown(KEY_H)) {
+            leftEngineVariable -= engineAccelaration * deltaTime;
+      }
+      else if (IsKeyDown(KEY_V))
+      {
+            rightEngineVariable += engineAccelaration * deltaTime;
+      }
+      else if (IsKeyDown(KEY_B)) {
+            rightEngineVariable -= engineAccelaration * deltaTime;
+      }
       // if ()
 
       reduceAngleDegrees();
@@ -337,7 +347,7 @@ void Plane::updateThrust()
       {
             leftEngineVariable = -maxEngineTrust;
       } 
-      else if (leftEngineVariable > 0) 
+      else if (-leftEngineVariable > 0) 
       {
             leftEngineVariable = 0;
       }
@@ -346,7 +356,7 @@ void Plane::updateThrust()
       {
             rightEngineVariable = -maxEngineTrust;
       } 
-      else if (rightEngineVariable > 0) 
+      else if (-rightEngineVariable > 0) 
       {
             rightEngineVariable = 0;
       }

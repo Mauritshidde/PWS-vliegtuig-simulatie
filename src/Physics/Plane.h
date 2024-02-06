@@ -22,7 +22,6 @@ public:
       ~Plane();
       void Draw();
       void Update(float deltaTime, float rho);
-      Vector3 calcCenterOfLiftWing(Vector3 startOfWing, Vector3 endOfWing, float startWingWidth, float endWingWidth);
       Vector2 getConsts(float pitch, float yaw, bool useYaw, bool usePitch);
 
       void calcLift(float rho);
