@@ -261,15 +261,6 @@ void Plane::updateRotation(float deltaTime)
 {
       anglePitch += angularVelocity.x * deltaTime * 360;
       angleYaw += angularVelocity.y * deltaTime * 360;
-      //std::cout << "new angle  " <<  angularVelocity.y << std::endl;
-      // //std::cout << "new angle  " <<  angularVelocity.y << std::endl;
-      // //std::cout << "new angle  " <<  angularVelocity.y << std::endl;
-      // //std::cout << "new angle  " <<  angularVelocity.y << std::endl;
-      // //std::cout << "new angle  " <<  angularVelocity.y << std::endl;
-      //std::cout << "new angle  " <<  angleYaw << std::endl;
-      // //std::cout << "new angle  " <<  angleYaw << std::endl;
-      // //std::cout << "new angle  " <<  angleYaw << std::endl;
-      // //std::cout << "new angle  " <<  angleYaw << std::endl;
       angleRoll += angularVelocity.z * deltaTime * 360;
       reduceAngleDegrees();
 }
@@ -359,6 +350,6 @@ void Plane::updateThrust()
       {
             rightEngineVariable = 0;
       }
-      leftMotorThrust = {0, 0, -leftEngineVariable};
-      rightMotorThrust = {0, 0, -rightEngineVariable};
+      leftMotorThrust = {0, 0, leftEngineVariable};
+      rightMotorThrust = {0, 0, rightEngineVariable};
 }

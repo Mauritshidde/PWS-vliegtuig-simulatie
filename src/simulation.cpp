@@ -190,8 +190,8 @@ void RunSimulation::Render()
             GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 3.6, guiTriangleWidth, renderHeight / 54}, minText, maxText, &plane.anglePitch, 0, maxAngle);
             GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 5, guiTriangleWidth, renderHeight / 50}, minText, maxText, &plane.angleYaw, 0, maxAngle);
             GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 6.4, guiTriangleWidth, renderHeight / 46}, minText, maxText, &plane.angleRoll, 0, maxAngle);
-            // GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 2.4, guiTriangleWidth, renderHeight / 42}, minText, engineText, &plane.leftEngineVariable, 0, plane.maxEngineTrust);
-            // GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight, guiTriangleWidth, renderHeight / 38}, minText,  engineText, &plane.rightEngineVariable, 0, plane.maxEngineTrust);
+            GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 1.4, guiTriangleWidth, renderHeight / 42}, minText, engineText, &plane.leftEngineVariable, 0, plane.maxEngineTrust);
+            GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 1.3, guiTriangleWidth, renderHeight / 38}, minText,  engineText, &plane.rightEngineVariable, 0, plane.maxEngineTrust);
             // GuiSlider((Rectangle){guiPanelSize.x + 0.5 * panelSliderWidthDifference, renderHeight / 0.5, guiTriangleWidth, renderHeight / 38}, minText,  engineText, &plane.currentEngineTrust, 0, plane.maxEngineTrust);
         EndScissorMode();
         // GuiSlider(Rectangle bounds, const char *textLeft, const char *textRight, float *value, float minValue, float maxValue);
