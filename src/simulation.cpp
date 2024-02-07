@@ -248,7 +248,7 @@ void RunSimulation::run()
         }
     }
     mat::plot(plotXRange, plotYValues, "-o");
-    mat::save("yaccel.pdf");
+    mat::save("zvel.pdf");
     vel.pop_back();
     lift.pop_back();
     mat::plot(vel, lift, "-o");
