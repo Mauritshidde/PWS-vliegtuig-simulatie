@@ -24,7 +24,7 @@ void func() {
             result.push_back(substr);
         }
         for(int i = 0; i<result.size(); i++) {    //print all splitted strings
-            std::cout << std::stod(result.at(i)) << std::endl;
+            std::cout << result.at(i) << std::endl;
         }
 
         // lift.push_back(result);

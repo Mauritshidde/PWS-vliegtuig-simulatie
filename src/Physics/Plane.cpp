@@ -131,13 +131,13 @@ void Plane::Draw()
       for (int i = 0; i < forces.size(); i++)
       {
             Vector3 test = Vector3Transform(forces.at(i).location, MatrixRotateXYZ((Vector3){DEG2RAD * anglePitch, DEG2RAD * angleYaw, DEG2RAD * angleRoll}));
-            DrawLine3D(test, {forces.at(i).components.x + test.x, forces.at(i).components.y + test.y, forces.at(i).components.z + test.z}, RED);
-            DrawCircle3D({0, 0, 0}, engineOffset, {1, 0, 0}, 90, RED);
-            DrawCircle3D({0, 0, 0}, maxEngineTrust / pow(10, 3), {1, 0, 0}, 90, RED);
-            DrawCube(test, 5, 5, 5, RED);
+            // DrawLine3D(test, {forces.at(i).components.x + test.x, forces.at(i).components.y + test.y, forces.at(i).components.z + test.z}, RED);
+            // DrawCircle3D({0, 0, 0}, engineOffset, {1, 0, 0}, 90, RED);
+            // DrawCircle3D({0, 0, 0}, maxEngineTrust / pow(10, 3), {1, 0, 0}, 90, RED);
+            // DrawCube(test, 5, 5, 5, RED);
             Vector3 tt = {forces.at(i).components.x / pow(10, 3), forces.at(i).components.y / pow(10, 3), forces.at(i).components.z / pow(10, 3)};
-            DrawCube(tt, 5, 5, 5, RED);
-            DrawLine3D(test, tt, BLACK);
+            // DrawCube(tt, 5, 5, 5, RED);
+            // DrawLine3D(test, tt, BLACK);
       }
       DrawModelEx(airplane, externalPos, (Vector3){1.0f, 0.0f, 0.0f}, 0, (Vector3){0.5f, 0.5f, 0.5f}, WHITE);
 }
