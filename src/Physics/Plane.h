@@ -30,6 +30,7 @@ public:
       void updateAngularVel(float deltaTime);
       void updateRotation(float deltaTime);
 
+      Vector3 doAngularDrag();
       void reduceAngleDegrees();
       Vector3 reduceAngleDegrees(Vector3 angle);
       void rotateVector();
