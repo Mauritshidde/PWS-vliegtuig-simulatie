@@ -48,6 +48,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
 
     decorations1 = skyDecoration({0, 0, 0});
     decorations2 = skyDecoration({-700, 40, -700});
+    decorations3 = skyDecoration({700, -40, 700});
 
     plane = Plane(fileName, 100);
     
@@ -157,6 +158,8 @@ void RunSimulation::Update(float deltaTime)
     //move the environment decorations1 (birds) with the speed of the plane to create the illusion of plane movement
     decorations1.globalPosition = decorations1.physics.moveWithVelocity(decorations1.globalPosition, Vector3Negate(plane.velocity), deltaTime);
     decorations2.globalPosition = decorations2.physics.moveWithVelocity(decorations2.globalPosition, Vector3Negate(plane.velocity), deltaTime);
+    decorations3.globalPosition = decorations3.physics.moveWithVelocity(decorations3.globalPosition, Vector3Negate(plane.velocity), deltaTime);
+
     //TODO add external plane position and move plane
     
     moveCamera(deltaTime);
@@ -174,6 +177,7 @@ void RunSimulation::Render()
             DrawModel(skybox, (Vector3){0.0f, 0.0f, 0.0f}, 1.0f, skybox.materials->maps->color);
             decorations1.draw();
             decorations2.draw();
+            decorations3.draw();
             plane.Draw();
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
             DrawGrid(10, 10.0f);
