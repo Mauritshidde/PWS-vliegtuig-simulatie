@@ -175,11 +175,11 @@ void Cfd::solvePressure(int i, int j, int k)
         }
         if (!mesh.at(i + 1).at(j).at(k).boundary)
         {
-            toCalc.push_back({i + 1, j, k});
+            toUse.push_back({i + 1, j, k});
         }
         if (!mesh.at(i - 1).at(j).at(k).boundary)
         {
-            toCalc.push_back({i - 1, j, k});
+            toUse.push_back({i - 1, j, k});
         }
         Vector3 indexes;
         std::vector<Vector3> toCalc;

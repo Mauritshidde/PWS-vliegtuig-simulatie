@@ -137,6 +137,15 @@ void RunSimulation::moveCamera(float deltaTime)
             cameraPos = {0.0f, 0.0f, cameraCircleRadius};
         }
 
+        if (cameraCircleRadius > 490)
+        {
+            cameraCircleRadius = 490;
+        }
+        else if (cameraCircleRadius < 50) 
+        {
+            cameraCircleRadius = 50;
+        }
+
         mainCamera.position = Vector3Transform(cameraPos, MatrixRotateXYZ((Vector3){DEG2RAD * angleXZAxis, DEG2RAD * angleYAxis, 0}));
         previousMousePosition = currentMousePos;
     }
@@ -164,6 +173,7 @@ void RunSimulation::Update(float deltaTime)
 
 void RunSimulation::Render()
 {
+    std::cout << cameraCircleRadius <<  " camera cirlce radius" << std::endl;
     Rectangle sliderRec = {renderWidth - 240, 40, 200, 150};
 
     BeginDrawing();
