@@ -69,9 +69,9 @@ void fileWithBoth(std::vector<std::vector<Vector2>> *consts)
 void createLiftFiles(std::vector<std::vector<Vector2>> *constsBoth, std::vector<Vector2> *constsPitch, std::vector<Vector2> *constsYaw)
 {                                // steps has to be greater than 2 but realisticly has to be higher than 200
     fileWithoutYaw(constsPitch); // for the best results x times stepsize should be 360
-    std::cout << "done with Pitch file << " << std::endl;
+    //std::cout << "done with Pitch file << " << std::endl;
     fileWithoutPitch(constsYaw);
-    std::cout << "done with Yaw file<< " << std::endl;
+    //std::cout << "done with Yaw file<< " << std::endl;
     fileWithBoth(constsBoth);
-    std::cout << "done with Yaw and Pitch file<< " << std::endl;
+    //std::cout << "done with Yaw and Pitch file<< " << std::endl;
 }

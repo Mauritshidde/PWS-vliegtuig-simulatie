@@ -25,5 +25,5 @@ int main()
 
     // Show plots
     plt::save("imshow.png");
-    std::cout << "Result saved to 'imshow.png'.\n";
+    //std::cout << "Result saved to 'imshow.png'.\n";
 }

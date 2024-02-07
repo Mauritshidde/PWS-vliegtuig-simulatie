@@ -36,7 +36,7 @@ std::vector<std::vector<float>> invertMatrix(std::vector<std::vector<float>> mat
     {
         if (a[i][i] == 0.0)
         {
-            std::cout << "Mathematical Error!";
+            //std::cout << "Mathematical Error!";
             exit(0);
         }
         for (j = 1; j <= n; j++)
@@ -61,8 +61,7 @@ std::vector<std::vector<float>> invertMatrix(std::vector<std::vector<float>> mat
     }
     /* Displaying Inverse Matrix */
     std::vector<std::vector<float>> invertedMatrix = matrix;
-    std::cout << std::endl
-              << "Inverse Matrix is:" << std::endl;
+    //std::cout << std::endl<< "Inverse Matrix is:" << std::endl;
 
     int i2 = 0;
     int j2 = 0;
@@ -72,11 +71,11 @@ std::vector<std::vector<float>> invertMatrix(std::vector<std::vector<float>> mat
         for (j = n + 1; j <= 2 * n; j++)
         {
             invertedMatrix.at(i - 1).at(j - n - 1) = a[i][j];
-            std::cout << a[i][j] << "\t";
+            //std::cout << a[i][j] << "\t";
             j2++;
         }
         i2++;
-        std::cout << std::endl;
+        //std::cout << std::endl;
     }
 
     return invertedMatrix;
