@@ -1,15 +1,17 @@
 #include "readFile.h"
 
-Vector2 LiftFileReader::getClCdWithYaw(float yawAngle) {
+Vector2 LiftFileReader::getClCdWithYaw(float yawAngle)
+{
     float cl, cd;
 
     float stepSize = liftWithYawData["stepSize"].get<float>();
 
-    float translatedYaw = yawAngle/stepSize;
-    int yawIndex = (int) translatedYaw;
+    float translatedYaw = yawAngle / stepSize;
+    int yawIndex = (int)translatedYaw;
 
     int indexAdition = 1;
-    if (yawAngle + stepSize > 360) {
+    if (yawAngle + stepSize > 360)
+    {
         indexAdition = -yawIndex;
     }
 
@@ -22,20 +24,22 @@ Vector2 LiftFileReader::getClCdWithYaw(float yawAngle) {
     float Cd2 = liftWithYawData["yaw"][std::to_string(yawIndex + indexAdition)]["cd"].get<float>() * (translatedYaw - yawIndex);
 
     cd = Cd1 + Cd2;
-    
+
     return {cl, cd};
 }
 
-Vector2 LiftFileReader::getClCdWithPitch(float pitchAngle) {
+Vector2 LiftFileReader::getClCdWithPitch(float pitchAngle)
+{
     float cl, cd;
 
     float stepSize = liftWithPitchData["stepSize"].get<float>();
 
-    float translatedPitch = pitchAngle/stepSize;
-    int pitchIndex = (int) translatedPitch;
+    float translatedPitch = pitchAngle / stepSize;
+    int pitchIndex = (int)translatedPitch;
 
     int indexAdition = 1;
-    if (pitchAngle + stepSize > 360) {
+    if (pitchAngle + stepSize > 360)
+    {
         indexAdition = -pitchIndex;
     }
 
@@ -48,26 +52,29 @@ Vector2 LiftFileReader::getClCdWithPitch(float pitchAngle) {
     float Cd2 = liftWithPitchData["pitch"][std::to_string(pitchIndex + indexAdition)]["cd"].get<float>() * (translatedPitch - pitchIndex);
 
     cd = Cd1 + Cd2;
-    
+
     return {cl, cd};
 }
 
-Vector2 LiftFileReader::getClCdWithPitchAndYaw(float pitchAngle, float yawAngle) {
+Vector2 LiftFileReader::getClCdWithPitchAndYaw(float pitchAngle, float yawAngle)
+{
     float cl, cd;
     float stepSize = liftData["stepSize"].get<float>();
-    float translatedPitch = pitchAngle/stepSize;
-    int pitchIndex = (int) translatedPitch;
+    float translatedPitch = pitchAngle / stepSize;
+    int pitchIndex = (int)translatedPitch;
 
-    float translatedYaw = yawAngle/stepSize;
-    int yawIndex = (int) translatedYaw;
+    float translatedYaw = yawAngle / stepSize;
+    int yawIndex = (int)translatedYaw;
 
     int indexAditionYaw = 1;
-    if (yawAngle + stepSize > 360) {
+    if (yawAngle + stepSize > 360)
+    {
         indexAditionYaw = -yawIndex;
     }
 
     int indexAditionPitch = 1;
-    if (pitchAngle + stepSize > 360) {
+    if (pitchAngle + stepSize > 360)
+    {
         indexAditionPitch = -pitchIndex;
     }
 
@@ -86,20 +93,26 @@ Vector2 LiftFileReader::getClCdWithPitchAndYaw(float pitchAngle, float yawAngle)
     float Cd4 = liftData["pitch"][std::to_string(pitchIndex + indexAditionPitch)]["yaw"][std::to_string(yawIndex + indexAditionYaw)]["cd"].get<float>() * (translatedPitch - pitchIndex) * (translatedYaw - yawIndex);
 
     cd = Cd1 + Cd2 + Cd3 + Cd4;
-    
+
     return {cl, cd};
 }
 
-Vector2 LiftFileReader::getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch) {
-    if (withYaw || withPitch) {
+Vector2 LiftFileReader::getConstFromLiftFile(float pitchAngle, float yawAngle, bool withYaw, bool withPitch)
+{
+    if (withYaw || withPitch)
+    {
         Vector2 vals = getClCdWithPitchAndYaw(pitchAngle, yawAngle);
 
         return vals;
-    } else if (withYaw) {
+    }
+    else if (withYaw)
+    {
         Vector2 vals = getClCdWithYaw(yawAngle);
 
         return vals;
-    } else {
+    }
+    else
+    {
         Vector2 vals = getClCdWithPitch(pitchAngle);
 
         return vals;
@@ -108,18 +121,17 @@ Vector2 LiftFileReader::getConstFromLiftFile(float pitchAngle, float yawAngle, b
     return {0, 0}; // to make the compiler happy
 }
 
-
 LiftFileReader::LiftFileReader(std::string fileName)
 {
-    std::ifstream f("planes/liftfiles/"+fileName+".json");
+    std::ifstream f("planes/liftfiles/" + fileName + ".json");
     liftData = nlohmann::json::parse(f);
     f.close();
-    
-    std::ifstream g("planes/liftfiles/"+fileName+"Yaw.json");
+
+    std::ifstream g("planes/liftfiles/" + fileName + "Yaw.json");
     liftWithYawData = nlohmann::json::parse(g);
     g.close();
 
-    std::ifstream h("planes/liftfiles/"+fileName+"Pitch.json");
+    std::ifstream h("planes/liftfiles/" + fileName + "Pitch.json");
     liftWithPitchData = nlohmann::json::parse(h);
     h.close();
 }

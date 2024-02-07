@@ -8,7 +8,6 @@
 #include "extra/raymath2.h"
 #include "ui/loadingScreen.h"
 #include "liftFileCode/createFile.h"
-// #include "matrix.h"
 
 class Cfd
 {
@@ -28,33 +27,31 @@ private:
     Texture airplaneTexture;
     bool drawing, drawing3D;
     BoundingBox boundingBoxPlane;
-    Vector3 boundingBoxPlaneMin;
-    Vector3 boundingBoxPlaneMax;
 
     // multi threading
     int cores;
     bool settingPlaneBOundarys;
 
     // mesh variables
-    int nx;   // amount of cells in x direction // steps in x direction
-    int ny;   // amount of cells in y direction // steps in y direction
+    int nx; // amount of cells in x direction // steps in x direction
+    int ny; // amount of cells in y direction // steps in y direction
     int nz;
-    double dx; // step size in x
-    double dy; // step size in y
-    double dz; // step size in z
-    double dxi; // 1/dx
-    double dyi; // 1/dy
-    double dzi; // 1/dz
+    double dx;             // step size in x
+    double dy;             // step size in y
+    double dz;             // step size in z
+    double dxi;            // 1/dx
+    double dyi;            // 1/dy
+    double dzi;            // 1/dz
     Vector3 startingPoint; // starting point of the grid
     FluidDynamicsModel plane;
 
     // calculation consts
-    double k; // const for amount of change of density in each time step
-    double nu; // const
-    double Re; // reynolds number const
-    double rho; // density const
+    double k;       // const for amount of change of density in each time step
+    double nu;      // const
+    double Re;      // reynolds number const
+    double rho;     // density const
     double maxTime; // max time for the program untill the program should quit
-    double dT; // time steps
+    double dT;      // time steps
 
     std::vector<std::vector<std::vector<MeshCube>>> mesh;
     std::vector<std::vector<std::vector<double>>> divergenceVelocityScalarField;
@@ -62,7 +59,6 @@ private:
     std::vector<std::vector<std::vector<Vector3>>> tempVelocity;
 
     // functions for the creation of the grid
-    void Start();
     void createMesh();
     void resetMesh();
     void setBoundaryConditions(double velocityXDirectionStart, double velocityYDirectionStart, double velocityZDirectionStart, double velocityXDirectionEnd, double velocityYDirectionEnd, double velocityZDirectionEnd);
@@ -71,7 +67,7 @@ private:
     void setPlaneBoundaryHelper(int startIndex, int endIndex);
     bool getCollisionPlaneRay(Vector3 direction, Vector3 oppositeDirection, Ray ray, Ray ray2);
     void detectColission();
-    void setPlaneBoundary(); // make parts of the plane part of the boundary conditions 
+    void setPlaneBoundary(); // make parts of the plane part of the boundary conditions
 
     // functions for calculating the movement of the fluid
     void removeDivergence();
@@ -79,14 +75,15 @@ private:
     void solvePressure(int i, int j, int k);
     Vector3 getNetPressureOnPlane();
     void calcVelocityField();
-    void solvePressure2(); 
-    Vector2 calc(double anglePitch, double angleYaw);    
+    void solvePressure2();
+    Vector2 calc(double anglePitch, double angleYaw);
 
-    // graphics functions (these are optionally when running the cfd) 
+    // graphics functions (these are optionally when running the cfd)
     void moveCamera(float deltaTime);
     void drawVelocityVectors();
     void draw2DGrid();
     void Draw();
+
 public:
     void run(int steps, double stepsizePitch, double stepsizeYaw);
 

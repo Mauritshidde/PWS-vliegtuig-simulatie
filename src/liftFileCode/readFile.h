@@ -11,7 +11,7 @@ private:
     nlohmann::json liftData;
     nlohmann::json liftWithYawData;
     nlohmann::json liftWithPitchData;
-    
+
 public:
     Vector2 getClCdWithYaw(float yawAngle);
     Vector2 getClCdWithPitch(float pitchAngle);
