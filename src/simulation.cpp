@@ -52,7 +52,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
 
     plane = Plane(fileName, 100);
     
-    plotXRange = linspace(0, 100, 101); //time
+    plotXRange = linspace(0, 1000, 1001); //time
     
     timeElapsed = 0;
     // Vector2 aeroConsts;
@@ -236,8 +236,8 @@ void RunSimulation::run()
             if (timeElapsed + deltaTime > 0.1)
             {
                 timeElapsed = 0;
-                //std::cout << plotYValues.size() << " size \n";
-                plotYValues.push_back(plane.acceleration.y);
+                std::cout << plotYValues.size() << " size \n";
+                plotYValues.push_back(plane.velocity.z);
                 vel.push_back(plane.pos.z);
                 lift.push_back((plane.pos.y));
             }
