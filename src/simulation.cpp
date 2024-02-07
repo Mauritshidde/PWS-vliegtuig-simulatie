@@ -43,7 +43,7 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     mainCamera.projection = CAMERA_PERSPECTIVE;  /// wat doet dit TODO
 
     skybox = LoadModel("models/object/skybox.obj");
-    skyboxTexture = LoadTexture("models/texture/skyboxtexture.png");
+    skyboxTexture = LoadTexture("models/texture/sky_texture1991.png");
     skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = skyboxTexture;
 
     decorations1 = skyDecoration({0, 0, 0});
