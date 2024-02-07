@@ -50,10 +50,10 @@ Plane::Plane(std::string planeName, float startVelocity, float rho)
       angularVelocity = {0, 0, 0};
       angularAcceleration = {0, 0, 0};
       externalPos = {0, 0, 0};
-      // //std::cout << " xVel " << velocity.x << " yVel " << velocity.y << " zVel " << velocity.z << "\n";
-      // //std::cout << " xAccel " << acceleration.x << " yAccel " << acceleration.y << " zAccel " << acceleration.z << "\n";
-      // //std::cout << " xangvel " << angularAcceleration.x << " yangvel " << angularAcceleration.y << " zangvel " << angularAcceleration.z << "\n";
-      // //std::cout << " xangAccel " << angularAcceleration.x << " yangAccel " << angularAcceleration.y << " zangAccel " << angularAcceleration.z << "\n";
+      // ////std::cout << " xVel " << velocity.x << " yVel " << velocity.y << " zVel " << velocity.z << "\n";
+      // ////std::cout << " xAccel " << acceleration.x << " yAccel " << acceleration.y << " zAccel " << acceleration.z << "\n";
+      // ////std::cout << " xangvel " << angularAcceleration.x << " yangvel " << angularAcceleration.y << " zangvel " << angularAcceleration.z << "\n";
+      // ////std::cout << " xangAccel " << angularAcceleration.x << " yangAccel " << angularAcceleration.y << " zangAccel " << angularAcceleration.z << "\n";
 
       leftEngineVariable = rightEngineVariable = maxEngineTrust / 2;
       engineOffset = 14;
@@ -98,18 +98,18 @@ void Plane::calcLift(float rho)
       speed = planePhysics.calcHypot(velocity);
       if (speed)
       {
-            // std::cout << " xvel " << velocity.x << " yvel " << velocity.y << " zvel " << velocity.z << "\n";
+            // //std::cout << " xvel " << velocity.x << " yvel " << velocity.y << " zvel " << velocity.z << "\n";
             float angleYZ = atan(velocity.y / velocity.z) * 360; // pitch
             float angleXZ = atan(velocity.x / velocity.z) * 360; // yaw
-            // std::cout << " YZ " << angleYZ << " xz " << angleXZ << " \n "; // << angleYX << "\n";
+            // //std::cout << " YZ " << angleYZ << " xz " << angleXZ << " \n "; // << angleYX << "\n";
             Vector3 angleOfAttack = {angleYZ - anglePitch, angleXZ - angleYaw, 0}; //, angleYX - angleRoll};
-            // std::cout << " aoa.x " << angleOfAttack.x << " aoa.y " << angleOfAttack.y << " \n ";
+            // //std::cout << " aoa.x " << angleOfAttack.x << " aoa.y " << angleOfAttack.y << " \n ";
             angleOfAttack = reduceAngleDegrees(angleOfAttack);
-            // std::cout << " aoa.x " << angleOfAttack.x << " aoa.y " << angleOfAttack.y << " \n ";
+            // //std::cout << " aoa.x " << angleOfAttack.x << " aoa.y " << angleOfAttack.y << " \n ";
             consts = getConsts(angleOfAttack.x, angleOfAttack.y, (angleOfAttack.x != 0), (angleOfAttack.y != 0));
             cl = consts.x;
             cd = consts.y;
-            // std::cout << " cl" << cl << " cd " << cd << " \n";
+            // //std::cout << " cl" << cl << " cd " << cd << " \n";
       }
       lift = cl * rho * pow(speed, 2) * 0.5;
       drag = cd * rho * pow(speed, 2) * 0.5;
@@ -117,8 +117,8 @@ void Plane::calcLift(float rho)
       forceDrag.components = Vector3Scale(dragDirection, drag);
       liftDirection = Vector3Transform({0, 1, 0}, MatrixRotateXYZ((Vector3){0, 0, DEG2RAD * angleRoll})); // lift points up, except when plane has roll
       forceLift.components = Vector3Scale(liftDirection, lift);
-      // std::cout << " xlift " << forceLift.components.x << " ylift " << forceLift.components.y << " zlift " << forceLift.components.z << "\n";
-      // std::cout << " xdrag " << forceDrag.components.x << " ydrag " << forceDrag.components.y << " zdrag " << forceDrag.components.z << "\n";
+      // //std::cout << " xlift " << forceLift.components.x << " ylift " << forceLift.components.y << " zlift " << forceLift.components.z << "\n";
+      // //std::cout << " xdrag " << forceDrag.components.x << " ydrag " << forceDrag.components.y << " zdrag " << forceDrag.components.z << "\n";
 }
 
 void Plane::Draw()
@@ -226,10 +226,10 @@ void Plane::Update(float deltaTime, float rho)
       // for (int i = 0; i < forces.size(); i++)
       // {
       //       DrawLine3D({0,0,0}, {forces.at(0).components.x/pow(10, 3), forces.at(0).components.y/pow(10, 3), forces.at(0).components.z /pow(10, 3)}, RED);
-      //       std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
-      //       std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
+      //       //std::cout << " xf " << forces.at(i).components.x << " yf " << forces.at(i).components.y << " zf " << forces.at(i).components.z << "\n";
+      //       //std::cout << " xloc " << forces.at(i).location.x << " yloc " << forces.at(i).location.y << " zloc " << forces.at(i).location.z << "\n";
       // }
-      // std::cout << "speed: " << velocity << " lift: " << lift << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
+      // //std::cout << "speed: " << velocity << " lift: " << lift << " mass: " << 9.81 * mass << " Drag: " << drag << " pitch: " << anglePitch << " yaw: " << angleYaw << std::endl;
 }
 
 void Plane::evaluateForces(std::vector<physicsVector> forces)
@@ -244,7 +244,7 @@ void Plane::updateVel(float deltaTime)
       velocity.x += deltaVelocity.x;
       velocity.y += deltaVelocity.y;
       velocity.z += deltaVelocity.z;
-      // //std::cout << " xVel " << velocity.x << " yVel " << velocity.y << " zVel " << velocity.z << "\n";
+      // ////std::cout << " xVel " << velocity.x << " yVel " << velocity.y << " zVel " << velocity.z << "\n";
 }
 
 void Plane::updateAngularVel(float deltaTime)
@@ -254,9 +254,9 @@ void Plane::updateAngularVel(float deltaTime)
       angularVelocity.y += deltaAngularV.y;
       angularVelocity.z += deltaAngularV.z;
       // doAngularDrag();
-      // //std::cout << " xDanV " << deltaAngularV.x << " yDanV " << deltaAngularV.y << " zDanV " << deltaAngularV.z << "\n";
-      // //std::cout << " xAn " << angularAcceleration.x << " yAn " << angularAcceleration.y << " zAn " << angularAcceleration.z << "\n";
-      // //std::cout << " xanvel " << angularVelocity.x << " yanvel " << angularVelocity.y << " zanvel " << angularVelocity.z << "\n";
+      // ////std::cout << " xDanV " << deltaAngularV.x << " yDanV " << deltaAngularV.y << " zDanV " << deltaAngularV.z << "\n";
+      // ////std::cout << " xAn " << angularAcceleration.x << " yAn " << angularAcceleration.y << " zAn " << angularAcceleration.z << "\n";
+      // ////std::cout << " xanvel " << angularVelocity.x << " yanvel " << angularVelocity.y << " zanvel " << angularVelocity.z << "\n";
 }
 
 void Plane::updateRotation(float deltaTime)

@@ -6,9 +6,11 @@
 
 #include <raylib.h>
 #include <iostream>
+#include "file.h"
 
 int main()
 {
+    func();
     bool running = true;
     Menu menu;
 

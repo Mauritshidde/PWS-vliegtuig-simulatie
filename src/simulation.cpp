@@ -176,7 +176,7 @@ void RunSimulation::Update(float deltaTime)
 
 void RunSimulation::Render()
 {
-    std::cout << cameraCircleRadius <<  " camera cirlce radius" << std::endl;
+    //std::cout << cameraCircleRadius <<  " camera cirlce radius" << std::endl;
     Rectangle sliderRec = {renderWidth - 240, 40, 200, 150};
 
     BeginDrawing();
@@ -230,13 +230,13 @@ void RunSimulation::run()
         float deltaTime = GetFrameTime();
         Update(deltaTime);
         Render();
-        std::cout << GetFPS() << std::endl;
+        //std::cout << GetFPS() << std::endl;
         if (plotYValues.size() < plotXRange.size()) 
         {
             if (timeElapsed + deltaTime > 0.1)
             {
                 timeElapsed = 0;
-                std::cout << plotYValues.size() << " size \n";
+                //std::cout << plotYValues.size() << " size \n";
                 plotYValues.push_back(plane.acceleration.y);
                 vel.push_back(plane.pos.z);
                 lift.push_back((plane.pos.y));

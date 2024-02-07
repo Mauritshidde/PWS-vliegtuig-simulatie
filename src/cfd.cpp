@@ -546,7 +546,7 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
             Draw();
         }
     }
-    std::cout << "done with loop getting pressure and velocity" << maxTime << std::endl;
+    //std::cout << "done with loop getting pressure and velocity" << maxTime << std::endl;
 
     // TODO correction fase
     // correction
@@ -557,8 +557,8 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
     double cl, cd;
     cl = forces.y / (rho * pow(10, 2) * 0.5);
     cd = forces.z / (rho * pow(10, 2) * 0.5);
-    // std::cout << forces.x << " forces " << forces.y << forces.z << std::endl;
-    // std::cout << cl << " cl " << cd << std::endl;
+    // //std::cout << forces.x << " forces " << forces.y << forces.z << std::endl;
+    // //std::cout << cl << " cl " << cd << std::endl;
     // float cz = forces.z / (rho * pow(100 ,2) * 0.5);
 
     return {cl, cd};
@@ -710,15 +710,15 @@ void Cfd::draw2DGrid()
 
                 Color velocityColor = {255, val2, val3, 255};
                 DrawRectangle(point.x * 4, point.y * 4, dx * 4, dy * 4, velocityColor);
-                // std::cout << mesh.at(1).at(j).at(k).pressure << " ";
-                // std::cout << velocity << " ";
+                // //std::cout << mesh.at(1).at(j).at(k).pressure << " ";
+                // //std::cout << velocity << " ";
             }
         }
-        // std::cout << std::endl;
+        // //std::cout << std::endl;
     }
-    // std::cout << std::endl;
-    // std::cout << std::endl;
-    // std::cout << std::endl;
+    // //std::cout << std::endl;
+    // //std::cout << std::endl;
+    // //std::cout << std::endl;
 }
 
 void Cfd::Draw()
@@ -758,7 +758,7 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw)
         }
     }
 
-    std::cout << "done" << std::endl;
+    //std::cout << "done" << std::endl;
     
     std::vector<Vector2> cfdResultsPitch, cfdResultsYaw;
     for (double i = 0; i <= 360; i += stepsizePitch)
@@ -771,7 +771,7 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw)
         cfdResultsPitch.push_back({consts.x, consts.y});
     }
 
-    std::cout << "done2" << std::endl;
+    //std::cout << "done2" << std::endl;
 
     for (double i = 0; i <= 360; i += stepsizeYaw)
     {
@@ -783,7 +783,7 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw)
         cfdResultsYaw.push_back({consts.x, consts.y});
     }
 
-    std::cout << "done3" << std::endl;
+    //std::cout << "done3" << std::endl;
 
     createLiftFiles(&cfdResults, &cfdResultsPitch, &cfdResultsYaw);
     if (drawing)
@@ -791,7 +791,7 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw)
         CloseWindow();
     }
 
-    std::cout << "cfd-program completed calculating cl and cd over pitch and yaw and exited succesfully";
+    //std::cout << "cfd-program completed calculating cl and cd over pitch and yaw and exited succesfully";
 }
 
 Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, double setRho, bool drawingEnabled, bool draw3D)
