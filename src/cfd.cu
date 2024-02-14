@@ -267,15 +267,6 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         std::vector<std::thread> threads;
         int newNz = nz - 2;
 
-        // for (int i=0; i < cores; i++) {
-        //     int part = 1 + (i * newNz)/cores;
-        //     int part2 = 1 + ((i+1) * newNz)/cores;
-        //     threads.emplace_back(&Cfd::velocityMovement, this, dT, part, part2);
-        // }
-
-        // for (int i=0; i < cores; i++) {
-        //     threads.at(i).join();
-        // }
         // std::cout << "start movement" << std::endl;
         velocityMovement(dT);
         // std::cout << "end movement" << std::endl;
