@@ -40,7 +40,7 @@ public:
       Physics planePhysics;
 
       float leftEngineVariable, rightEngineVariable; // in newton
-      float maxEngineTrust = 116000;   // in newton
+      float maxEngineTrust = 116000*5;   // in newton
       float engineOffset; //distance of the engine to the center of mass
       Vector2 consts;
       float cl;

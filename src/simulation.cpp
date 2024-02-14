@@ -190,7 +190,7 @@ void RunSimulation::Render()
             decorations3.draw();
             plane.Draw();
             DrawLine3D((Vector3){0.0f, 0.0f, 0.0f}, (Vector3){0.0f, 100.0f, 0.0f}, RED);
-            DrawGrid(10, 10.0f);
+            // DrawGrid(10, 10.0f);
         EndMode3D();
 
         Rectangle guiPanelSize = (Rectangle){renderWidth - (renderWidth / 8), 0, (renderWidth / 8), renderHeight};
