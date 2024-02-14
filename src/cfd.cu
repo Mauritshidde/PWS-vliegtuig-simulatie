@@ -248,17 +248,7 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
     float cl, cd;
     double tijd = 0;
     std::vector<std::vector<std::vector<double>>> *diffuseV;
-
-    int N = mesh.at(0).at(0).size();
-    int M = mesh.at(0).size();
-    int B = mesh.size();
-
     
-    // size_t size = N * M * B * sizeof(MeshCube);
-    // MeshCube *mesh_array = (MeshCube*)malloc(N * M * B * sizeof(MeshCube));
-
-    // std::cout << "this?? " << std::endl;
-
     for (int i=0; i < N; i++) {
         for (int j=0; j < M; j++) {
             for (int k=0; k < B; k++) {
@@ -286,13 +276,14 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         // for (int i=0; i < cores; i++) {
         //     threads.at(i).join();
         // }
+        // std::cout << "start movement" << std::endl;
         velocityMovement(dT);
+        // std::cout << "end movement" << std::endl;
 
         for (int i=1; i < nz-1; i++) {
             for (int j=1; j < nx-1; j++) {
                 for (int k=1; k < ny-1; k++) {
                     if (!mesh.at(i).at(j).at(k).boundary) {
-
                         mesh_array[k + i*M + j * B].velocityX = mesh_array[k + i*M + j * B].tempVelocity.x;
                         mesh_array[k + i*M + j * B].velocityX = mesh_array[k + i*M + j * B].tempVelocity.y;
                         mesh_array[k + i*M + j * B].velocityX = mesh_array[k + i*M + j * B].tempVelocity.z;
@@ -304,6 +295,8 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         if (drawing) {
             Draw();
         }
+
+        std::cout << tijd << std::endl;
     }
     std::cout << "done with loop getting pressure and velocity" << maxTime << std::endl;
     for (int i=0; i < N; i++) {
@@ -444,13 +437,13 @@ void Cfd::draw2DGrid() {
             point.y = k * dy - 0.5 * dy;
             point.z = startingPoint.z + dz - 0.5 * dz;
 
-            if (mesh.at(1).at(j).at(k).boundary) {
+            if (mesh_array[k + 1*M + j * B].boundary) {
                 DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, BLACK);
 
             } else {
-                float velocityX = mesh.at(1).at(j).at(k).velocityX;
-                float velocityY = mesh.at(1).at(j).at(k).velocityY;
-                float velocityZ = mesh.at(1).at(j).at(k).velocityZ;
+                float velocityX = mesh_array[k + 1*M + j * B].velocityX;
+                float velocityY = mesh_array[k + 1*M + j * B].velocityY;
+                float velocityZ = mesh_array[k + 1*M + j * B].velocityZ;
                 float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
                 
                 double val = (velocity / 200.0f) *300;
@@ -463,7 +456,7 @@ void Cfd::draw2DGrid() {
                 // std::cout << velocity << " ";
             }
         }
-        // std::cout  << std::endl;
+        // std::cout  << std::endl;0
     }
     // std::cout  << std::endl;
     // std::cout  << std::endl;
@@ -488,6 +481,10 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
     N = mesh.at(0).at(0).size();
     M = mesh.at(0).size();
     B = mesh.size();
+    
+    grid_size = ((N * M * B + 255) / block_size);
+    mesh_array = (MeshCube*)malloc(N * M * B * sizeof(MeshCube));
+
     double stepsize = 360.0f/steps;
     std::vector<std::vector<Vector2>> cfdResults;
     for (double i=0; i <= 360; i+=stepsize) { // pitch
@@ -533,6 +530,8 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
     if (drawing) {
         CloseWindow();
     }
+    
+    free(mesh_array);
     std::cout << "cfd-program completed calculating cl and cd over pitch and yaw and exited succesfully";
 }
 
@@ -543,10 +542,8 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
 
     // set variables for gpu
     block_size = 256;
-    grid_size = ((N * M * B + 255) / block_size);
 
     // set multithreading variables
-    MeshCube *mesh_array = (MeshCube*)malloc(N * M * B * sizeof(MeshCube));
     cores = 12;
     settingPlaneBOundarys = false;
 
