@@ -1,7 +1,5 @@
 // Device code
-#include <cuda.h>
 #include <cuda_runtime.h>
-#include <cuda_device_runtime_api.h>
 #include <stdio.h>
 __global__ void VecAdd(float* A, float* B, float* C, int N)
 {

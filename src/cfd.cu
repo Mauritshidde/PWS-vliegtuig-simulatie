@@ -1,4 +1,5 @@
 #include "cfd.h"
+#include <cuda_runtime.h>
 
 #define WITHOUT_NUMPY
 #include "Physics/matplotlibcpp.h"
@@ -81,68 +82,66 @@ void Cfd::setBoundaryConditions(double velocityXDirectionStart, double velocityY
     }
 }
 
-bool Cfd::getCollisionPlaneRay(Vector3 direction, Vector3 oppositeDirection, Ray ray, Ray ray2) {
+__device__ bool getCollisionPlaneRay(Vector3 direction, Vector3 oppositeDirection, Ray ray, Ray ray2) {
     ray.direction = direction;
     ray2.direction = oppositeDirection;
 
-    RayCollision meshHitInfo = GetRayCollisionMesh(ray, *airplane.meshes, airplane.transform);
-    RayCollision meshHitInfo2 = GetRayCollisionMesh(ray2, *airplane.meshes, airplane.transform);
-
-    if (meshHitInfo.hit && meshHitInfo2.hit) {
-        return true;
-    } else {
-        return false;
-    }
+    // RayCollision meshHitInfo = GetRayCollisionMesh(ray, *airplane.meshes, airplane.transform);
+    // RayCollision meshHitInfo2 = GetRayCollisionMesh(ray2, *airplane.meshes, airplane.transform);
+    
+    // if (meshHitInfo.hit && meshHitInfo2.hit) {
+    //     return true;
+    // } else {
+    //     return false;
+    // }
 }
 
-void Cfd::setPlaneBoundaryHelper(int startIndex, int endIndex) {
-    for (int i=startIndex; i < endIndex; i++) {
-        for (int j=1; j < nx-1; j++) {
-            for (int k=1; k < ny-1; k++) {
-                Vector3 position;
-                position.x = dx * j + startingPoint.x;
-                position.y = dy * k + startingPoint.y;
-                position.z = dz * i + startingPoint.z;
-                if (CheckCollisionBoxSphere(boundingBoxPlane, position, dx)) {
-                    Ray ray;
-                    Ray ray2;
-                    
-                    ray.position = position;
-                    ray2.position = position;
-                    
-                    // check if the cube is inside the plane
-                    if (getCollisionPlaneRay({1,0,0}, {1,0,0}, ray, ray2)) { 
-                        if (getCollisionPlaneRay({0,1,0}, {0,1,0}, ray, ray2)) {
-                            if (getCollisionPlaneRay({0,0,1}, {0,0,1}, ray, ray2)) {
-                                mesh.at(i).at(j).at(k).boundary = true;
-                            }
-                        }
-                    }
+__global__ void setPlaneBoundaryHelper(MeshCube *mesh, Vector3 startingPoint, int dx, int dy, int dz, int i, int j) {
+    Vector3 position;
+    int k = blockIdx.x * blockDim.x + threadIdx.x;
+    position.x = dx * j + startingPoint.x;
+    position.y = dy * k + startingPoint.y;
+    position.z = dz * i + startingPoint.z;
+    // if (CheckCollisionBoxSphere(boundingBoxPlane, position, dx)) {
+        Ray ray;
+        Ray ray2;
+        
+        ray.position = position;
+        ray2.position = position;
+        
+        // check if the cube is inside the plane
+        if (getCollisionPlaneRay({1,0,0}, {1,0,0}, ray, ray2)) { 
+            if (getCollisionPlaneRay({0,1,0}, {0,1,0}, ray, ray2)) {
+                if (getCollisionPlaneRay({0,0,1}, {0,0,1}, ray, ray2)) {
+                    mesh[k].boundary = true;
                 }
             }
         }
-    }
-
-    settingPlaneBOundarys = false;
-
+    // }
 }
 
 void Cfd::setPlaneBoundary() //222
 {
-    std::vector<std::thread> threads;
-    int newNz = nz - 2;
-    
-    for (int i=0; i < cores; i++) {
-        int part = 1 + (i * newNz)/cores;
-        int part2 = 1 + ((i+1) * newNz)/cores;
-        // std::cout << part << " " << part2 << " " << cores << " " << nz << std::endl;
-        // std::thread t1(&Cfd::setPlaneBoundaryHelper, this, part, part2);
-        threads.emplace_back(&Cfd::setPlaneBoundaryHelper, this, part, part2);
-    }
+    int N = mesh.at(0).at(0).size();
+    // int threadsPerBlock = 256;
+    // int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 
-    for (int i=0; i < cores; i++) {
-        threads.at(i).join();
+    size_t size = sizeof(MeshCube) * N;
+    for (int i=1; i < nz-1; i++) {
+        for (int j=1; j < nx-1; j++) {
+        
+            MeshCube *array = mesh.at(i).at(j).data();
+            MeshCube *array_p;
+
+            cudaMalloc(&array_p, size);
+            cudaMemcpy(array_p, array, size, cudaMemcpyHostToDevice);
+            
+            setPlaneBoundaryHelper<<<grid_size, block_size>>>(array_p, startingPoint, dx, dy, dz, i, j);
+
+            cudaMemcpy(array, array_p, size, cudaMemcpyDeviceToHost);
+        }
     }
+    std::cout << "done this" << std::endl;
 }
 
 void Cfd::resetMesh() {
@@ -159,31 +158,56 @@ void Cfd::resetMesh() {
     }
 }
 
-void Cfd::velocityMovement(float dT, int startIndex, int endIndex) {
-    for (int i=startIndex; i < endIndex; i++) {
-        for (int j=1; j < nx-1; j++) {
-            for (int k=1; k < ny-1; k++) {
-                if (!mesh.at(i).at(j).at(k).boundary) {
-                    double duDt = -(mesh.at(i).at(j).at(k).velocityX * (mesh.at(i).at(j).at(k).velocityX - mesh.at(i).at(j-1).at(k).velocityX) / dx +
-                            mesh.at(i).at(j).at(k).velocityY * (mesh.at(i).at(j).at(k).velocityX - mesh.at(i).at(j).at(k-1).velocityX) / dy + 
-                            mesh.at(i).at(j).at(k).velocityZ * (mesh.at(i).at(j).at(k).velocityX - mesh.at(i-1).at(j).at(k).velocityX) / dz) / dx;
+__global__ void velocityMovementHelper(int N, int M, int B, MeshCube *mesh, float dT, double rho, double dx, double dy, double dz) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    int k = index / (M * B);
+    int j = (index % (M * B)) / B;
+    int i = (index % B);
 
-                    double dvDt = -(mesh.at(i).at(j).at(k).velocityX * (mesh.at(i).at(j).at(k).velocityY - mesh.at(i).at(j-1).at(k).velocityY) / dx +
-                            mesh.at(i).at(j).at(k).velocityY * (mesh.at(i).at(j).at(k).velocityY - mesh.at(i).at(j).at(k-1).velocityY) / dy + 
-                            mesh.at(i).at(j).at(k).velocityZ * (mesh.at(i).at(j).at(k).velocityY - mesh.at(i-1).at(j).at(k).velocityY) / dz) / dy;
+    if (i < N * M * B && (i > 0 && i < N-1) && (j > 0 && j < M-1) && (k > 0 && k < B-1)) {
+        // int index = z * (nx * ny) + x * ny + y;
+        if (!mesh[index].boundary) {
+            double vx = mesh[index].velocityX;
+            double vy = mesh[index].velocityY;
+            double vz = mesh[index].velocityZ;
+            double duDt = -(vx * (vx - mesh[k + i*M + (j-1) * B].velocityX) / dx +
+                    vy * (vx - mesh[(k-1) + i*M + j * B].velocityX) / dy + 
+                    vz * (vx - mesh[k + (i-1)*M + j * B].velocityX) / dz) / dx;
 
-                    double dwDt = -(mesh.at(i).at(j).at(k).velocityX * (mesh.at(i).at(j).at(k).velocityZ - mesh.at(i).at(j-1).at(k).velocityZ) / dx +
-                            mesh.at(i).at(j).at(k).velocityY * (mesh.at(i).at(j).at(k).velocityZ - mesh.at(i).at(j).at(k-1).velocityZ) / dy +
-                            mesh.at(i).at(j).at(k).velocityZ * (mesh.at(i).at(j).at(k).velocityZ - mesh.at(i-1).at(j).at(k).velocityZ) / dz) / dz;
+            double dvDt = -(vx * (vy - mesh[k + i*M + (j-1) * B].velocityY) / dx +
+                    vy * (vy - mesh[(k-1) + i*M + j * B].velocityY) / dy + 
+                    vz * (vy - mesh[k + (i-1)*M + j * B].velocityY) / dz) / dy;
 
-                    tempVelocity.at(i).at(j).at(k).x = mesh.at(i).at(j).at(k).velocityX + duDt * dT;
-                    tempVelocity.at(i).at(j).at(k).y = mesh.at(i).at(j).at(k).velocityY + dvDt * dT;
-                    tempVelocity.at(i).at(j).at(k).z = mesh.at(i).at(j).at(k).velocityZ + dwDt * dT;
-                    mesh.at(i).at(j).at(k).pressure = (duDt / dT + dvDt / dT + dwDt / dT) * rho; 
-                }
-            }
+            double dwDt = -(vx * (vz - mesh[k + i*M + (j-1) * B].velocityZ) / dx +
+                    vy * (vz - mesh[(k-1) + i*M + j * B].velocityZ) / dy +
+                    vz * (vz - mesh[k + (i-1)*M + j * B].velocityZ) / dz) / dz;
+
+            mesh[index].tempVelocity.x = mesh[index].velocityX + duDt * dT;
+            mesh[index].tempVelocity.y = mesh[index].velocityY + dvDt * dT;
+            mesh[index].tempVelocity.z = mesh[index].velocityZ + dwDt * dT;
+            mesh[index].pressure = (duDt / dT + dvDt / dT + dwDt / dT) * rho; 
         }
-    } 
+    }
+}
+
+void Cfd::velocityMovement(float dT) {
+    // std::cout << "start " << std::endl;
+    int N = mesh.at(0).at(0).size();
+    int M = mesh.at(0).size();
+    int B = mesh.size();
+
+    MeshCube *array_p;
+
+    cudaMalloc(&array_p, N * M * B * sizeof(MeshCube));
+    cudaMemcpy(array_p, mesh_array, N * M * B * sizeof(MeshCube), cudaMemcpyHostToDevice);
+    
+    velocityMovementHelper<<<grid_size, block_size>>>(N, M, B, array_p, dT, rho, dx, dy, dz);
+
+    cudaMemcpy(mesh_array, array_p, N * M * B * sizeof(MeshCube), cudaMemcpyDeviceToHost);
+
+    cudaFree(array_p);
+    // free(array);
 }
 
 Vector3 Cfd::getNetPressureOnPlane() {
@@ -224,6 +248,26 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
     float cl, cd;
     double tijd = 0;
     std::vector<std::vector<std::vector<double>>> *diffuseV;
+
+    int N = mesh.at(0).at(0).size();
+    int M = mesh.at(0).size();
+    int B = mesh.size();
+
+    
+    // size_t size = N * M * B * sizeof(MeshCube);
+    // MeshCube *mesh_array = (MeshCube*)malloc(N * M * B * sizeof(MeshCube));
+
+    // std::cout << "this?? " << std::endl;
+
+    for (int i=0; i < N; i++) {
+        for (int j=0; j < M; j++) {
+            for (int k=0; k < B; k++) {
+                mesh_array[k + i*M + j * B] = mesh.at(i).at(j).at(k);
+            }
+        }
+    } 
+
+    std::cout << "start loop for getting pressure and velocity" << std::endl;
     while (tijd < maxTime)
     {
         tijd += dT;
@@ -233,23 +277,25 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         std::vector<std::thread> threads;
         int newNz = nz - 2;
 
-        for (int i=0; i < cores; i++) {
-            int part = 1 + (i * newNz)/cores;
-            int part2 = 1 + ((i+1) * newNz)/cores;
-            threads.emplace_back(&Cfd::velocityMovement, this, dT, part, part2);
-        }
+        // for (int i=0; i < cores; i++) {
+        //     int part = 1 + (i * newNz)/cores;
+        //     int part2 = 1 + ((i+1) * newNz)/cores;
+        //     threads.emplace_back(&Cfd::velocityMovement, this, dT, part, part2);
+        // }
 
-        for (int i=0; i < cores; i++) {
-            threads.at(i).join();
-        }
+        // for (int i=0; i < cores; i++) {
+        //     threads.at(i).join();
+        // }
+        velocityMovement(dT);
 
         for (int i=1; i < nz-1; i++) {
             for (int j=1; j < nx-1; j++) {
                 for (int k=1; k < ny-1; k++) {
                     if (!mesh.at(i).at(j).at(k).boundary) {
-                        mesh.at(i).at(j).at(k).velocityX = tempVelocity.at(i).at(j).at(k).x;
-                        mesh.at(i).at(j).at(k).velocityY = tempVelocity.at(i).at(j).at(k).y;
-                        mesh.at(i).at(j).at(k).velocityZ = tempVelocity.at(i).at(j).at(k).z;
+
+                        mesh_array[k + i*M + j * B].velocityX = mesh_array[k + i*M + j * B].tempVelocity.x;
+                        mesh_array[k + i*M + j * B].velocityX = mesh_array[k + i*M + j * B].tempVelocity.y;
+                        mesh_array[k + i*M + j * B].velocityX = mesh_array[k + i*M + j * B].tempVelocity.z;
                     }
                 }
             }
@@ -260,7 +306,13 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         }
     }
     std::cout << "done with loop getting pressure and velocity" << maxTime << std::endl;
-
+    for (int i=0; i < N; i++) {
+        for (int j=0; j < M; j++) {
+            for (int k=0; k < B; k++) {
+                mesh.at(i).at(j).at(k) = mesh_array[k + i*M + j * B];
+            }
+        }
+    } 
     // TODO correction fase
     // correction 
 
@@ -433,6 +485,9 @@ void Cfd::Draw() {
 }
 
 void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
+    N = mesh.at(0).at(0).size();
+    M = mesh.at(0).size();
+    B = mesh.size();
     double stepsize = 360.0f/steps;
     std::vector<std::vector<Vector2>> cfdResults;
     for (double i=0; i <= 360; i+=stepsize) { // pitch
@@ -440,7 +495,7 @@ void Cfd::run(int steps, double stepsizePitch, double stepsizeYaw) { //333
         for (double j=0; j <= 360; j+=stepsize) { // yaw
             airplane.transform = MatrixRotateXYZ2((Vector3){DEG2RAD * i, DEG2RAD * j, DEG2RAD * 0});
             resetMesh();
-            setPlaneBoundary();
+            // setPlaneBoundary();
                 // for (int j=1; j < ny-1; j++) {
                 //     mesh.at(1).at(nx/2).at(j).boundary = true;
                 // }
@@ -486,7 +541,12 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
     Re = 100;
     nu = 1 / Re;
 
+    // set variables for gpu
+    block_size = 256;
+    grid_size = ((N * M * B + 255) / block_size);
+
     // set multithreading variables
+    MeshCube *mesh_array = (MeshCube*)malloc(N * M * B * sizeof(MeshCube));
     cores = 12;
     settingPlaneBOundarys = false;
 

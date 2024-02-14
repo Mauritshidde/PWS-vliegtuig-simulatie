@@ -27,25 +27,25 @@ private:
     Model airplane;
     Texture airplaneTexture;
     bool drawing, drawing3D;
-    BoundingBox boundingBoxPlane;
     Vector3 boundingBoxPlaneMin;
     Vector3 boundingBoxPlaneMax;
+
+    // gpu programming
+    MeshCube *mesh_array;
+    int block_size;
+    int grid_size;
+    int N;
+    int M;
+    int B;
 
     // multi threading
     int cores;
     bool settingPlaneBOundarys;
 
     // mesh variables
-    int nx;   // amount of cells in x direction // steps in x direction
-    int ny;   // amount of cells in y direction // steps in y direction
-    int nz;
-    double dx; // step size in x
-    double dy; // step size in y
-    double dz; // step size in z
     double dxi; // 1/dx
     double dyi; // 1/dy
     double dzi; // 1/dz
-    Vector3 startingPoint; // starting point of the grid
     FluidDynamicsModel plane;
 
     // calculation consts
@@ -56,7 +56,6 @@ private:
     double maxTime; // max time for the program untill the program should quit
     double dT; // time steps
 
-    std::vector<std::vector<std::vector<MeshCube>>> mesh;
     std::vector<std::vector<std::vector<double>>> divergenceVelocityScalarField;
     std::vector<std::vector<std::vector<Vector3>>> gradientPressureField, divergenceVelocityField, divergenceFreeField;
     std::vector<std::vector<std::vector<Vector3>>> tempVelocity;
@@ -68,13 +67,11 @@ private:
     void setBoundaryConditions(double velocityXDirectionStart, double velocityYDirectionStart, double velocityZDirectionStart, double velocityXDirectionEnd, double velocityYDirectionEnd, double velocityZDirectionEnd);
 
     // functions for setting the plane boundary
-    void setPlaneBoundaryHelper(int startIndex, int endIndex);
-    bool getCollisionPlaneRay(Vector3 direction, Vector3 oppositeDirection, Ray ray, Ray ray2);
-    void detectColission();
+    // void setPlaneBoundaryHelper(std::vector<std::vector<std::vector<MeshCube>>> *mesh);
     void setPlaneBoundary(); // make parts of the plane part of the boundary conditions 
 
     // functions for calculating the movement of the fluid
-    void velocityMovement(float dT, int startIndex, int endIndex);
+    void velocityMovement(float dT);
     Vector3 getNetPressureOnPlane();
     Vector2 calc(double anglePitch, double angleYaw);    
 
@@ -84,6 +81,18 @@ private:
     void draw2DGrid();
     void Draw();
 public:
+    int nx;   // amount of cells in x direction // steps in x direction
+    int ny;   // amount of cells in y direction // steps in y direction
+    int nz;
+    double dx; // step size in x
+    double dy; // step size in y
+    double dz; // step size in z
+    std::vector<std::vector<std::vector<MeshCube>>> mesh;
+    Vector3 startingPoint; // starting point of the grid
+    BoundingBox boundingBoxPlane;
+    bool getCollisionPlaneRay(Vector3 direction, Vector3 oppositeDirection, Ray ray, Ray ray2);
+
+    void detectColission();
     void run(int steps, double stepsizePitch, double stepsizeYaw);
 
     Cfd(int setnx = 5, int setny = 5, int setnz = 5, double deltaTime = 0.1, double setMaxTime = 1000, double setRho = 1.293, bool drawingEnabled = true, bool draw3D = true);

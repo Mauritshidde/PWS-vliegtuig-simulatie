@@ -1,3 +1,5 @@
+#include "raylib.h"
+
 class MeshCube
 {
 private:
@@ -9,6 +11,7 @@ public:
     double newVelocityX;
     double newVelocityY;
     double newVelocityZ;
+    Vector3 tempVelocity;
     
     double pressure;
     double newPressure;

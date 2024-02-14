@@ -53,6 +53,11 @@ void RunSimulation::Start(int screenWidth, int screenHeight)
     
     plotXRange = linspace(0, 100, 101);
     timeElapsed = 0;
+    std::vector<double> plotZange = {22, 26, 29, 30, 34, 40, 45, 50, 56, 63, 70, 76, 84, 90};
+    std::vector<double> vels = {0.50, 0.43, 0.40, 0.38, 0.30, 0.24, 0.20, 0.15, 0.11, 0.1, 0.08, 0.05, 0.02, 0.01};
+
+    mat::plot(plotZange, vels, "-o");
+    mat::save("velocity.pdf");
     // Vector2 aeroConsts;
     // for (float x = 0; x < plotXRange.size(); x++)
     // {
