@@ -573,7 +573,7 @@ Cfd::Cfd(int setnx, int setny, int setnz, double deltaTime, double setMaxTime, d
     nu = 1 / Re;
 
     // set variables for gpu
-    block_size = 256;
+    block_size = 2048;
 
     // set multithreading variables
     cores = 12;
