@@ -122,11 +122,11 @@ __global__ void setPlaneBoundaryHelper(MeshCube *mesh, Vector3 startingPoint, in
 
 void Cfd::setPlaneBoundary() //222
 {
-    int N = mesh.at(0).at(0).size();
+    int N2 = mesh.at(0).at(0).size();
     // int threadsPerBlock = 256;
     // int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 
-    size_t size = sizeof(MeshCube) * N;
+    size_t size = sizeof(MeshCube) * N2;
     for (int i=1; i < nz-1; i++) {
         for (int j=1; j < nx-1; j++) {
         
@@ -166,22 +166,22 @@ __global__ void velocityMovementHelper(int N, int M, int B, MeshCube *mesh, floa
     int i = (index % B);
 
     if (i < N * M * B && (i > 0 && i < N-1) && (j > 0 && j < M-1) && (k > 0 && k < B-1)) {
-        // int index = z * (nx * ny) + x * ny + y;
         if (!mesh[index].boundary) {
+            // int index = z * (nx * ny) + x * ny + y;
             double vx = mesh[index].velocityX;
             double vy = mesh[index].velocityY;
             double vz = mesh[index].velocityZ;
-            double duDt = -(vx * (vx - mesh[k + i*M + (j-1) * B].velocityX) / dx +
-                    vy * (vx - mesh[(k-1) + i*M + j * B].velocityX) / dy + 
-                    vz * (vx - mesh[k + (i-1)*M + j * B].velocityX) / dz) / dx;
+            double duDt = -(vx * (vx - mesh[k + i*M * B + (j-1) * B].velocityX) / dx +
+                    vy * (vx - mesh[(k-1) + i*M * B + j * B].velocityX) / dy + 
+                    vz * (vx - mesh[k + (i-1)*M * B + j * B].velocityX) / dz) / dx;
 
-            double dvDt = -(vx * (vy - mesh[k + i*M + (j-1) * B].velocityY) / dx +
-                    vy * (vy - mesh[(k-1) + i*M + j * B].velocityY) / dy + 
-                    vz * (vy - mesh[k + (i-1)*M + j * B].velocityY) / dz) / dy;
+            double dvDt = -(vx * (vy - mesh[k + i*M * B + (j-1) * B].velocityY) / dx +
+                    vy * (vy - mesh[(k-1) + i*M * B + j * B].velocityY) / dy + 
+                    vz * (vy - mesh[k + (i-1)*M * B + j * B].velocityY) / dz) / dy;
 
-            double dwDt = -(vx * (vz - mesh[k + i*M + (j-1) * B].velocityZ) / dx +
-                    vy * (vz - mesh[(k-1) + i*M + j * B].velocityZ) / dy +
-                    vz * (vz - mesh[k + (i-1)*M + j * B].velocityZ) / dz) / dz;
+            double dwDt = -(vx * (vz - mesh[k + i*M * B + (j-1) * B].velocityZ) / dx +
+                    vy * (vz - mesh[(k-1) + i*M * B + j * B].velocityZ) / dy +
+                    vz * (vz - mesh[k + (i-1)*M * B + j * B].velocityZ) / dz) / dz;
 
             mesh[index].tempVelocity.x = mesh[index].velocityX + duDt * dT;
             mesh[index].tempVelocity.y = mesh[index].velocityY + dvDt * dT;
@@ -191,24 +191,36 @@ __global__ void velocityMovementHelper(int N, int M, int B, MeshCube *mesh, floa
     }
 }
 
-void Cfd::velocityMovement(float dT) {
-    // std::cout << "start " << std::endl;
-    int N = mesh.at(0).at(0).size();
-    int M = mesh.at(0).size();
-    int B = mesh.size();
-
-    MeshCube *array_p;
-
-    cudaMalloc(&array_p, N * M * B * sizeof(MeshCube));
-    cudaMemcpy(array_p, mesh_array, N * M * B * sizeof(MeshCube), cudaMemcpyHostToDevice);
+__global__ void velocityMovementUpdater(int N, int M, int B, MeshCube *mesh) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
     
-    velocityMovementHelper<<<grid_size, block_size>>>(N, M, B, array_p, dT, rho, dx, dy, dz);
+    int k = index / (M * B);
+    int j = (index % (M * B)) / B;
+    int i = (index % B);
 
-    cudaMemcpy(mesh_array, array_p, N * M * B * sizeof(MeshCube), cudaMemcpyDeviceToHost);
-
-    cudaFree(array_p);
-    // free(array);
+    if (i < N * M * B && (i > 0 && i < N-1) && (j > 0 && j < M-1) && (k > 0 && k < B-1)) {
+        // int index = z * (nx * ny) + x * ny + y;
+        if (!mesh[index].boundary) {
+            mesh[k + i*M * B + j * B].velocityX = mesh[k + i*M * B + j * B].tempVelocity.x;
+            mesh[k + i*M * B + j * B].velocityX = mesh[k + i*M * B + j * B].tempVelocity.y;
+            mesh[k + i*M * B + j * B].velocityX = mesh[k + i*M * B + j * B].tempVelocity.z; 
+        }
+    }
 }
+
+// void Cfd::velocityMovement(float dT) {
+//     // std::cout << "start " << std::endl;
+//     // int N = mesh.at(0).at(0).size();
+//     // int M = mesh.at(0).size();
+//     // int B = mesh.size();
+    
+
+//     // auto start = std::chrono::system_clock::now();
+//     velocityMovementHelper<<<grid_size, block_size>>>(N, M, B, array_p, dT, rho, dx, dy, dz);
+//     // auto end = std::chrono::system_clock::now();
+//     // std::chrono::duration<double> elapsed_seconds = end-start;
+//     // std::cout << elapsed_seconds.count() << std::endl;
+// }
 
 Vector3 Cfd::getNetPressureOnPlane() {
     Vector3 netPressure = {0,0,0};
@@ -250,16 +262,24 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
     std::vector<std::vector<std::vector<double>>> *diffuseV;
     
     for (int i=0; i < N; i++) {
+        
         for (int j=0; j < M; j++) {
             for (int k=0; k < B; k++) {
-                mesh_array[k + i*M + j * B] = mesh.at(i).at(j).at(k);
+                mesh_array[k + i*M * B + j * B] = mesh.at(i).at(j).at(k);
             }
         }
     } 
 
     std::cout << "start loop for getting pressure and velocity" << std::endl;
+    // setting gpu memory
+    MeshCube *array_p;
+
+    cudaMalloc(&array_p, N * M * B * sizeof(MeshCube));
+    cudaMemcpy(array_p, mesh_array, N * M * B * sizeof(MeshCube), cudaMemcpyHostToDevice);
+    
     while (tijd < maxTime)
     {
+        auto start = std::chrono::system_clock::now();
         tijd += dT;
         
         // TODO the movement of the pressure NOTE density is constant
@@ -268,32 +288,53 @@ Vector2 Cfd::calc(double anglePitch, double angleYaw)
         int newNz = nz - 2;
 
         // std::cout << "start movement" << std::endl;
-        velocityMovement(dT);
+        // velocityMovement(dT);
+
+        velocityMovementHelper<<<grid_size, block_size>>>(N, M, B, array_p, dT, rho, dx, dy, dz);
+        velocityMovementUpdater<<<grid_size, block_size>>>(N, M, B, array_p);
+        
+
+
         // std::cout << "end movement" << std::endl;
 
-        for (int i=1; i < nz-1; i++) {
-            for (int j=1; j < nx-1; j++) {
-                for (int k=1; k < ny-1; k++) {
-                    if (!mesh.at(i).at(j).at(k).boundary) {
-                        mesh_array[k + i*M + j * B].velocityX = mesh_array[k + i*M + j * B].tempVelocity.x;
-                        mesh_array[k + i*M + j * B].velocityX = mesh_array[k + i*M + j * B].tempVelocity.y;
-                        mesh_array[k + i*M + j * B].velocityX = mesh_array[k + i*M + j * B].tempVelocity.z;
-                    }
-                }
-            }
-        }
+        // for (int i=1; i < nz-1; i++) {
+        //     for (int j=1; j < nx-1; j++) {
+        //         for (int k=1; k < ny-1; k++) {
+        //             if (!mesh_array[k + i*M * B + j * B].boundary) {
+        //                 mesh_array[k + i*M * B + j * B].velocityX = mesh_array[k + i*M * B + j * B].tempVelocity.x;
+        //                 mesh_array[k + i*M * B + j * B].velocityX = mesh_array[k + i*M * B + j * B].tempVelocity.y;
+        //                 mesh_array[k + i*M * B + j * B].velocityX = mesh_array[k + i*M * B + j * B].tempVelocity.z;
+        //             }
+        //         }
+        //     }
+        // }
 
         if (drawing) {
+            // for (int i=0; i < N; i++) {
+            //     for (int j=0; j < M; j++) {
+            //         for (int k=0; k < B; k++) {
+            //             mesh.at(i).at(j).at(k) = mesh_array[k + i*M * B + j * B];
+            //         }
+            //     }
+            // } 
             Draw();
         }
-
+        
+        auto end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << elapsed_seconds.count() << std::endl;
         std::cout << tijd << std::endl;
     }
+
+    // deleting array_p and writing gpu memory to cpu
+    cudaMemcpy(mesh_array, array_p, N * M * B * sizeof(MeshCube), cudaMemcpyDeviceToHost);
+    cudaFree(array_p);
+
     std::cout << "done with loop getting pressure and velocity" << maxTime << std::endl;
     for (int i=0; i < N; i++) {
         for (int j=0; j < M; j++) {
             for (int k=0; k < B; k++) {
-                mesh.at(i).at(j).at(k) = mesh_array[k + i*M + j * B];
+                mesh.at(i).at(j).at(k) = mesh_array[k + i*M * B + j * B];
             }
         }
     } 
@@ -428,13 +469,13 @@ void Cfd::draw2DGrid() {
             point.y = k * dy - 0.5 * dy;
             point.z = startingPoint.z + dz - 0.5 * dz;
 
-            if (mesh_array[k + 1*M + j * B].boundary) {
+            if (mesh_array[k + 1*M * B + j * B].boundary) {
                 DrawRectangle(point.x*4, point.y*4, dx*4, dy*4, BLACK);
 
             } else {
-                float velocityX = mesh_array[k + 1*M + j * B].velocityX;
-                float velocityY = mesh_array[k + 1*M + j * B].velocityY;
-                float velocityZ = mesh_array[k + 1*M + j * B].velocityZ;
+                float velocityX = mesh_array[k + 1*M * B + j * B].velocityX;
+                float velocityY = mesh_array[k + 1*M * B + j * B].velocityY;
+                float velocityZ = mesh_array[k + 1*M * B + j * B].velocityZ;
                 float velocity = sqrt(pow(velocityX,2) + pow(velocityY,2) + pow(velocityZ,2));
                 
                 double val = (velocity / 200.0f) *300;
@@ -447,7 +488,7 @@ void Cfd::draw2DGrid() {
                 // std::cout << velocity << " ";
             }
         }
-        // std::cout  << std::endl;0
+        // std::cout  << std::endl;
     }
     // std::cout  << std::endl;
     // std::cout  << std::endl;
